@@ -2,12 +2,14 @@ import axios, {
     type AxiosInstance,
     type AxiosError,
     type AxiosRequestConfig,
-    type AxiosResponse
+    type AxiosResponse,
+    AxiosHeaders
 } from 'axios';
 import { message } from 'ant-design-vue';
 const [messageApi] = message.useMessage();
-import  local_config from '../../config/local.env';
-
+import local_config from '@config/local.env';
+import router from '@/router/main';
+import AuthService from '@/service/auth_service';
 
 // 数据返回的接口
 interface Result {
@@ -19,7 +21,6 @@ interface ResultData<T = any> extends Result {
     data?: T;
 }
 
-const URL: string = import.meta.env.VITE_AXIOS_SERVER_URL || '';
 
 // 使用常量对象替代枚举
 const RequestEnums = {
@@ -47,7 +48,16 @@ class RequestHttp {
          */
         this.service.interceptors.request.use(
             (conf) => {
-                // 可添加token等认证信息
+                const token = AuthService.getToken();
+                if (token && !AuthService.isTokenExpired(token)) {
+                    const headers = AxiosHeaders.from(conf.headers || {});
+                    headers.set('Authorization', `Bearer ${token}`);
+                    conf.headers = headers;
+                } else {
+                    AuthService.clearToken();
+                    // 这里可以选择跳转到登录页
+                    router.push('/login');
+                }
                 return conf;
             },
             (error) => {
@@ -63,6 +73,7 @@ class RequestHttp {
         this.service.interceptors.response.use(
             (response: AxiosResponse) => {
                 const { data } = response; // 提取response的data部分
+
                 if (data.code !== RequestEnums.SUCCESS) {
                     // 如果请求失败，统一弹出错误提示
                     messageApi.error(data.msg || '请求失败');
@@ -76,6 +87,8 @@ class RequestHttp {
                     // 服务器响应失败
                     const status = error.response.status;
                     if (status === 401) {
+                        AuthService.clearToken();
+                        router.push('/login');
                         messageApi.error('登录已过期，请重新登录');
                     } else if (status === 500) {
                         messageApi.error('服务器错误，请稍后重试');
@@ -134,15 +147,5 @@ class RequestHttp {
 }
 
 const requestHttp = new RequestHttp(config);
-
-// 使用示例
-requestHttp
-    .retryRequest('api/endpoint', 3, { method: 'GET' })
-    .then((data) => {
-        console.log('请求成功:', data);
-    })
-    .catch((error) => {
-        console.error('请求失败:', error);
-    });
 
 export { requestHttp };

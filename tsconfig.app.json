@@ -5,8 +5,10 @@
     "types": ["vite/client"],
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "@config/*": ["config/*"]
     },
+    "ignoreDeprecations": "6.0",
 
     /* Linting */
     "strict": true,

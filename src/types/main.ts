@@ -21,3 +21,8 @@ export interface ApiResponse<T> {
 }
 
 
+// JWT 检查选项接口
+export interface JwtCheckOptions {
+    leewayMs?: number;           // 默认 30s
+    treatNoExpAsExpired?: boolean; // 没有 exp 怎么处理
+}
