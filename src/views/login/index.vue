@@ -1,13 +1,108 @@
 <template>
-    <div>
-        登录页面
+    <div class="login">
+        <a-card class="login-container">
+            <template #title>
+                <div class="card-title">登录</div>
+            </template>
+            <a-form :model="formState" @finish="handleFinish" @finishFailed="handleFinishFailed">
+                <a-form-item>
+                    <a-input v-model:value="formState.user" placeholder="用户名">
+                        <template #prefix>
+                            <UserOutlined class="icon-class" />
+                        </template>
+                    </a-input>
+                </a-form-item>
+                <a-form-item>
+                    <a-input v-model:value="formState.password" type="password" placeholder="密码">
+                        <template #prefix>
+                            <LockOutlined class="icon-class" />
+                        </template>
+                    </a-input>
+                </a-form-item>
+                <a-form-item>
+                    <a-button type="primary" html-type="submit" class="login-button" @click="handleLogin">
+                        登录
+                    </a-button>
+                    <p>还没有账号？点击<a>注册</a>一个账号</p>
+                </a-form-item>
+            </a-form>
+        </a-card>
     </div>
+
+
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
+import { reactive } from 'vue';
+import { Form, Input, Button, Card } from 'ant-design-vue';
+import { UserOutlined, LockOutlined } from '@ant-design/icons-vue';
+import type { UnwrapRef } from 'vue';
+import type { FormProps } from 'ant-design-vue';
+import type { UserLoginData } from '@/types/main';
+import { login as loginApi } from '@/api/user/user';
+
+const AForm = Form;
+const AFormItem = Form.Item;
+const AInput = Input;
+const AButton = Button;
+const ACard = Card;
+
+interface FormState {
+    user: string;
+    password: string;
+}
+const formState: UnwrapRef<FormState> = reactive({
+    user: '',
+    password: '',
+});
+const handleFinish: FormProps['onFinish'] = values => {
+    console.log(values, formState);
+};
+const handleFinishFailed: FormProps['onFinishFailed'] = errors => {
+    console.log(errors);
+};
+
+const handleLogin = async () => {
+    try {
+        const data: UserLoginData = {
+            username: formState.user,
+            password: formState.password,
+        };
+        const response = await loginApi(data);
+        console.log('登录成功，返回数据：', response);
+    } catch (error) {
+        console.error('登录失败：', error);
+    }
+};
 
 </script>
+<style scoped lang="scss">
+.login {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    background: url('../../assets/login.png') center/cover no-repeat;
+    
+    width: 100%;
+    height: 100%;    
+    box-sizing: border-box;
+    
+    .login-container {
+        width: 350px;
+        margin-right: 100px;
 
-<style scoped>
+        .card-title {
+            width: 100%;
+        }
 
+        .login-button {
+            width: 100%;
+        }
+
+        .icon-class {
+            color: rgba(0, 0, 0, 0.25);
+        }
+
+    }
+}
 </style>
