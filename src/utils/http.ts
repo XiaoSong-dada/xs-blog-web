@@ -1,0 +1,148 @@
+import axios, {
+    type AxiosInstance,
+    type AxiosError,
+    type AxiosRequestConfig,
+    type AxiosResponse
+} from 'axios';
+import { message } from 'ant-design-vue';
+const [messageApi] = message.useMessage();
+import  local_config from '../../config/local.env';
+
+
+// 数据返回的接口
+interface Result {
+    code: number;
+    msg: string;
+}
+
+interface ResultData<T = any> extends Result {
+    data?: T;
+}
+
+const URL: string = import.meta.env.VITE_AXIOS_SERVER_URL || '';
+
+// 使用常量对象替代枚举
+const RequestEnums = {
+    TIMEOUT: 20000,
+    OVERDUE: 600,  // 登录失效
+    FAIL: 999,     // 请求失败
+    SUCCESS: 200   // 请求成功
+} as const;
+
+const config = {
+    baseURL: local_config.baseURL,
+    timeout: local_config.TIMEOUT,
+    withCredentials: true
+};
+
+class RequestHttp {
+    service: AxiosInstance;
+
+    public constructor(config: AxiosRequestConfig) {
+        this.service = axios.create(config);
+
+        /** 
+         * 请求拦截器
+         * 客户端发送请求 -> [请求拦截器] -> 服务器
+         */
+        this.service.interceptors.request.use(
+            (conf) => {
+                // 可添加token等认证信息
+                return conf;
+            },
+            (error) => {
+                messageApi.error('请求失败，请稍后重试');
+                return Promise.reject(error);
+            }
+        );
+
+        /** 
+         * 响应拦截器
+         * 服务器响应 -> [响应拦截器] -> 客户端
+         */
+        this.service.interceptors.response.use(
+            (response: AxiosResponse) => {
+                const { data } = response; // 提取response的data部分
+                if (data.code !== RequestEnums.SUCCESS) {
+                    // 如果请求失败，统一弹出错误提示
+                    messageApi.error(data.msg || '请求失败');
+                    return Promise.reject(data.msg || '请求失败');
+                }
+                return data; // 返回ResultData类型的数据
+            },
+            (error: AxiosError) => {
+                // 根据错误类型做相应处理
+                if (error.response) {
+                    // 服务器响应失败
+                    const status = error.response.status;
+                    if (status === 401) {
+                        messageApi.error('登录已过期，请重新登录');
+                    } else if (status === 500) {
+                        messageApi.error('服务器错误，请稍后重试');
+                    } else {
+                        messageApi.error(`请求错误，状态码：${status}`);
+                    }
+                } else if (error.request) {
+                    // 请求没有响应
+                    messageApi.error('网络请求失败，请检查网络连接');
+                } else {
+                    // 其他错误
+                    messageApi.error('请求失败，请稍后重试');
+                }
+                return Promise.reject(error);
+            }
+        );
+    }
+
+    /**
+     * 通用的请求方法
+     * @param url 请求地址
+     * @param config 请求配置
+     * @returns 响应结果
+     */
+    public async request<T>(url: string, config: AxiosRequestConfig = {}): Promise<ResultData<T>> {
+        try {
+            const response = await this.service.request<T>({ url, ...config });
+            // 提取返回的 data 部分并返回 ResultData 类型
+            return response.data as ResultData<T>;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    /**
+     * 简单的重试机制
+     * @param url 请求地址
+     * @param retries 重试次数
+     * @param config 请求配置
+     */
+    public async retryRequest<T>(url: string, retries: number = 3, config: AxiosRequestConfig = {}): Promise<ResultData<T>> {
+        let lastError: any;
+        for (let attempt = 1; attempt <= retries; attempt++) {
+            try {
+                const response = await this.request<T>(url, config);
+                return response;
+            } catch (error) {
+                lastError = error;
+                if (attempt < retries) {
+                    console.log(`重试第 ${attempt} 次...`);
+                }
+            }
+        }
+        throw lastError;
+    }
+}
+
+const requestHttp = new RequestHttp(config);
+
+// 使用示例
+requestHttp
+    .retryRequest('api/endpoint', 3, { method: 'GET' })
+    .then((data) => {
+        console.log('请求成功:', data);
+    })
+    .catch((error) => {
+        console.error('请求失败:', error);
+    });
+
+export { requestHttp };
