@@ -40,7 +40,9 @@ import type { UnwrapRef } from 'vue';
 import type { FormProps } from 'ant-design-vue';
 import type { UserLoginData } from '@/types/main';
 import { login as loginApi } from '@/api/user/user';
-
+import { useRouter } from 'vue-router';
+import { AuthService } from '@/service/auth.service';
+const router = useRouter();
 const AForm = Form;
 const AFormItem = Form.Item;
 const AInput = Input;
@@ -63,16 +65,18 @@ const handleFinishFailed: FormProps['onFinishFailed'] = errors => {
 };
 
 const handleLogin = async () => {
-    try {
-        const data: UserLoginData = {
-            username: formState.user,
-            password: formState.password,
-        };
-        const response = await loginApi(data);
-        console.log('登录成功，返回数据：', response);
-    } catch (error) {
-        console.error('登录失败：', error);
-    }
+    const data: UserLoginData = {
+        username: formState.user,
+        password: formState.password,
+    };
+
+    loginApi(data).then(res => {
+        if(res.code === 200){
+            AuthService.setToken(res.data?.token || '')
+            router.push({ path: '/' })
+        }
+    });
+
 };
 
 </script>
@@ -82,11 +86,11 @@ const handleLogin = async () => {
     justify-content: flex-end;
     align-items: center;
     background: url('../../assets/login.png') center/cover no-repeat;
-    
+
     width: 100%;
-    height: 100%;    
+    height: 100%;
     box-sizing: border-box;
-    
+
     .login-container {
         width: 350px;
         margin-right: 100px;
