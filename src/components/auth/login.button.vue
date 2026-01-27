@@ -1,12 +1,15 @@
 <template>
     <div class="login-button flex-evenly" @click="router.push('/login')">
-        <img src="../../assets/user.svg"></img>
-        <text>未登录</text>
+        <a-button type="primary">登录/注册</a-button>
     </div>
 </template>
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
+import { Button } from 'ant-design-vue';
+const AButton =  Button;
+
+
 const router = useRouter()
 
 </script>
@@ -14,7 +17,7 @@ const router = useRouter()
 <style scoped lang="scss">
 .login-button {
     gap: 20px;
-    height: 40px;
+    width: 100px;
     .user-out-lined {
         font-size: 24px;
         line-height: 40px;

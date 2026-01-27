@@ -16,6 +16,12 @@
   justify-content: start;
 }
 
+// 末尾对齐
+.flex-end {
+  display: flex;
+  justify-content: flex-end;
+}
+
 // 弹性盒水平居中
 .flex-center {
   display: flex;

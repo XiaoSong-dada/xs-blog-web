@@ -1,7 +1,6 @@
 <template>
-    <div class="user-avatar flex-evenly align-center">
+    <div class="user-avatar flex-end align-center">
         <img :src="avatarUrl"></img>
-        <text>{{ userInfo?.nick_name }}</text>
     </div>
 </template>
 
@@ -26,5 +25,6 @@ const avatarUrl = computed<string>(() => userInfo.value?.avatar_url ? userInfo.v
 .user-avatar {
     gap:30px;
     height:40px;
+    width: 50px;
 }
 </style>

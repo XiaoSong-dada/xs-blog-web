@@ -3,10 +3,17 @@
         @change="handleTabChange">
         <a-tab-pane v-for="item in homeTopMenu" :key="item.key" :tab="item.label" />
         <template #rightExtra>
-            <div class="login-status">
-                <UserAvatar v-if="isLogin"/>
-                <LoginButton  v-else />
+            <div class="top-right flex-start align-center">
+                <div>
+
+                </div>
+
+                <div class="login-status align-center flex-end">
+                    <UserAvatar v-if="isLogin" />
+                    <LoginButton v-else />
+                </div>
             </div>
+
         </template>
     </a-tabs>
 </template>
@@ -45,16 +52,17 @@ const handleTabChange = (key: string | number) => {
 
 <style scoped lang="scss">
 .top-menu {
-    .login-status {
-        height: 40px;
-        width: 140px;
-        position: relative;
-        right: 30px;
-    }
+    .top-right {
+        gap: 30px;
+        .login-status {
+            height: 40px;
+            padding-right: 20px;
+        }
 
-    :deep(ant-tabs-extra-content) {
-        height: 40px;
-        line-height: 40px;
+        :deep(ant-tabs-extra-content) {
+            height: 40px;
+            line-height: 40px;
+        }
     }
 
 }
