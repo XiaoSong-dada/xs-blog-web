@@ -20,16 +20,23 @@
 
 <script setup lang="ts">
 import { homeTopMenu } from '@/router/home.top.menu';
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, onMounted, computed } from 'vue';
 import { Tabs, TabPane } from 'ant-design-vue';
 import type { HomeTopMenuItem } from '@/types/main';
 import { useRouter } from 'vue-router';
 import { AuthService } from '@/service/auth.service';
 import LoginButton from '@/components/auth/login.button.vue';
 import UserAvatar from '@/components/auth/user.avatar.vue';
+import useAuthStore from '@/stores/auth';
+import { storeToRefs } from 'pinia';
 
 // import userDropDown from '@/components/auth/user.drop.down.vue';
-const isLogin = ref<boolean>(false)
+const authStore = useAuthStore();
+const { token } = storeToRefs(authStore);
+const isLogin = computed(() => {
+    if (!token.value) return false;
+    return !AuthService.isTokenExpired(token.value);
+});
 
 const ATabs = Tabs;
 const ATabPane = TabPane;
@@ -41,8 +48,8 @@ onMounted(() => {
     homeTopMenu.forEach(item => {
         homeTopMenuMap.set(item.key, item);
     });
-    isLogin.value = !AuthService.isUserTokenExpired()
-})
+    authStore.loadToken();
+});
 
 const handleTabChange = (key: string | number) => {
     const item = homeTopMenuMap.get(key as string);
