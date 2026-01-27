@@ -33,3 +33,13 @@ export interface HomeTopMenuItem {
     label: string;
     route: string;
 }
+
+// payload
+export interface IUserInfo {
+    username: string;
+    email: string | null | undefined;
+    status: string;
+    is_admin: boolean;
+    avatar_url: string | null | undefined;
+    nick_name: string | null | undefined;
+}
