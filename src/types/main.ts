@@ -43,3 +43,8 @@ export interface IUserInfo {
     avatar_url: string | null | undefined;
     nick_name: string | null | undefined;
 }
+
+// 显示下拉框
+export interface IDropDown {
+    isShow: boolean
+}

@@ -1,7 +1,12 @@
 <template>
     <div class="user-avatar flex-end align-center">
-        <img :src="avatarUrl"></img>
+        <user-drop-down :is-show="true">
+            <template #image>
+                <img :src="avatarUrl"></img>
+            </template>
+        </user-drop-down>
     </div>
+
 </template>
 
 <script setup lang="ts">
@@ -9,8 +14,8 @@ import defaultAvatar from '@/assets/user.svg'
 import { onMounted, ref, computed } from 'vue';
 import type { IUserInfo } from '@/types/main'
 import { AuthService } from '@/service/auth.service';
+import userDropDown from './user.drop.down.vue';
 const userInfo = ref<IUserInfo>()
-
 onMounted(() => {
     console.log(AuthService.getUserInfo());
     const user = AuthService.getUserInfo();
@@ -23,8 +28,8 @@ const avatarUrl = computed<string>(() => userInfo.value?.avatar_url ? userInfo.v
 
 <style scoped lang="scss">
 .user-avatar {
-    gap:30px;
-    height:40px;
+    gap: 30px;
+    height: 40px;
     width: 50px;
 }
 </style>
