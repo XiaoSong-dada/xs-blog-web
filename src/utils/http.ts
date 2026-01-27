@@ -8,7 +8,7 @@ import axios, {
 import { message } from 'ant-design-vue';
 import local_config from '@config/local.env';
 import router from '@/router/main';
-import AuthService from '@/service/auth_service';
+import {AuthService} from '@/service/auth.service';
 
 // 数据返回的接口
 interface Result {
@@ -78,7 +78,7 @@ class RequestHttp {
                     message.error(data.msg || '请求失败');
                     return Promise.reject(data.msg || '请求失败');
                 }
-                return data; // 返回ResultData类型的数据
+                return response
             },
             (error: AxiosError) => {
                 // 根据错误类型做相应处理
