@@ -35,13 +35,14 @@ class AuthService {
 
     static isUserTokenExpired(opt: JwtCheckOptions = {}):boolean {
         const token = AuthService.getToken()
-        if (!token) return false;
+        if (!token) return true;
         return AuthService.isTokenExpired(token , opt)
     }
 
     static getUserInfo(): IUserInfo | null | undefined {
         const token = AuthService.getToken();
-        return jwtDecode(token || '')
+        if(token) return jwtDecode(token)
+        return null
     }
 }
 
