@@ -6,7 +6,6 @@ import axios, {
     AxiosHeaders
 } from 'axios';
 import { message } from 'ant-design-vue';
-const [messageApi] = message.useMessage();
 import local_config from '@config/local.env';
 import router from '@/router/main';
 import AuthService from '@/service/auth_service';
@@ -61,7 +60,7 @@ class RequestHttp {
                 return conf;
             },
             (error) => {
-                messageApi.error('请求失败，请稍后重试');
+                message.error('请求失败，请稍后重试');
                 return Promise.reject(error);
             }
         );
@@ -76,7 +75,7 @@ class RequestHttp {
 
                 if (data.code !== RequestEnums.SUCCESS) {
                     // 如果请求失败，统一弹出错误提示
-                    messageApi.error(data.msg || '请求失败');
+                    message.error(data.msg || '请求失败');
                     return Promise.reject(data.msg || '请求失败');
                 }
                 return data; // 返回ResultData类型的数据
@@ -89,18 +88,18 @@ class RequestHttp {
                     if (status === 401) {
                         AuthService.clearToken();
                         router.push('/login');
-                        messageApi.error('登录已过期，请重新登录');
+                        message.error('登录已过期，请重新登录');
                     } else if (status === 500) {
-                        messageApi.error('服务器错误，请稍后重试');
+                        message.error('服务器错误，请稍后重试');
                     } else {
-                        messageApi.error(`请求错误，状态码：${status}`);
+                        message.error(`请求错误，状态码：${status}`);
                     }
                 } else if (error.request) {
                     // 请求没有响应
-                    messageApi.error('网络请求失败，请检查网络连接');
+                    message.error('网络请求失败，请检查网络连接');
                 } else {
                     // 其他错误
-                    messageApi.error('请求失败，请稍后重试');
+                    message.error('请求失败，请稍后重试');
                 }
                 return Promise.reject(error);
             }
