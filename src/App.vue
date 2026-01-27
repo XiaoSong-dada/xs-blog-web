@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { message } from 'ant-design-vue';
 
-const [ContextHolder] = message.useMessage();
+const [, ContextHolder] = message.useMessage();
 </script>
 
 <template>
