@@ -26,3 +26,10 @@ export interface JwtCheckOptions {
     leewayMs?: number;           // 默认 30s
     treatNoExpAsExpired?: boolean; // 没有 exp 怎么处理
 }
+
+// 首页顶部菜单项接口
+export interface HomeTopMenuItem {
+    key: string;
+    label: string;
+    route: string;
+}

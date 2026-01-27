@@ -11,6 +11,8 @@ const routes = [
         component: Index,
         children: [
             { path: '', component: Home, name: 'Home' },
+            { path: 'article', component: () => import('../views/article/index.vue'), name: 'Article' },
+            { path: 'about', component: () => import('../views/about/index.vue'), name: 'About' },
             { path: 'center', component: Center, name: 'Center' }
         ],
     },
@@ -21,16 +23,5 @@ const router = createRouter({
     history: createWebHistory(),
     routes,
 })
-
-router.beforeEach(async (to) => {
-   if (
-     
-     // ❗️ 避免无限重定向
-     to.name !== 'Login'
-   ) {
-     // 将用户重定向到登录页面
-     return { name: 'Login' }
-   }
- })
 
 export default router
