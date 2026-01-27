@@ -1,6 +1,6 @@
 <template>
     <div class="user-avatar flex-end align-center">
-        <user-drop-down :is-show="true">
+        <user-drop-down :items="menus" @select="handleSelect">
             <template #image>
                 <img :src="avatarUrl"></img>
             </template>
@@ -10,12 +10,16 @@
 </template>
 
 <script setup lang="ts">
-import defaultAvatar from '@/assets/user.svg'
+import defaultAvatar from '@/assets/user.svg';
 import { onMounted, ref, computed } from 'vue';
-import type { IUserInfo } from '@/types/main'
+import type { IDropDownItem, IUserInfo } from '@/types/main';
 import { AuthService } from '@/service/auth.service';
 import userDropDown from './user.drop.down.vue';
+import {menus} from '@/router/user.drop.items';
+import { useRouter } from 'vue-router';
+
 const userInfo = ref<IUserInfo>()
+const router = useRouter()
 onMounted(() => {
     console.log(AuthService.getUserInfo());
     const user = AuthService.getUserInfo();
@@ -23,6 +27,12 @@ onMounted(() => {
 })
 
 const avatarUrl = computed<string>(() => userInfo.value?.avatar_url ? userInfo.value?.avatar_url : defaultAvatar)
+const handleSelect = (select:IDropDownItem) =>{
+    console.log(select);
+
+    if(select.click) select.click();
+    if(select.route) router.push(select.route);
+}
 
 </script>
 

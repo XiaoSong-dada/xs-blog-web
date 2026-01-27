@@ -3,15 +3,8 @@
         <a-dropdown class="flex-end align-center">
             <slot name="image"></slot>
             <template #overlay>
-                <a-menu>
-                    <a-menu-item key="0">
-                        <a>我的创作</a>
-                    </a-menu-item>
-                    <a-menu-item key="1">
-                        <a>个人中心</a>
-                    </a-menu-item>
-                    <a-menu-divider />
-                    <a-menu-item key="3">退出</a-menu-item>
+                <a-menu style="width: 100px;">
+                    <drop-down-item :data="item" v-for="item in props.items" :key="item.key" @click="emit('select', item)"/>
                 </a-menu>
             </template>
         </a-dropdown>
@@ -19,17 +12,25 @@
 </template>
 
 <script setup lang="ts">
-import type { IDropDown } from '@/types/main'
+import type { IDropDownItem } from '@/types/main'
 import { Dropdown } from 'ant-design-vue';
-import { Menu, MenuItem , MenuDivider } from 'ant-design-vue';
+import { Menu } from 'ant-design-vue';
+import DropDownItem from './drop.down.item.vue';
 
 const ADropdown = Dropdown;
 const AMenu = Menu;
-const AMenuItem = MenuItem;
-const AMenuDivider = MenuDivider;
-
-const props = defineProps<IDropDown>()
+const props = defineProps<{items: IDropDownItem[]}>();
+const emit = defineEmits<{
+  (e: 'select', item: IDropDownItem): void
+}>();
 
 </script>
 
-<style scoped></style>
+<style scoped lang="scss">
+.user-drop-down {
+    .menu-item {
+        height: 30px;
+        width: 200px;
+    }
+}
+</style>

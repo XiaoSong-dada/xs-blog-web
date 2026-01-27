@@ -48,3 +48,17 @@ export interface IUserInfo {
 export interface IDropDown {
     isShow: boolean
 }
+
+// 用户下拉框
+export interface IDropDownItem {
+    label:string;
+    key:string | number;
+    route:string;
+    icon?:string | null | undefined;
+    before_need_driver?:boolean;
+    click?: () => void
+}
+
+export interface IItemCompoment {
+    data:IDropDownItem
+}
