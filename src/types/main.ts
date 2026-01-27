@@ -56,7 +56,7 @@ export interface IDropDownItem {
     route:string;
     icon?:string | null | undefined;
     before_need_driver?:boolean;
-    click?: () => void
+    action?: 'logout'
 }
 
 export interface IItemCompoment {

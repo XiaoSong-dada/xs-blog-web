@@ -19,7 +19,7 @@
 </template>
 
 <script setup lang="ts">
-import { homeTopMenu } from '@/router/home.top.menu';
+import { homeTopMenu } from '@/constants/home.top.menu';
 import { ref, reactive, onMounted, computed } from 'vue';
 import { Tabs, TabPane } from 'ant-design-vue';
 import type { HomeTopMenuItem } from '@/types/main';
@@ -33,11 +33,6 @@ import { storeToRefs } from 'pinia';
 // import userDropDown from '@/components/auth/user.drop.down.vue';
 const authStore = useAuthStore();
 const { token } = storeToRefs(authStore);
-const isLogin = computed(() => {
-    if (!token.value) return false;
-    return !AuthService.isTokenExpired(token.value);
-});
-
 const ATabs = Tabs;
 const ATabPane = TabPane;
 const homeTopMenuMap = reactive(new Map<string, HomeTopMenuItem>());
@@ -55,12 +50,19 @@ const handleTabChange = (key: string | number) => {
     const item = homeTopMenuMap.get(key as string);
     if (item) router.push(item.route);
 }
+
+const isLogin = computed(() => {
+    if (!token.value) return false;
+
+    return !AuthService.isTokenExpired(token.value);
+});
 </script>
 
 <style scoped lang="scss">
 .top-menu {
     .top-right {
         gap: 30px;
+
         .login-status {
             height: 40px;
             padding-right: 20px;
