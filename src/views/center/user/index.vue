@@ -7,7 +7,7 @@
                         用户名：
                     </text>
                     <div class="flex-center flex-column">
-                        <a-input v-model="params.username" />
+                        <a-input v-model:value="params.username" />
                     </div>
                 </a-flex>
                 <a-flex class="search-item">
@@ -15,7 +15,7 @@
                         昵称：
                     </text>
                     <div class="flex-center flex-column">
-                        <a-input v-model="params.nick_name" />
+                        <a-input v-model:value="params.nick_name" />
                     </div>
                 </a-flex>
                 <a-flex class="search-item">
@@ -23,7 +23,7 @@
                         邮箱：
                     </text>
                     <div class="flex-center flex-column">
-                        <a-input v-model="params.email" />
+                        <a-input v-model:value="params.email" />
                     </div>
                 </a-flex>
             </a-flex>
@@ -35,7 +35,7 @@
         <a-flex class="tools">
             <a-button type="primary" :icon="h(PlusOutlined)">新增</a-button>
         </a-flex>
-        <a-table :columns="columns" :data-source="data" :pagination="paginationComputed">
+        <a-table :columns="columns" :data-source="data" :loading="loading" :pagination="paginationComputed">
             <template #bodyCell="{ column, record }">
                 <template v-if="column.key === 'action'">
                     <a-button type="link" :icon="h(EditOutlined)">修改</a-button>
@@ -47,26 +47,17 @@
 </template>
 
 <script setup lang="ts">
-import { Table, Button, Flex, Input, type Pagination } from 'ant-design-vue';
+import { Table, Button, Flex, Input } from 'ant-design-vue';
 import { PlusOutlined } from '@ant-design/icons-vue';
 import { useUserList } from '@/hook/user/useUser';
 import { EditOutlined, DeleteOutlined, SearchOutlined, ReloadOutlined } from '@ant-design/icons-vue';
-import { computed, h, onMounted, reactive, ref } from 'vue'
-import type { IUserCell, IUserSearch } from '@/types/main';
+import { computed, h, onMounted } from 'vue'
 
 const ATable = Table;
 const AButton = Button;
 const AFlex = Flex;
 const AInput = Input;
-const params = ref<IUserSearch>({
-    username: null,
-    email: null,
-    nick_name: null,
-    offset: 1,
-    limit: 10
-})
-const data = ref<IUserCell[]>()
-const total = ref<number>(0);
+const { params, data, total, loading, fetchList, resetParams } = useUserList()
 const columns = [
     {
         title: '用户名',
@@ -106,39 +97,33 @@ const columns = [
 
 
 const onSearch = () => {
-    params.value.offset = 0
-    fetchUsers()
+    params.value.offset = 1
+    fetchList()
 }
 
 const onReset = () => {
-    params.value = { username: null, email: null, nick_name: null, offset: 0, limit: 10 }
-    fetchUsers()
+    resetParams()
+    fetchList()
 }
 
 const onTableChange = (page: number, pageSize: number) => {
     params.value.offset = page
     params.value.limit = pageSize
-    fetchUsers()
+    fetchList()
 }
 
 const paginationComputed = computed(() => ({
-    current: params.value.offset ,
+    current: params.value.offset || 0,
     pageSize: params.value.limit || 10,
     total: total.value,
     showSizeChanger: true,
     onChange: onTableChange,
-    onShowSizeChange: onTableChange
+    onShowSizeChange: onTableChange,
+    showTotal: () => `共 ${11} 条`
 }))
 
-const fetchUsers = async () => {
-    const { userList, userTotal } = await useUserList(params.value)
-    data.value = userList.value || []
-    total.value = userTotal.value || 0
-}
-
 onMounted(async () => {
-    const { userList } = await useUserList({});
-    data.value = userList.value
+    await fetchList()
 })
 </script>
 

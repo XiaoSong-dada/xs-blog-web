@@ -90,8 +90,14 @@ export interface IUserCell {
 
 // 用户搜索
 export interface IUserSearch extends IPages{
-    username?: string | null;
-    email?: string | null;
-    nick_name?: string | null
-    is_admin?: string | null
+    username?: string;
+    email?: string;
+    nick_name?: string;
+    is_admin?: string;
+}
+
+// 用户列表返回
+export interface IUserListResponse {
+    list: IUserCell[];
+    total: number;
 }
