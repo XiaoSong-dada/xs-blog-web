@@ -12,13 +12,12 @@ export default defineConfig(({ mode }) => {
     resolve: {
       alias: {
         '@': fileURLToPath(new URL('./src', import.meta.url)),
-        '@config': fileURLToPath(new URL('./config', import.meta.url)),
       },
     },
     server: {
       proxy: {
         '/api': {
-          target: proxyTarget,
+          target:proxyTarget,
           changeOrigin: true,
           secure: false,
           rewrite: (path) => path.replace(/^\/api/, ''),

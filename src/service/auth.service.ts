@@ -1,5 +1,5 @@
 // /services/authService.ts
-import { config } from '@config/local.env';
+import { config } from '@/config/local.env';
 import useAuthStore from '../stores/auth';
 import Cookies from 'js-cookie';
 import { jwtDecode } from 'jwt-decode';

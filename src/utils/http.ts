@@ -6,7 +6,7 @@ import axios, {
     AxiosHeaders
 } from 'axios';
 import { message } from 'ant-design-vue';
-import {config as local_config} from '@config/local.env';
+import {config as local_config} from '@/config/local.env';
 import router from '@/router/main';
 import {AuthService} from '@/service/auth.service';
 
