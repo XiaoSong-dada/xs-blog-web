@@ -10,7 +10,7 @@ export const authMenus: IDropDownItem[] = [
   {
     key: 2,
     label: '个人中心',
-    route: '/',
+    route: '/center',
   },
   {
     key: 3,

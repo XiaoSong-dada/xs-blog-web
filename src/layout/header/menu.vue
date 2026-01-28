@@ -2,8 +2,6 @@
 
     <a-tabs class="top-menu" v-model:activeKey="activeKey" centered type="line" :tabBarGutter="80"
         @change="handleTabChange">
-        <a-tab-pane :key="'1'" :tab="'213'" />
-        <a-tab-pane :key="'about'" :tab="'111'" />
        <a-tab-pane v-for="item in homeTopMenu" v-model:key="item.key" :tab="item.label" />
         <template #rightExtra>
             <div class="top-right flex-start align-center">
@@ -61,7 +59,7 @@ const isLogin = computed(() => {
 
 // 解决菜单项聚焦问题
 const routeToKey = (path: string) => {
-    if (path.startsWith('/center')) return 'home'
+    if (path.startsWith('/center')) return 'center'
     if (path.startsWith('/article')) return 'article'
     if (path.startsWith('/about')) return 'about'
     return 'home'

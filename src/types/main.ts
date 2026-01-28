@@ -51,14 +51,22 @@ export interface IDropDown {
 
 // 用户下拉框
 export interface IDropDownItem {
-    label:string;
-    key:string | number;
-    route:string;
-    icon?:string | null | undefined;
-    before_need_driver?:boolean;
+    label: string;
+    key: string | number;
+    route: string;
+    icon?: string | null | undefined;
+    before_need_driver?: boolean;
     action?: 'logout'
 }
 
 export interface IItemCompoment {
-    data:IDropDownItem
+    data: IDropDownItem
+}
+
+// 用户中心菜单项接口
+export interface CenterMenuItem {
+    key: string;
+    label: string;
+    icon: 'user' | 'article';
+    route: string
 }

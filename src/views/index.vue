@@ -1,21 +1,27 @@
 <template>
     <div class="main">
-        <top-menu />
-        <div class="cover-with-height">
-
+        <header-menu />
+        <div class="main-content">
             <router-view />
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import topMenu from '@/layout/top.menu.vue';
+import HeaderMenu from '@/layout/header/menu.vue';
 
 </script>
 
 <style scoped lang="scss">
-.main{
+.main {
     width: 100%;
     height: 100%;
+    display: flex;
+    flex-direction: column;
+
+    .main-content {
+        flex: 1;
+        min-height: 0;
+    }
 }
 </style>
