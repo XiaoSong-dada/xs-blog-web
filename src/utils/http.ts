@@ -6,9 +6,9 @@ import axios, {
     AxiosHeaders
 } from 'axios';
 import { message } from 'ant-design-vue';
-import {config as local_config} from '@/config/local.env';
+import { config as local_config } from '@/config/local.env';
 import router from '@/router/main';
-import {AuthService} from '@/service/auth.service';
+import { AuthService } from '@/service/auth.service';
 
 // 数据返回的接口
 interface Result {
@@ -143,6 +143,23 @@ class RequestHttp {
         }
         throw lastError;
     }
+
+    public async get<T, P = Record<string, any>>(url: string, params?: P): Promise<ResultData<T>> {
+        return this.request<T>(url, { method: 'GET', params })
+    }
+
+    public async post<T, D = any>(url: string, data?: D): Promise<ResultData<T>> {
+        return this.request<T>(url, { method: 'POST', data })
+    }
+
+    public async put<T, D = any>(url: string, data?: D): Promise<ResultData<T>> {
+        return this.request<T>(url, { method: 'PUT', data })
+    }
+
+    public async delete<T, P = Record<string, any>>(url: string, params?: P): Promise<ResultData<T>> {
+        return this.request<T>(url, { method: 'DELETE', params })
+    }
+
 }
 
 const requestHttp = new RequestHttp(config);
