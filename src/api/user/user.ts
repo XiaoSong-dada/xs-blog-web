@@ -5,5 +5,5 @@ export const login = async (data: UserLoginData): Promise<ApiResponse<{ token: s
 }
 
 export const getList = async (params: IUserSearch):Promise<ApiResponse<IUserCell[]>> => {
-    return requestHttp.get('/users/', params)
+    return requestHttp.get('/users', params)
 }
