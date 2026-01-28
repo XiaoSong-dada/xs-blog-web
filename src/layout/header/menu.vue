@@ -2,11 +2,10 @@
 
     <a-tabs class="top-menu" v-model:activeKey="activeKey" centered type="line" :tabBarGutter="80"
         @change="handleTabChange">
-       <a-tab-pane v-for="item in homeTopMenu" v-model:key="item.key" :tab="item.label" />
+        <a-tab-pane v-for="item in homeTopMenu" v-model:key="item.key" :tab="item.label" />
         <template #rightExtra>
             <div class="top-right flex-start align-center">
                 <div>
-
                 </div>
                 <div class="login-status align-center flex-end">
                     <UserAvatar v-if="isLogin" />
@@ -47,7 +46,7 @@ onMounted(() => {
     authStore.loadToken();
 });
 
-const handleTabChange = (key: string | number)  => {
+const handleTabChange = (key: string | number) => {
     const item = homeTopMenuMap.get(key as string);
     if (item) router.push(item.route);
 }
@@ -76,6 +75,7 @@ watch(
 
 <style scoped lang="scss">
 .top-menu {
+
     .top-right {
         gap: 30px;
 
@@ -86,5 +86,9 @@ watch(
 
     }
 
+  :deep(.ant-tabs-nav) {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+    z-index: 1;
+  }
 }
 </style>

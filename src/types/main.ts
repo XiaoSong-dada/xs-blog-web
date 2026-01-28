@@ -70,3 +70,27 @@ export interface CenterMenuItem {
     icon: 'user' | 'article';
     route: string
 }
+
+// 分页搜索
+export interface IPages {
+    limit?:number;
+    offset?:number;
+}
+
+// 用户columns
+export interface IUserCell {
+    username: string;
+    nick_name: string | null;
+    email: string | null;
+    status: string;
+    is_admin: boolean;
+    avatar_url: string | null;
+}
+
+// 用户搜索
+export interface IUserSearch extends IPages{
+    username?: string;
+    email?: string;
+    nick_name?: string
+    is_admin?: string
+}

@@ -1,9 +1,9 @@
 import { requestHttp } from '@/utils/http';
-import type { ApiResponse, UserLoginData } from '@/types/main';
+import type { ApiResponse, UserLoginData, IUserSearch, IUserCell } from '@/types/main';
 export const login = async (data: UserLoginData): Promise<ApiResponse<{ token: string }>> => {
-    const response = await requestHttp.request<{ token: string }>('/auth/login', {
-        method: 'POST',
-        data
-    });
-    return response;
+    return requestHttp.post<{ token: string }>('/auth/login', data);
+}
+
+export const getList = async (params: IUserSearch):Promise<ApiResponse<IUserCell[]>> => {
+    return requestHttp.get('/users/', params)
 }

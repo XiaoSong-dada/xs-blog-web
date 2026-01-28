@@ -3,7 +3,7 @@
         <a-layout-sider class="cover-width-height">
             <sider @menu-select="onMenuClick" />
         </a-layout-sider>
-        <a-layout-content class="cover-width-height">
+        <a-layout-content class="cover-width-height content">
             <router-view />
         </a-layout-content>
     </a-layout>
@@ -38,5 +38,8 @@ onMounted(() => {
 <style scoped lang="scss">
 .center-layout {
     height: 100%;
+    .content {
+        padding: 5px;
+    }
 }
 </style>
