@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import Cookies from 'js-cookie';
-import config from '@config/local.env';
+import { config } from '@config/local.env';
 
 const useAuthStore = defineStore('auth', {
     state: () => ({

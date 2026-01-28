@@ -1,5 +1,5 @@
 // /services/authService.ts
-import config from '@config/local.env';
+import { config } from '@config/local.env';
 import useAuthStore from '../stores/auth';
 import Cookies from 'js-cookie';
 import { jwtDecode } from 'jwt-decode';
@@ -33,15 +33,15 @@ class AuthService {
         }
     }
 
-    static isUserTokenExpired(opt: JwtCheckOptions = {}):boolean {
+    static isUserTokenExpired(opt: JwtCheckOptions = {}): boolean {
         const token = AuthService.getToken()
         if (!token) return true;
-        return AuthService.isTokenExpired(token , opt)
+        return AuthService.isTokenExpired(token, opt)
     }
 
     static getUserInfo(): IUserInfo | null | undefined {
         const token = AuthService.getToken();
-        if(token) return jwtDecode(token)
+        if (token) return jwtDecode(token)
         return null
     }
 }

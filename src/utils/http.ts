@@ -6,7 +6,7 @@ import axios, {
     AxiosHeaders
 } from 'axios';
 import { message } from 'ant-design-vue';
-import local_config from '@config/local.env';
+import {config as local_config} from '@config/local.env';
 import router from '@/router/main';
 import {AuthService} from '@/service/auth.service';
 
@@ -30,7 +30,7 @@ const RequestEnums = {
 } as const;
 
 const config = {
-    baseURL: local_config.baseURL,
+    baseURL: local_config.PROXY_NAME,
     timeout: local_config.TIMEOUT,
     withCredentials: true
 };
