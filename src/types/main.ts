@@ -14,11 +14,9 @@ export interface UserRegisterData {
 }
 
 // 定义 API 响应数据类型
-export interface ApiResponse<T> {
-    code: number;
-    msg: string;
+export interface ApiResponse<T> extends ApiReposeBase {
     data?: T;
-    total?:number;
+    total?: number;
 }
 
 
@@ -74,8 +72,8 @@ export interface CenterMenuItem {
 
 // 分页搜索
 export interface IPages {
-    limit?:number;
-    offset?:number;
+    limit?: number;
+    offset?: number;
 }
 
 // 用户columns
@@ -88,8 +86,16 @@ export interface IUserCell {
     avatar_url: string | null;
 }
 
+
+
+// 通用消息弹窗
+export interface ApiReposeBase {
+    code: number;
+    message: string;
+}
+
 // 用户搜索
-export interface IUserSearch extends IPages{
+export interface IUserSearch extends IPages {
     username?: string;
     email?: string;
     nick_name?: string;
@@ -100,4 +106,19 @@ export interface IUserSearch extends IPages{
 export interface IUserListResponse {
     list: IUserCell[];
     total: number;
+}
+
+// 重置密码
+export interface IResetPassword {
+    username: string;
+    password: string;
+    isPassword: string;
+}
+
+// 注册账号
+export interface IRegister{
+    username:string;
+    password:string;
+    email:string;
+    nick_name:string;
 }

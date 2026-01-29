@@ -13,7 +13,7 @@ import { AuthService } from '@/service/auth.service';
 // 数据返回的接口
 interface Result {
     code: number;
-    msg: string;
+    message: string;
 }
 
 interface ResultData<T = any> extends Result {

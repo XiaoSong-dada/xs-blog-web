@@ -32,14 +32,19 @@
                 <a-button :icon="h(ReloadOutlined)" @click="onReset">重置</a-button>
             </a-flex>
         </a-flex>
-        <a-flex class="tools">
-            <a-button type="primary" :icon="h(PlusOutlined)">新增</a-button>
+        <a-flex class="tools" gap="small">
+            <a-button type="primary" :icon="h(PlusOutlined)" @click="notDevelopedMessage()">新增</a-button>
+            <a-button type="primary" :icon="h(RedoOutlined)" @click="notDevelopedMessage()">重置密码</a-button>
         </a-flex>
         <a-table :columns="columns" :data-source="data" :loading="loading" :pagination="paginationComputed">
             <template #bodyCell="{ column, record }">
                 <template v-if="column.key === 'action'">
-                    <a-button type="link" :icon="h(EditOutlined)">修改</a-button>
-                    <a-button type="link" danger :icon="h(DeleteOutlined)">删除</a-button>
+                    <a-button type="link" :icon="h(EditOutlined)" @click="notDevelopedMessage()">修改</a-button>
+                    <a-popconfirm :title="`是否确认删除用户${record.username}`" ok-text="确认" cancel-text="取消"
+                        @confirm="deleteUserByUsername(record.username)">
+                        <a-button type="link" danger :icon="h(DeleteOutlined)">删除</a-button>
+                    </a-popconfirm>
+
                 </template>
             </template>
         </a-table>
@@ -47,17 +52,21 @@
 </template>
 
 <script setup lang="ts">
-import { Table, Button, Flex, Input } from 'ant-design-vue';
-import { PlusOutlined } from '@ant-design/icons-vue';
+import { Table, Button, Flex, Input, Popconfirm, message } from 'ant-design-vue';
+import { PlusOutlined, RedoOutlined } from '@ant-design/icons-vue';
 import { useUserList } from '@/hook/user/useUser';
 import { EditOutlined, DeleteOutlined, SearchOutlined, ReloadOutlined } from '@ant-design/icons-vue';
 import { computed, h, onMounted } from 'vue'
+import { deleteUser } from '@/api/user/user';
+import { notDevelopedMessage } from '@/ui/status/not-developed';
 
 const ATable = Table;
 const AButton = Button;
 const AFlex = Flex;
 const AInput = Input;
+const APopconfirm = Popconfirm;
 const { params, data, total, loading, fetchList, resetParams } = useUserList()
+
 const columns = [
     {
         title: '用户名',
@@ -121,6 +130,15 @@ const paginationComputed = computed(() => ({
     onShowSizeChange: onTableChange,
     showTotal: () => `共 ${11} 条`
 }))
+
+const deleteUserByUsername = (username: string) => {
+    deleteUser(username).then(res => {
+        if (res.code === 200) {
+            message.success(res.message);
+            fetchList();
+        }
+    })
+}
 
 onMounted(async () => {
     await fetchList()
