@@ -1,4 +1,5 @@
 // /types/main.ts
+import type { IPages } from "./http";
 
 // 用户登录数据模型
 export interface UserLoginData {
@@ -12,13 +13,6 @@ export interface UserRegisterData {
     password: string;
     email: string;
 }
-
-// 定义 API 响应数据类型
-export interface ApiResponse<T> extends ApiReposeBase {
-    data?: T;
-    total?: number;
-}
-
 
 // JWT 检查选项接口
 export interface JwtCheckOptions {
@@ -70,12 +64,6 @@ export interface CenterMenuItem {
     route: string
 }
 
-// 分页搜索
-export interface IPages {
-    limit?: number;
-    offset?: number;
-}
-
 // 用户columns
 export interface IUserCell {
     username: string;
@@ -84,14 +72,6 @@ export interface IUserCell {
     status: string;
     is_admin: boolean;
     avatar_url: string | null;
-}
-
-
-
-// 通用消息弹窗
-export interface ApiReposeBase {
-    code: number;
-    message: string;
 }
 
 // 用户搜索
@@ -116,9 +96,29 @@ export interface IResetPassword {
 }
 
 // 注册账号
-export interface IRegister{
-    username:string;
-    password:string;
-    email:string;
-    nick_name:string;
+export interface IRegister {
+    username: string;
+    password: string;
+    email: string;
+    nick_name: string;
+}
+
+// 文章接口
+export interface IArticle {
+    id: string;
+    author_id: string;
+    title: string;
+    slug: string;
+    content_md: string | null;
+    view_count: number;
+    created_at: string;
+    updated_at: string;
+    published_at: string | null;
+    deleted_at: string | null;
+}
+
+export interface IArticleQuery extends IPages {
+    title: string | undefined;
+    slug: string | undefined;
+    content_md: string | undefined;
 }

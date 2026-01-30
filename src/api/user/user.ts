@@ -1,5 +1,6 @@
 import { requestHttp } from '@/utils/http';
-import type { ApiResponse, UserLoginData, IUserSearch, IUserListResponse, ApiReposeBase, IRegister } from '@/types/main';
+import type { UserLoginData, IUserSearch, IUserListResponse, IRegister } from '@/types/main';
+import type { ApiReposeBase, ApiResponse } from '@/types/http'
 export const login = async (data: UserLoginData): Promise<ApiResponse<{ token: string }>> => {
     return requestHttp.post<{ token: string }>('/auth/login', data);
 }

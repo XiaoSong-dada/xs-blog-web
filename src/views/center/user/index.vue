@@ -122,13 +122,13 @@ const onTableChange = (page: number, pageSize: number) => {
 }
 
 const paginationComputed = computed(() => ({
-    current: params.value.offset || 0,
+    current: params.value.offset || 1,
     pageSize: params.value.limit || 10,
     total: total.value,
     showSizeChanger: true,
     onChange: onTableChange,
     onShowSizeChange: onTableChange,
-    showTotal: () => `共 ${11} 条`
+    showTotal: () => `共 ${total.value} 条`
 }))
 
 const deleteUserByUsername = (username: string) => {
