@@ -44,6 +44,16 @@ class AuthService {
         if (token) return jwtDecode(token)
         return null
     }
+
+    static isLogin():boolean {
+        return !AuthService.isUserTokenExpired()
+    }
+
+    static isAdmin():boolean {
+        const user_info = AuthService.getUserInfo()
+        if(user_info && user_info.is_admin) return true;
+        return false
+    }
 }
 
 export { AuthService };

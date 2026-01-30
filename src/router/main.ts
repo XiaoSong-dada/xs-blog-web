@@ -1,50 +1,41 @@
 import { createWebHistory, createRouter } from 'vue-router'
-
-import Home from '@/views/home/index.vue'
-import Login from '@/views/login/index.vue'
-import AdminLayout from '@/layout/admin/layout.vue'
-import AdminEditorLayout from '@/layout/admin/editor.layout.vue'
-import HomeLayout from '@/layout/home.layout.vue';
-import AppLayout from '@/layout/app.layout.vue';
-
-const routes = [
-    {
-        path: '/',
-        component: AppLayout,
-        children: [
-            {
-                path: '/',
-                component: HomeLayout,
-                children: [
-                    { path: '', component: Home, name: 'Home' },
-                    { path: 'article', component: () => import('@/views/article/index.vue'), name: 'Article' },
-                    { path: 'about', component: () => import('@/views/about/index.vue'), name: 'About' }
-                ],
-            },
-            {
-                path: '/admin', component: AdminLayout, name: 'Admin',
-                children: [
-                    { path: 'user', component: () => import('@/views/admin/user/index.vue'), name: 'AdminUserList' },
-                    { path: 'article', component: () => import('@/views/admin/article/index.vue'), name: 'AdminArticleList' },
-                ]
-            },
-            {
-                path: '/admin', component: AdminEditorLayout, name: 'Editor',
-                children: [
-                    { path: 'article/new', component: () => import('@/views/admin/article/new.vue'), name: 'AdminEditor' },
-                ]
-            },
-
-
-        ],
-    },
-    { path: '/login', component: Login, name: 'Login' },
-
-]
+import { AuthService } from '@/service/auth.service';
+import { routes } from '@/router/routes';
+import { message } from 'ant-design-vue';
 
 const router = createRouter({
     history: createWebHistory(),
     routes,
-})
+});
+
+router.beforeEach((to, from, next) => {
+    const requiresAuth = to.matched.some(
+        record => record.meta.requiresAuth
+    );
+
+    const requiresAdmin = to.matched.some(
+        record => record.meta.requiresAdmin
+    );
+
+    // 需要登录，但没登录
+    if (requiresAuth && !AuthService.isLogin()) {
+        message.info('请登录后使用该功能')
+        next({
+            path: "/login",
+            query: { redirect: to.fullPath }
+        });
+        return;
+    }
+
+    // 需要管理员，但不是管理员
+    if (requiresAdmin && !AuthService.isAdmin()) {
+        message.info('无权限访问！')
+        return;
+    }
+
+    // 放行
+    next();
+});
+
 
 export default router
