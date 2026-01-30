@@ -5,12 +5,12 @@ export const authMenus: IDropDownItem[] = [
   {
     key: 1,
     label: '我的创作',
-    route: '/',
+    route: '/admin/article/new',
   },
   {
     key: 2,
-    label: '个人中心',
-    route: '/center',
+    label: '后台管理',
+    route: '/admin',
   },
   {
     key: 3,

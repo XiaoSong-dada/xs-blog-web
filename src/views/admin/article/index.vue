@@ -33,7 +33,7 @@
             </a-flex>
         </a-flex>
         <a-flex class="tools" gap="small">
-            <a-button type="primary" :icon="h(PlusOutlined)" @click="notDevelopedMessage()">新增</a-button>
+            <a-button type="primary" :icon="h(PlusOutlined)" @click="()=>router.push('./article/new')">新增</a-button>
             <a-button type="primary" danger :icon="h(CloseOutlined)" @click="notDevelopedMessage()">删除</a-button>
         </a-flex>
         <a-table :columns="columns" :data-source="data" :loading="loading" :pagination="paginationComputed"
@@ -67,6 +67,7 @@ import { computed, h, onMounted } from 'vue'
 import { notDevelopedMessage } from '@/ui/status/not-developed';
 import { formatDate } from '@/utils/date';
 import { useBuildTableIndex } from '@/hook/useBuilding';
+import { useRouter } from 'vue-router';
 
 const ATable = Table;
 const AButton = Button;
@@ -75,6 +76,7 @@ const AInput = Input;
 const APopconfirm = Popconfirm;
 const { params, data, total, loading, fetchList, resetParams, rowSelection, selectedRows } = useArticleList();
 const { buildIndex } = useBuildTableIndex();
+const router = useRouter();
 
 const columns = [
     {
