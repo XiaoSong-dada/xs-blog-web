@@ -3,5 +3,6 @@ export const config = {
     TOKEN_KEY: 'blog_token',
     PROXY_URL: 'http://localhost:8000/api',
     TIMEOUT: 20000,
-    PROXY_NAME:'/api'
+    PROXY_NAME:'/api',
+    VITE_STATIC_URL:import.meta.env.VITE_STATIC_URL ?? 'http://localhost:8000/static/'
 }

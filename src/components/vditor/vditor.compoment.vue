@@ -62,6 +62,8 @@ import type { Props, ArticlePayload } from '@/types/vditor';
 import { convertToPinyin } from "@/utils/pinyin";
 import type { ChangeEvent } from "ant-design-vue/es/_util/EventInterface";
 import { RedoOutlined } from '@ant-design/icons-vue'
+import { AuthService } from "@/service/auth.service";
+import { config } from '@/config/local.env'
 
 const AInput = Input;
 const ATag = Tag;
@@ -78,7 +80,8 @@ const props = withDefaults(defineProps<Props>(), {
     placeholder: "开始写作吧…",
     uploadFieldName: "file",
     enableOutline: true,
-    outlinePosition: 'left'
+    outlinePosition: 'left',
+    uploadType: 'attachment'
 });
 
 const emit = defineEmits<{
@@ -234,6 +237,40 @@ function initVditor() {
                 upload: {
                     url: props.uploadUrl,
                     fieldName: props.uploadFieldName,
+                    extraData: {
+                        bucket: props.uploadType, // "markdown" | "image" | "attachment"
+                    },
+                    headers: {
+                        Authorization: `Bearer ${AuthService.getToken()}`,
+                    },
+                    // 把后端返回格式转成 Vditor 期望的结构
+                    format: (_files, responseText) => {
+                        try {
+                            const response = JSON.parse(responseText);
+                            const storedPath = response?.data?.stored_path;
+                            if (response?.code === 200 && storedPath) {
+                                const originalName = response?.data?.original_name || "file";
+                                const staticBase = config.VITE_STATIC_URL
+                                const normalizedPath = storedPath.startsWith("/") ? storedPath.slice(1) : storedPath;
+                                const url = storedPath.startsWith("http")
+                                    ? storedPath
+                                    : `${staticBase.replace(/\/$/, "")}/${normalizedPath}`;
+                                return JSON.stringify({
+                                    code: 0,
+                                    msg: response?.message || "ok",
+                                    data: {
+                                        succMap: {
+                                            [originalName]: url,
+                                        },
+                                        errFiles: [],
+                                    },
+                                });
+                            }
+                        } catch (_e) {
+                            // fall through and return original response text
+                        }
+                        return responseText;
+                    },
                     // 注意：format 要按你后端返回结构适配
                     // format: (files, responseText) => { ... }
                 },

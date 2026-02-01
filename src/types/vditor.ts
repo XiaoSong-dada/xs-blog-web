@@ -60,4 +60,5 @@ export interface Props {
      */
     uploadUrl?: string;
     uploadFieldName?: string;
+    uploadType?:string
 };
