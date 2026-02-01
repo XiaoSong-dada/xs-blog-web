@@ -210,6 +210,8 @@ function initVditor() {
         height: "100%",
         mode: props.vditorMode,
         placeholder: props.placeholder,
+        cdn: config.VITE_VDITOR_CDN,
+        lang: "zh_CN",
 
         // 不建议用 Vditor 自带 cache（可控性弱），我们用自己的 autosave
         cache: { enable: false },
