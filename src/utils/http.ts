@@ -26,7 +26,8 @@ const RequestEnums = {
     TIMEOUT: 20000,
     OVERDUE: 600,  // 登录失效
     FAIL: 999,     // 请求失败
-    SUCCESS: 200   // 请求成功
+    SUCCESS: 200,  // 请求成功
+    CREATED: 201
 } as const;
 
 const config = {
@@ -73,7 +74,7 @@ class RequestHttp {
             (response: AxiosResponse) => {
                 const { data } = response; // 提取response的data部分
 
-                if (data.code !== RequestEnums.SUCCESS) {
+                if (![RequestEnums.SUCCESS, RequestEnums.CREATED].includes(data.code)) {
                     // 如果请求失败，统一弹出错误提示
                     message.error(data.message || '请求失败');
                     return Promise.reject(data.message || '请求失败');

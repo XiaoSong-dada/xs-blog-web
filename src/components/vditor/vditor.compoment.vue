@@ -4,14 +4,14 @@
         <div class="toolbar">
             <div>
                 <a-input class="title" v-model:value="form.title" size="large" :maxlength="40" show-count
-                    @change="titleChange" placeholder="请输入文章标题" @pressEnter="onPublish" />
+                    @change="titleChange" placeholder="请输入文章标题"  @pressEnter="onPublish"/>
             </div>
 
 
             <div class="flex-start">
                 <a-input-group compact>
                     <a-input class="slug" v-model:value="form.slug" size="large" :maxlength="120" show-count
-                        placeholder="请输入文章标题" @pressEnter="onPublish" />
+                        placeholder="请输入文章标识" @pressEnter="onPublish"/>
                     <a-button :icon="h(RedoOutlined)" @click="reDoSlug"></a-button>
                 </a-input-group>
             </div>
@@ -64,7 +64,6 @@ import type { ChangeEvent } from "ant-design-vue/es/_util/EventInterface";
 import { RedoOutlined } from '@ant-design/icons-vue'
 import { AuthService } from "@/service/auth.service";
 import { config } from '@/config/local.env'
-import { pl } from "date-fns/locale";
 
 const AInput = Input;
 const ATag = Tag;
@@ -107,6 +106,11 @@ const emit = defineEmits<{
      */
 
      (e:"editDraft",payload: ArticlePayload): Promise<void> | void;
+
+    /**
+     * 保存状态监听
+     */
+    (e:"isDirty" ,dirty: boolean):Promise<void> | void;
 }>();
 
 /** ---------------------------
@@ -128,6 +132,7 @@ const saving = ref(false);
 const publishing = ref(false);
 const dirty = ref(false); // 是否有未保存修改
 const lastSavedAt = ref<string>("");
+
 
 // 统计
 const wordCount = ref(0);
@@ -155,6 +160,7 @@ function buildPayload(): ArticlePayload {
     };
 }
 
+
 /** ---------------------------
  * 3) 基础校验（编辑器组件只做最基本的校验）
  * -------------------------- */
@@ -163,10 +169,16 @@ function validateBeforeSubmit(payload: ArticlePayload): boolean {
         message.warning("请输入文章标题");
         return false;
     }
+    if (!payload.slug) {
+        message.warning("请输入文章slug");
+        return false;
+    }
+
     if (!payload.content_md.trim()) {
         message.warning("文章内容不能为空");
         return false;
     }
+
     return true;
 }
 
@@ -192,7 +204,6 @@ async function onSaveDraft() {
 
         dirty.value = false;
         lastSavedAt.value = new Date().toLocaleString();
-        // message.success("草稿已保存");
     } catch (e) {
         message.error("保存失败，请重试");
     } finally {
@@ -203,12 +214,13 @@ async function onSaveDraft() {
 async function onPublish() {
     const payload = buildPayload();
     if (!validateBeforeSubmit(payload)) return;
-
+    // 未保存时不允许发布
+    if (dirty.value) return message.info('文章还未保存');
+    
     try {
         publishing.value = true;
         await emit("publish", payload);
         dirty.value = false;
-        message.success("已发布");
     } catch (e) {
         message.error("发布失败，请重试");
     } finally {
@@ -339,6 +351,11 @@ watch(
     }
 );
 
+watch(dirty , ()=>{
+    // 当保存状态更新时，及时通知父组件
+    emit('isDirty',dirty.value)
+})
+
 /** ---------------------------
  * 7) 自动保存 + 快捷键 Ctrl/⌘+S（工程化写法）
  * -------------------------- */
@@ -360,9 +377,11 @@ function stopAutosave() {
 
 function onKeydown(e: KeyboardEvent) {
     const isSave = (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s";
-    if (!isSave) return;
-    e.preventDefault();
-    onSaveDraft();
+    const isPublsih = e.ctrlKey && e.altKey && e.key === 'Enter';
+    if(isSave || isPublsih) e.preventDefault();
+    if(isSave) onSaveDraft();
+    else if (isPublsih)onPublish();
+    else return;
 }
 
 /** ---------------------------

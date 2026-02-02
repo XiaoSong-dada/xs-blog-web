@@ -5,6 +5,8 @@
     @save-draft="createArticle"
     :mode="modle"
     @edit-draft="editArticle"
+    @publish="publishArticle"
+    @is-dirty="(dirty)=>isDirty = dirty"
     />
 </template>
 
@@ -13,8 +15,7 @@ import VditorCompoment from '@/components/vditor/vditor.compoment.vue';
 import {  useArticleEditor } from '@/hook/article/useArticle';
 import { reactive } from 'vue';
 
-const { modle , createArticle , editArticle} = useArticleEditor()
-
+const { modle , isDirty,createArticle , editArticle,publishArticle} = useArticleEditor()
 
 const upload = reactive({
     upload_url: '/api/file',

@@ -17,3 +17,7 @@ export const createArticle = async (article: IAritcleCreate): Promise<ApiRespons
 export const updateArticle = async (article: IAritcleUpdate): Promise<ApiReposeBase> => {
     return requestHttp.put(`/article`, article)
 }
+
+export const publishArticle = async (article_id:string): Promise<ApiReposeBase> => {
+    return requestHttp.post(`/article/${article_id}`)
+}
