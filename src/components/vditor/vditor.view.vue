@@ -28,7 +28,6 @@ function render(md: string) {
 }
 
 onMounted(() => {
-  render(props.markdown)
 })
 
 watch(
