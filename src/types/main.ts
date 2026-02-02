@@ -133,3 +133,7 @@ export interface IAritcleUpdate extends IAritcleCreate {
     id:string;
 }
 
+// 文章详细信息接口
+export interface IArticleDetailPropos {
+    slug:string;
+}

@@ -7,7 +7,7 @@ export const getList = async (params: IArticleQuery): Promise<ApiResponse<IArtic
 }
 
 export const getDetailBySulg = async (sulg: string): Promise<ApiResponse<IArticle>> => {
-    return requestHttp.delete(`/article/${sulg}`)
+    return requestHttp.get(`/article/${sulg}`)
 }
 
 export const createArticle = async (article: IAritcleCreate): Promise<ApiResponse<{ article_id: string }>> => {

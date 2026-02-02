@@ -15,6 +15,12 @@ export const routes = [
                 children: [
                     { path: '', component: Home, name: 'Home' },
                     { path: 'article', component: () => import('@/views/article/index.vue'), name: 'Article' },
+                    {
+                        path: 'article/:slug',
+                        component: () => import('@/views/article/detail.vue'),
+                        name: 'ArticleDetail',
+                        props: true
+                    },
                     { path: 'about', component: () => import('@/views/about/index.vue'), name: 'About' }
                 ],
             },

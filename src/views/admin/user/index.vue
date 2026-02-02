@@ -143,6 +143,8 @@ const deleteUserByUsername = (username: string) => {
 onMounted(async () => {
     await fetchList()
 })
+
+
 </script>
 
 <style scoped lang="scss">

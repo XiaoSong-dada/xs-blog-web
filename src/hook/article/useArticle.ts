@@ -1,11 +1,12 @@
 import type { IAritcleCreate, IAritcleUpdate, IArticle, IArticleQuery } from "@/types/main";
 import type { ArticlePayload } from '@/types/vditor';
 import { ref } from "vue";
-import { getList, createArticle as create, updateArticle, publishArticle } from '@/api/article/article';
+import { getList, createArticle as create, updateArticle, publishArticle, getDetailBySulg } from '@/api/article/article';
 import { useBuildQueryParams } from '@/hook/useBuilding';
 import { message } from "ant-design-vue";
 import { AuthService } from "@/service/auth.service";
 import { isNull } from "@/utils/verification";
+
 
 const buildQueryParams = useBuildQueryParams
 const createDefaultParams = (): IArticleQuery => ({
@@ -130,13 +131,34 @@ export const useArticleEditor = () => {
              */
 
             // 必须是已保存的文章才能发布
-            if(isDirty.value) return message.info('文章还未保存');
-            if(isNull(article_id)) return message.warn('未找到文章id');
-            
+            if (isDirty.value) return message.info('文章还未保存');
+            if (isNull(article_id)) return message.warn('未找到文章id');
+
             publishArticle(article_id.value).then(res => {
                 if (res.code === 200) message.success('发布成功');
                 else message.warn(res.message);
             })
         }
+    }
+}
+
+
+export const useArticleDetail = () => {
+    const articleDetail = ref<IArticle | null>(null)
+
+    const getArticleDetail = (slug: string) => {
+        getDetailBySulg(slug).then(res => {
+            if (res.code === 200 && res.data){
+                console.log('get res ' ,res);
+                
+                 articleDetail.value = res.data
+                }
+            else message.warn(`获取详细信息失败 ${res.data}`);
+        })
+    }
+
+    return {
+        articleDetail,
+        getArticleDetail
     }
 }
