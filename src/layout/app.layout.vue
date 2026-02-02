@@ -12,4 +12,7 @@ import HeaderMenu from "@/layout/header/menu.vue";
 </script>
 
 <style scoped>
+.main {
+  --app-header-height: 56px;
+}
 </style>

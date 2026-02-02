@@ -15,16 +15,23 @@ interface HTMLDivElement extends HTMLElement {
 const props = defineProps<{
   markdown: string,
 }>()
+const emit = defineEmits<{
+  (event: "rendered", el: HTMLElement): void;
+}>()
 
 const elRef = ref<HTMLDivElement | null>(null)
 
-function render(md: string) {
+async function render(md: string) {
   if (!elRef.value) return
-  Vditor.preview(elRef.value, md, {
+  await Vditor.preview(elRef.value, md, {
     mode: "light",
     cdn: config.VITE_VDITOR_CDN,
     lang: "zh_CN",
+    markdown:{
+      toc:true
+    }
   })
+  emit("rendered", elRef.value)
 }
 
 onMounted(() => {
