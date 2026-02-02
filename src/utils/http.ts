@@ -75,16 +75,17 @@ class RequestHttp {
 
                 if (data.code !== RequestEnums.SUCCESS) {
                     // 如果请求失败，统一弹出错误提示
-                    message.error(data.msg || '请求失败');
-                    return Promise.reject(data.msg || '请求失败');
+                    message.error(data.message || '请求失败');
+                    return Promise.reject(data.message || '请求失败');
                 }
                 return response
             },
-            (error: AxiosError) => {
+            (error: AxiosError<Result>) => {
                 // 根据错误类型做相应处理
                 if (error.response) {
                     // 服务器响应失败
                     const status = error.response.status;
+                    const msg = error.response.data?.message ?? error.message;
                     if (status === 401) {
                         AuthService.clearToken();
                         router.push('/login');
@@ -92,7 +93,7 @@ class RequestHttp {
                     } else if (status === 500) {
                         message.error('服务器错误，请稍后重试');
                     } else {
-                        message.error(`请求错误，状态码：${status}`);
+                        message.error(`请求错误：${msg}`);
                     }
                 } else if (error.request) {
                     // 请求没有响应

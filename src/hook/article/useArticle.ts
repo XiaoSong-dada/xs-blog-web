@@ -1,7 +1,11 @@
-import type { IArticle, IArticleQuery } from "@/types/main";
+import type { IAritcleCreate, IAritcleUpdate, IArticle, IArticleQuery } from "@/types/main";
+import type { ArticlePayload } from '@/types/vditor';
 import { ref } from "vue";
-import { getList } from '@/api/article/article';
+import { getList, createArticle, updateArticle } from '@/api/article/article';
 import { useBuildQueryParams } from '@/hook/useBuilding';
+import { message } from "ant-design-vue";
+import { AuthService } from "@/service/auth.service";
+import { isNull } from "@/utils/verification";
 
 const buildQueryParams = useBuildQueryParams
 const createDefaultParams = (): IArticleQuery => ({
@@ -42,7 +46,7 @@ export const useArticleList = () => {
         loading.value = true
         try {
             const query = { ...params.value, ...overrides }
-            const bulid = buildQueryParams(query)
+            const bulid = buildQueryParams<IArticleQuery>(query)
             console.log(bulid);
 
             const res = await getList(bulid)
@@ -73,3 +77,46 @@ export const useArticleList = () => {
     }
 }
 
+
+export const useArticleEditor = () => {
+    const article_id = ref<string>('');
+    const modle  = ref<'create' | 'edit'>('create')
+
+    return {
+        article_id,
+        modle,
+        createArticle: (article: ArticlePayload) => {
+            // 获取用户id
+            const user_id = AuthService.getUserInfo()?.user_id
+            const article_create: IAritcleCreate = {
+                ...article,
+            }
+            if (user_id) {
+                article_create.author_id = user_id
+            }
+            createArticle(article).then(res => {
+                console.log(res);
+                
+                if (res.code === 200) {
+                    article_id.value = res.data?.article_id ?? '';
+                    modle.value = 'edit';
+                    
+                    return message.success('保存成功')
+                };
+                return message.warn(res.message)
+            })
+        },
+        editArticle: (article: ArticlePayload) => {
+            if (isNull(article_id.value)) return message.warn('article id is not found!');
+
+            const update_article: IAritcleUpdate = {
+                ...article,
+                id: article_id.value
+            }
+            updateArticle(update_article).then(res => {
+                if (res.code === 200) message.success('编辑成功');
+                else message.warn(res.message);
+            })
+        }
+    }
+}

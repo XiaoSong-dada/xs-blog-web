@@ -1,6 +1,6 @@
 import type { IPages } from "@/types/http"
 
-export const useBuildQueryParams = (raw: IPages) => {
+export const useBuildQueryParams = <T extends Record<string, unknown>>(raw: IPages<T>): IPages<T> => {
     const page = raw.offset ?? 1
     const limit = raw.limit ?? 10
 

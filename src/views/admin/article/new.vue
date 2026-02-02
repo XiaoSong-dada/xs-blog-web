@@ -1,12 +1,19 @@
 <template>
-    <vditor-compoment :upload-url="upload.upload_url" upload-type="image"/>
+    <vditor-compoment 
+    :upload-url="upload.upload_url" 
+    upload-type="image"
+    @save-draft="createArticle"
+    :mode="modle"
+    @edit-draft="editArticle"
+    />
 </template>
 
 <script setup lang="ts">
 import VditorCompoment from '@/components/vditor/vditor.compoment.vue';
-import {config} from '@/config/local.env'
-import { requestHttp } from '@/utils/http';
+import {  useArticleEditor } from '@/hook/article/useArticle';
 import { reactive } from 'vue';
+
+const { modle , createArticle , editArticle} = useArticleEditor()
 
 
 const upload = reactive({

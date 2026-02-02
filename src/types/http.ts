@@ -6,10 +6,10 @@ export interface ApiReposeBase {
 }
 
 // 分页搜索
-export interface IPages {
+export type IPages<T = Record<string, unknown>> = {
     limit?: number;
     offset?: number;
-}
+} & T;
 
 
 // 定义 API 响应数据类型

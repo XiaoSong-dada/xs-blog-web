@@ -30,11 +30,8 @@ export interface HomeTopMenuItem {
 // payload
 export interface IUserInfo {
     username: string;
-    email: string | null | undefined;
-    status: string;
+    user_id: string;
     is_admin: boolean;
-    avatar_url: string | null | undefined;
-    nick_name: string | null | undefined;
 }
 
 // 显示下拉框
@@ -75,12 +72,12 @@ export interface IUserCell {
 }
 
 // 用户搜索
-export interface IUserSearch extends IPages {
+export type IUserSearch = IPages<{
     username?: string;
     email?: string;
     nick_name?: string;
     is_admin?: string;
-}
+}>;
 
 // 用户列表返回
 export interface IUserListResponse {
@@ -117,8 +114,22 @@ export interface IArticle {
     deleted_at: string | null;
 }
 
-export interface IArticleQuery extends IPages {
+export type IArticleQuery = IPages<{
     title: string | undefined;
     slug: string | undefined;
     content_md: string | undefined;
+}>;
+
+// 新建文章
+export interface IAritcleCreate {
+    title: string;
+    slug: string;
+    content_md: string ;
+    author_id?: string;
 }
+
+// 新建文章
+export interface IAritcleUpdate extends IAritcleCreate {
+    id:string;
+}
+

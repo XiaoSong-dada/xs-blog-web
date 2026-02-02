@@ -64,6 +64,7 @@ import type { ChangeEvent } from "ant-design-vue/es/_util/EventInterface";
 import { RedoOutlined } from '@ant-design/icons-vue'
 import { AuthService } from "@/service/auth.service";
 import { config } from '@/config/local.env'
+import { pl } from "date-fns/locale";
 
 const AInput = Input;
 const ATag = Tag;
@@ -81,7 +82,7 @@ const props = withDefaults(defineProps<Props>(), {
     uploadFieldName: "file",
     enableOutline: true,
     outlinePosition: 'left',
-    uploadType: 'attachment'
+    uploadType: 'attachment',
 });
 
 const emit = defineEmits<{
@@ -100,6 +101,12 @@ const emit = defineEmits<{
      * 内容有变化：父组件可用来做“是否启用按钮、是否提示”等
      */
     (e: "change", payload: ArticlePayload): void;
+
+    /**
+     * 第一次保存草稿后，就是编辑草稿所以应启用编辑草稿对应的结构
+     */
+
+     (e:"editDraft",payload: ArticlePayload): Promise<void> | void;
 }>();
 
 /** ---------------------------
@@ -175,10 +182,17 @@ async function onSaveDraft() {
 
     try {
         saving.value = true;
-        await emit("saveDraft", payload);
+
+        if (props.mode === 'create') {
+            await emit("saveDraft", payload);
+        }
+        else {
+            await emit("editDraft", payload)
+        }
+
         dirty.value = false;
         lastSavedAt.value = new Date().toLocaleString();
-        message.success("草稿已保存");
+        // message.success("草稿已保存");
     } catch (e) {
         message.error("保存失败，请重试");
     } finally {
@@ -385,7 +399,7 @@ onBeforeUnmount(() => {
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .article-editor {
     height: 100%;
     display: flex;
