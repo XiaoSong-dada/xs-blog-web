@@ -180,7 +180,7 @@ const updateArticle = (article_id: string): void => {
 onMounted(async () => {
     await fetchList()
 })
-tableHeightOnMounted('content', 'toobar')
+tableHeightOnMounted('main-content', 'toobar')
 const computTableHeight = computed(() =>tableHeight.value)
 
 </script>

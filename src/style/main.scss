@@ -1,5 +1,6 @@
-// 用于引入全局变量
-@forward './flex.scss';
-@forward './layout.scss'; 
-@forward './default.scss';
-@forward './variable.scss';
+// // 用于引入全局变量
+// @forward './flex.scss';
+// @forward './layout.scss'; 
+// @forward './default.scss';
+// @forward './variable.scss';
+html, body, #app { height: 100%; }

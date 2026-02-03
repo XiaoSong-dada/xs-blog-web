@@ -1,9 +1,9 @@
 <template>
-    <a-layout class="center-layout cover-width-height">
+    <a-layout class="admin-layout">
         <a-layout-sider class="cover-width-height">
             <sider @menu-select="onMenuClick" />
         </a-layout-sider>
-        <a-layout-content class="cover-width-height content">
+        <a-layout-content class="admin-content">
             <router-view />
         </a-layout-content>
     </a-layout>
@@ -35,13 +35,11 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
-.center-layout {
-    height: 100%;
-
-    .content {
-        padding: 5px;
-        position: sticky;
-        overflow: hidden;
-    }
+.admin-layout {
+  height: 100%;
+  .admin-content {
+    padding: $admin-content-padding;
+    height: calc(100% - $header-h - $editor-content-padding);
+  }
 }
 </style>

@@ -10,11 +10,3 @@ const [, ContextHolder] = message.useMessage();
     <router-view class="app-view" />
   </div>
 </template>
-
-<style scoped>
-.app-root,
-.app-view {
-  width: 100%;
-  height: 100%;
-}
-</style>

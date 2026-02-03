@@ -90,8 +90,7 @@ watch(
 
   :deep(.ant-tabs-nav) {
     background-color: #fff;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
-    margin-bottom: 5px;
+    margin-bottom: 0;
   }
 }
 </style>

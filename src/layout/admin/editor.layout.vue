@@ -1,6 +1,6 @@
 <template>
-    <a-layout class="center-layout cover-width-height">
-        <a-layout-content class="cover-width-height content">
+    <a-layout class="admin-layout">
+        <a-layout-content class="admin-content">
             <router-view />
         </a-layout-content>
     </a-layout>
@@ -24,11 +24,10 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
-.center-layout {
-    height: 100%;
 
-    .content {
-        padding: 5px;
+.admin-layout{
+    .admin-content {
+        padding: $editor-content-padding;
     }
 }
 </style>

@@ -1,4 +1,18 @@
-@use './variable.scss' as *;
+@use "./variable.scss" as *;
+
+html,
+body,
+#app {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+.app-root,
+.app-view {
+  width: 100%;
+  height: 100%;
+}
 .header {
   width: 100%;
   padding-bottom: 10px;
@@ -12,15 +26,18 @@
   padding-bottom: 10px;
 }
 
-.main {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    font-size: 16px;
-    .main-content {
-        flex: 1;
-        min-height: 0;
-        background-color: $default-background;
-    }
+.app-layout {
+  width: 100%;
+  height: 100%;
+  font-size: 16px;
+
+  .main-content {
+    height: calc(100% - $header-h);
+    background-color: $default-background;
+  }
+}
+
+.admin-layout,
+.admin-content {
+  height: 100%;
 }
