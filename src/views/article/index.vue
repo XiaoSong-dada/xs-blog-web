@@ -1,7 +1,7 @@
 <template>
     <div class="article">
         <div class="list">
-            <article-list :data="data" />
+            <article-list :data="data" @click-title="getDetail"/>
         </div>
     </div>
 </template>
@@ -11,6 +11,8 @@ import ArticleList from '@/components/article/list.vue';
 import { useArticleList } from '@/hook/article/useArticle';
 import type { IArticle } from '@/types/main';
 import { onMounted, ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
+const router = useRouter();
 
 const {
     params,
@@ -30,10 +32,19 @@ onMounted(async () => {
     console.log(data);
 })
 
+
+const getDetail = (slug:string)=>{
+    router.push(`/article/${slug}`)
+}
+
+
+
 watch(
     () => data.value,
     (data) => article_list.value = data
 )
+
+
 </script>
 
 <style scoped lang="scss">

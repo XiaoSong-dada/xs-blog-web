@@ -2,7 +2,7 @@
     <div v-if="items.length" class="article-list">
         <article v-for="article in items" :key="article.id" class="card">
             <header class="card__header">
-                <h3 class="card__title">{{ article.title }}</h3>
+                <h3 class="card__title" @click="() => emit('clickTitle', article.slug)">{{ article.title }}</h3>
 
                 <div class="card__tags">
                     <a-tag>学习</a-tag>
@@ -74,6 +74,13 @@ const ATag = Tag;
 const props = defineProps<{ data: IArticle[] }>();
 
 const items = computed(() => props.data ?? []);
+const emit = defineEmits<{
+    /**
+     * 标题点击事件获取当前文章的slug
+     */
+    (e: "clickTitle", slug: string): Promise<void> | void;
+
+}>();
 
 /**
  * 简易“去 Markdown 标记”版本：先把常见符号去掉，做列表摘要足够用。
