@@ -40,8 +40,6 @@ onMounted(() => {
 watch(
   () => props.markdown,
   (md) => {
-    console.log(md);
-    
     render(md)
   },
 )

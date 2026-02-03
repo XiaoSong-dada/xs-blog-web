@@ -6,8 +6,12 @@ export interface ArticlePayload {
     title: string;
     slug: string;
     content_md: string;
-    content_html: string;
 };
+
+export interface IActicleFrom {
+    title:string;
+    slug :string
+}
 
 export interface Props {
     /**
@@ -61,4 +65,6 @@ export interface Props {
     uploadUrl?: string;
     uploadFieldName?: string;
     uploadType?:string
+    form?:IActicleFrom;
+    markdown?:string;
 };

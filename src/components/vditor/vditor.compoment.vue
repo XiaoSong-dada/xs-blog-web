@@ -82,7 +82,14 @@ const props = withDefaults(defineProps<Props>(), {
     enableOutline: true,
     outlinePosition: 'left',
     uploadType: 'attachment',
+    initial: () => ({
+        title: '',
+        slug: '',
+        content_md: ''
+    }),
 });
+
+
 
 const emit = defineEmits<{
     /**
@@ -132,6 +139,8 @@ const saving = ref(false);
 const publishing = ref(false);
 const dirty = ref(false); // 是否有未保存修改
 const lastSavedAt = ref<string>("");
+const isVditorReady = ref(false);
+const pendingMarkdown = ref<string | null>(null);
 
 
 // 统计
@@ -144,6 +153,7 @@ const wordCountText = computed(() => `字数：${wordCount.value}`);
  * 2) 生成 payload（对外输出的标准结构）
  * -------------------------- */
 function getMarkdown(): string {
+    if (!isVditorReady.value || !vditor.value) return pendingMarkdown.value ?? "";
     return vditor.value?.getValue() ?? "";
 }
 
@@ -156,7 +166,6 @@ function buildPayload(): ArticlePayload {
         title: form.title.trim(),
         slug: form.slug?.trim() || "",
         content_md: getMarkdown(),
-        content_html: getHTML(),
     };
 }
 
@@ -249,8 +258,8 @@ function initVditor() {
                 wordCount.value = count;
             },
         },
-        fullscreen:{
-            index:2000
+        fullscreen: {
+            index: 2000
         },
 
         // 大纲默认展开
@@ -310,6 +319,7 @@ function initVditor() {
 
         // 初始化完成回填内容（编辑模式）
         after: () => {
+            isVditorReady.value = true;
             const initMd = props.initial?.content_md ?? "";
             if (initMd) vditor.value?.setValue(initMd);
         },
@@ -358,6 +368,17 @@ watch(dirty, () => {
     // 当保存状态更新时，及时通知父组件
     emit('isDirty', dirty.value)
 })
+
+watch(
+    () => [props.initial.title, props.initial.slug],
+    () => {
+        console.log('init !');
+
+        form.title = props.initial.title ?? '',
+            form.slug = props.initial.slug ?? ''
+    }
+)
+
 
 /** ---------------------------
  * 7) 自动保存 + 快捷键 Ctrl/⌘+S（工程化写法）
@@ -418,6 +439,9 @@ onBeforeUnmount(() => {
     window.removeEventListener("keydown", onKeydown);
     cleanupBeforeUnload?.();
     vditor.value?.destroy();
+    vditor.value = null;
+    isVditorReady.value = false;
+    pendingMarkdown.value = null;
 });
 </script>
 

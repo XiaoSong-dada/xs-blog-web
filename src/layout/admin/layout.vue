@@ -40,6 +40,8 @@ onMounted(() => {
 
     .content {
         padding: 5px;
+        position: sticky;
+        overflow: hidden;
     }
 }
 </style>

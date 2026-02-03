@@ -1,7 +1,7 @@
 import type { IAritcleCreate, IAritcleUpdate, IArticle, IArticleQuery } from "@/types/main";
 import type { ArticlePayload } from '@/types/vditor';
 import { ref } from "vue";
-import { getList, createArticle as create, updateArticle, publishArticle, getDetailBySulg } from '@/api/article/article';
+import { getList, createArticle as create, updateArticle, publishArticle, getDetailBySulg, getDetailById } from '@/api/article/article';
 import { useBuildQueryParams } from '@/hook/useBuilding';
 import { message } from "ant-design-vue";
 import { AuthService } from "@/service/auth.service";
@@ -151,6 +151,24 @@ export const useArticleDetail = () => {
             if (res.code === 200 && res.data){
                 console.log('get res ' ,res);
                 
+                 articleDetail.value = res.data
+                }
+            else message.warn(`获取详细信息失败 ${res.data}`);
+        })
+    }
+
+    return {
+        articleDetail,
+        getArticleDetail
+    }
+}
+
+export const useArticleDetailById = () => {
+    const articleDetail = ref<IArticle | null>(null)
+
+    const getArticleDetail = (id: string) => {
+        getDetailById(id).then(res => {
+            if (res.code === 200 && res.data){
                  articleDetail.value = res.data
                 }
             else message.warn(`获取详细信息失败 ${res.data}`);

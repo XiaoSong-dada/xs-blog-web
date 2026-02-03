@@ -29,18 +29,22 @@ export const routes = [
                 meta: { requiresAuth: true, requiresAdmin: true },
                 children: [
                     { path: 'user', component: () => import('@/views/admin/user/index.vue'), name: 'AdminUserList' },
-                    { path: 'article', component: () => import('@/views/admin/article/index.vue'), name: 'AdminArticleList' },
+                    {
+                        path: 'article',
+                        component: () => import('@/views/admin/article/index.vue'),
+                        name: 'AdminArticleList',
+                    },
                 ]
             },
             {
-                path: '/admin', component: AdminEditorLayout, name: 'Editor',
+                path: "/admin",
+                component: AdminEditorLayout,
                 meta: { requiresAuth: true, requiresAdmin: true },
                 children: [
-                    { path: 'article/new', component: () => import('@/views/admin/article/new.vue'), name: 'AdminEditor' },
-                ]
+                    { path: "article/new", name: "AdminArticleCreate", component: () => import("@/views/admin/article/editor.vue") },
+                    { path: "article/edit/:id", name: "AdminArticleEdit", component: () => import("@/views/admin/article/editor.vue"), props: true },
+                ],
             },
-
-
         ],
     },
     { path: '/login', component: Login, name: 'Login' },

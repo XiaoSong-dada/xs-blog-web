@@ -10,6 +10,10 @@ export const getDetailBySulg = async (sulg: string): Promise<ApiResponse<IArticl
     return requestHttp.get(`/article/${sulg}`)
 }
 
+export const getDetailById = async (id: string): Promise<ApiResponse<IArticle>> => {
+    return requestHttp.get(`/article/id/${id}`)
+}
+
 export const createArticle = async (article: IAritcleCreate): Promise<ApiResponse<{ article_id: string }>> => {
     return requestHttp.post(`/article`, article)
 }
@@ -21,3 +25,5 @@ export const updateArticle = async (article: IAritcleUpdate): Promise<ApiReposeB
 export const publishArticle = async (article_id:string): Promise<ApiReposeBase> => {
     return requestHttp.post(`/article/${article_id}`)
 }
+
+
