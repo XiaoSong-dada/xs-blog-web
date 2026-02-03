@@ -4,14 +4,14 @@
         <div class="toolbar">
             <div>
                 <a-input class="title" v-model:value="form.title" size="large" :maxlength="40" show-count
-                    @change="titleChange" placeholder="请输入文章标题"  @pressEnter="onPublish"/>
+                    @change="titleChange" placeholder="请输入文章标题" @pressEnter="onPublish" />
             </div>
 
 
             <div class="flex-start">
                 <a-input-group compact>
                     <a-input class="slug" v-model:value="form.slug" size="large" :maxlength="120" show-count
-                        placeholder="请输入文章标识" @pressEnter="onPublish"/>
+                        placeholder="请输入文章标识" @pressEnter="onPublish" />
                     <a-button :icon="h(RedoOutlined)" @click="reDoSlug"></a-button>
                 </a-input-group>
             </div>
@@ -105,12 +105,12 @@ const emit = defineEmits<{
      * 第一次保存草稿后，就是编辑草稿所以应启用编辑草稿对应的结构
      */
 
-     (e:"editDraft",payload: ArticlePayload): Promise<void> | void;
+    (e: "editDraft", payload: ArticlePayload): Promise<void> | void;
 
     /**
      * 保存状态监听
      */
-    (e:"isDirty" ,dirty: boolean):Promise<void> | void;
+    (e: "isDirty", dirty: boolean): Promise<void> | void;
 }>();
 
 /** ---------------------------
@@ -216,7 +216,7 @@ async function onPublish() {
     if (!validateBeforeSubmit(payload)) return;
     // 未保存时不允许发布
     if (dirty.value) return message.info('文章还未保存');
-    
+
     try {
         publishing.value = true;
         await emit("publish", payload);
@@ -248,6 +248,9 @@ function initVditor() {
             after: (count: number) => {
                 wordCount.value = count;
             },
+        },
+        fullscreen:{
+            index:2000
         },
 
         // 大纲默认展开
@@ -351,9 +354,9 @@ watch(
     }
 );
 
-watch(dirty , ()=>{
+watch(dirty, () => {
     // 当保存状态更新时，及时通知父组件
-    emit('isDirty',dirty.value)
+    emit('isDirty', dirty.value)
 })
 
 /** ---------------------------
@@ -378,9 +381,9 @@ function stopAutosave() {
 function onKeydown(e: KeyboardEvent) {
     const isSave = (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s";
     const isPublsih = e.ctrlKey && e.altKey && e.key === 'Enter';
-    if(isSave || isPublsih) e.preventDefault();
-    if(isSave) onSaveDraft();
-    else if (isPublsih)onPublish();
+    if (isSave || isPublsih) e.preventDefault();
+    if (isSave) onSaveDraft();
+    else if (isPublsih) onPublish();
     else return;
 }
 

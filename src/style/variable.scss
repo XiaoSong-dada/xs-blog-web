@@ -1,0 +1,3 @@
+$--header-h :  var(--app-header-height, 56px);
+$--page-padding: 5px;
+$--sticky-top :  calc(var(--header-h) + var(--page-padding));
