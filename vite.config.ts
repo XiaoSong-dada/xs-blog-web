@@ -24,5 +24,14 @@ export default defineConfig(({ mode }) => {
         },
       },
     },
+    css: {
+    preprocessorOptions: {
+      scss: {
+        additionalData: `
+          @use "@/style/main.scss" as *;
+        `
+      }
+    }
+  }
   }
 })

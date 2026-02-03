@@ -1,7 +1,8 @@
 <template>
-    <div>
-        <article-list :data="data" />
-        这是文章内容
+    <div class="article">
+        <div class="list">
+            <article-list :data="data" />
+        </div>
     </div>
 </template>
 
@@ -35,4 +36,9 @@ watch(
 )
 </script>
 
-<style scoped></style>
+<style scoped lang="scss">
+.article {
+    margin: 0 auto;
+    width: $content-width  ;
+}
+</style>

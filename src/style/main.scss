@@ -1,5 +1,5 @@
 // 用于引入全局变量
-@import url('./flex.scss');
-@import url('./layout.scss');
-@import url('./default.scss');
-@import url('./variable.scss');
+@forward './flex.scss';
+@forward './layout.scss'; 
+@forward './default.scss';
+@forward './variable.scss';
