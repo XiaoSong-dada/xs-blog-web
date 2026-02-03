@@ -1,13 +1,19 @@
 import type { IAritcleCreate, IAritcleUpdate, IArticle, IArticleQuery } from "@/types/main";
 import type { ArticlePayload } from '@/types/vditor';
 import { ref } from "vue";
-import { getList, createArticle as create, updateArticle, publishArticle, getDetailBySulg, getDetailById } from '@/api/article/article';
+import {
+    getList, getPublishList,
+    getPublishDetailBySulg,
+    createArticle as create,
+    updateArticle, publishArticle,
+    getDetailBySulg, getDetailById
+} from '@/api/article/article';
 import { useBuildQueryParams } from '@/hook/useBuilding';
 import { message } from "ant-design-vue";
 import { AuthService } from "@/service/auth.service";
 import { isNull } from "@/utils/verification";
 
-
+// TODO:以后再详细拆分用户获取与管理员获取的数据
 const buildQueryParams = useBuildQueryParams
 const createDefaultParams = (): IArticleQuery => ({
     title: "",
@@ -36,7 +42,7 @@ const rowSelection = ref({
 })
 
 
-export const useArticleList = () => {
+export const useArticleList = (publish_flag: boolean = false) => {
     const params = ref<IArticleQuery>(createDefaultParams());
     const data = ref<IArticle[]>([]);
     const total = ref(0);
@@ -47,10 +53,12 @@ export const useArticleList = () => {
         loading.value = true
         try {
             const query = { ...params.value, ...overrides }
+            console.log(query);
+            
             const bulid = buildQueryParams<IArticleQuery>(query)
             console.log(bulid);
 
-            const res = await getList(bulid)
+            const res = publish_flag ? await getPublishList(bulid) : await getList(bulid)
             const resTotal = (res as { total?: number }).total
             const normalized = normalizeArticleList(res.data, resTotal)
             data.value = normalized.list
@@ -146,15 +154,12 @@ export const useArticleEditor = () => {
 export const useArticleDetail = () => {
     const articleDetail = ref<IArticle | null>(null)
 
-    const getArticleDetail = (slug: string) => {
-        getDetailBySulg(slug).then(res => {
-            if (res.code === 200 && res.data){
-                console.log('get res ' ,res);
-                
-                 articleDetail.value = res.data
-                }
-            else message.warn(`获取详细信息失败 ${res.data}`);
-        })
+    const getArticleDetail = async (slug: string, publish_flag: boolean = false) => {
+        const detail = publish_flag ? await getPublishDetailBySulg(slug) : await getDetailBySulg(slug)
+        if (detail.code === 200 && detail.data) {
+            articleDetail.value = detail.data
+        }
+        else message.warn(`获取详细信息失败: ${detail.message}`);
     }
 
     return {
@@ -168,9 +173,9 @@ export const useArticleDetailById = () => {
 
     const getArticleDetail = (id: string) => {
         getDetailById(id).then(res => {
-            if (res.code === 200 && res.data){
-                 articleDetail.value = res.data
-                }
+            if (res.code === 200 && res.data) {
+                articleDetail.value = res.data
+            }
             else message.warn(`获取详细信息失败 ${res.data}`);
         })
     }

@@ -38,7 +38,7 @@ const { articleDetail, getArticleDetail } = useArticleDetail();
 const tocRef = ref<InstanceType<typeof VditorToc> | null>(null);
 
 onMounted(async () => {
-    await getArticleDetail(props.slug);
+    await getArticleDetail(props.slug , true);
 });
 
 // vditor-view 渲染完成后，把 root element 交给 toc 渲染

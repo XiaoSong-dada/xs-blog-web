@@ -55,8 +55,6 @@ class RequestHttp {
                     conf.headers = headers;
                 } else {
                     AuthService.clearToken();
-                    // 这里可以选择跳转到登录页
-                    router.push('/login');
                 }
                 return conf;
             },
@@ -87,9 +85,10 @@ class RequestHttp {
                     // 服务器响应失败
                     const status = error.response.status;
                     const msg = error.response.data?.message ?? error.message;
+                    
                     if (status === 401) {
                         AuthService.clearToken();
-                        router.push('/login');
+                        // router.push('/login');
                         message.error('登录已过期，请重新登录');
                     } else if (status === 500) {
                         message.error('服务器错误，请稍后重试');

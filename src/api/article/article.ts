@@ -6,8 +6,16 @@ export const getList = async (params: IArticleQuery): Promise<ApiResponse<IArtic
     return requestHttp.get('/article', params)
 }
 
+export const getPublishList = async (params: IArticleQuery): Promise<ApiResponse<IArticle[]>> => {
+    return requestHttp.get('/publish', params)
+}
+
 export const getDetailBySulg = async (sulg: string): Promise<ApiResponse<IArticle>> => {
     return requestHttp.get(`/article/${sulg}`)
+}
+
+export const getPublishDetailBySulg = async (sulg: string): Promise<ApiResponse<IArticle>> => {
+    return requestHttp.get(`/publish/${sulg}`)
 }
 
 export const getDetailById = async (id: string): Promise<ApiResponse<IArticle>> => {
@@ -25,5 +33,6 @@ export const updateArticle = async (article: IAritcleUpdate): Promise<ApiReposeB
 export const publishArticle = async (article_id:string): Promise<ApiReposeBase> => {
     return requestHttp.post(`/article/${article_id}`)
 }
+
 
 
