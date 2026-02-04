@@ -137,3 +137,8 @@ export interface IAritcleUpdate extends IAritcleCreate {
 export interface IArticleDetailPropos {
     slug:string;
 }
+
+// 文章卡片用户介绍行
+export interface IArticleMeta {
+    published_at?: string ;
+}
