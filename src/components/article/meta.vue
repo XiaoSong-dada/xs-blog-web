@@ -10,25 +10,20 @@
         <span class="meta__item">
             <span class="meta__label">发布</span>
             <time class="meta__value" :datetime="data.published_at ?? ''">
-                {{ data.published_at ? formatDate(data.published_at, "yyyy/MM/dd") : "未发布" }}
+                {{ props.data.published_at ? formatDate(props.data.published_at, "yyyy/MM/dd") : "未发布" }}
             </time>
         </span>
     </p>
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref } from 'vue';
 import type { IArticleMeta } from '@/types/main'
 import { formatDate } from '@/utils/date'
 
 const props = defineProps<{ data: IArticleMeta }>()
 const data = ref<IArticleMeta>({})
 
-
-watch(
-    () => props.data,
-    (p_data) => data.value.published_at = p_data.published_at
-)
 </script>
 
 <style scoped lang="scss">

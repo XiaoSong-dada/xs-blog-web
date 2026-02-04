@@ -3,10 +3,10 @@
         <div class="detail-layout">
             <aside class="detail-aside detail-aside--toc sticky-aside">
                 <div class="card aside-padding">
-                    <detail-header v-model:data="articleDetail" />
+                    <detail-header :data="article ?? null" />
                 </div>
                 <div class="card toc">
-                    <vditor-toc ref="tocRef" />
+                    <vditor-toc ref="tocRef" :scroll-container="scrollContainer" :offset-top="8" />
                 </div>
             </aside>
             <!-- 中间：内容 -->
@@ -20,14 +20,15 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 
 import VditorView from "@/components/vditor/vditor.view.vue";
 import VditorToc from "@/components/vditor/vditor.toc.vue";
 import DetailHeader from "@/components/article/detail.header.vue";
 
 import { useArticleDetail } from "@/hook/article/useArticle";
-import type { IArticleDetailPropos } from "@/types/main";
+import type { IArticle, IArticleDetailPropos } from "@/types/main";
+const article = ref<IArticle>();
 
 const props = defineProps<IArticleDetailPropos>();
 
@@ -35,8 +36,11 @@ const { articleDetail, getArticleDetail } = useArticleDetail();
 
 // 目录组件实例
 const tocRef = ref<InstanceType<typeof VditorToc> | null>(null);
+const scrollContainer = ref<HTMLElement | null>(null);
 
 onMounted(async () => {
+    scrollContainer.value = document.querySelector(".main-content") as HTMLElement | null;
+
     await getArticleDetail(props.slug, true);
 });
 
@@ -44,6 +48,18 @@ onMounted(async () => {
 function handleRendered(el: HTMLElement) {
     tocRef.value?.render(el);
 }
+
+
+watch(
+    () => articleDetail.value,
+    (val) => {
+        
+        if (val) {
+            article.value = val
+        }
+
+    },
+)
 </script>
 
 <style scoped lang="scss">
@@ -57,12 +73,11 @@ function handleRendered(el: HTMLElement) {
     --right-w: 200px;
     --toc-height: 400px;
 
-    --sticky-top: calc( var(--header-h) + var(--page-padding));
+    --sticky-top: calc(var(--header-h) + var(--page-padding));
     --sticky-max-h: calc(100vh - 80px);
 
     background-color: #F5F6F7;
-    height: 100%;
-    overflow: auto;
+    min-height: 100%;
     box-sizing: border-box;
 
     /* Layout：只关心布局，不关心颜色皮肤 */
@@ -95,6 +110,7 @@ function handleRendered(el: HTMLElement) {
         overflow: auto;
         flex: 1;
     }
+
     .aside-padding {
         padding: 10px;
     }
@@ -102,6 +118,7 @@ function handleRendered(el: HTMLElement) {
     .toc {
         min-height: var(--toc-height);
     }
+
     /* 通用：侧栏基础 */
     .detail-aside {
         display: flex;
@@ -127,7 +144,7 @@ function handleRendered(el: HTMLElement) {
     .detail-main {
         flex: 1;
         min-width: 0;
-        min-height:var(--sticky-max-h);
+        min-height: var(--sticky-max-h);
         align-items: flex-start;
         /* 关键：防止中间内容把 flex 撑爆导致横向溢出 */
         padding: 10px;
@@ -142,12 +159,6 @@ function handleRendered(el: HTMLElement) {
         min-width: 0;
     }
 
-    /**
- * ⚠️ 建议：把这类 deep 样式挪到 VditorToc.vue 内部，
- * 因为它依赖子组件内部结构，页面不应该关心 .vditor-outline
- *
- * 如果你暂时不想改组件，就先保留：
- */
     .detail-aside--toc {
         :deep(.vditor-outline) {
             display: block;

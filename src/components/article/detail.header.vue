@@ -14,7 +14,7 @@ import { onMounted, ref, watch } from 'vue'
 import ArticleMeta from '@/components/article/meta.vue'
 
 const props = defineProps<{ data: IArticle | null }>()
-const detailData = ref<IArticle>();
+const detailData = ref<IArticle | null>(null);
 const metaData = ref<IArticleMeta>({})
 
 onMounted(async () => {
@@ -32,9 +32,9 @@ watch(
     () => props.data,
     (val) => {
         if (!val) return;
-        detailData.value = { ...val };
+        detailData.value = val;
         detailData.value.created_at = formatDate(detailData.value.created_at);
-        if(metaData)metaData.value.published_at = formatDate(detailData.value.published_at as string);
+        metaData.value.published_at = formatDate(detailData.value.published_at as string);
     },
     { immediate: true }
 );
