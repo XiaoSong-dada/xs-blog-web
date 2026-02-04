@@ -6,7 +6,8 @@ import {
     getPublishDetailBySulg,
     createArticle as create,
     updateArticle, publishArticle,
-    getDetailBySulg, getDetailById
+    getDetailBySulg, getDetailById,
+    addView
 } from '@/api/article/article';
 import { useBuildQueryParams } from '@/hook/useBuilding';
 import { message } from "ant-design-vue";
@@ -183,5 +184,14 @@ export const useArticleDetailById = () => {
     return {
         articleDetail,
         getArticleDetail
+    }
+}
+
+export const useAddView = ()=>{
+    return{
+        addView:(id:string)=>{
+            // 直接增加
+            addView(id)
+        }
     }
 }

@@ -26,14 +26,14 @@ import VditorView from "@/components/vditor/vditor.view.vue";
 import VditorToc from "@/components/vditor/vditor.toc.vue";
 import DetailHeader from "@/components/article/detail.header.vue";
 
-import { useArticleDetail } from "@/hook/article/useArticle";
+import { useAddView, useArticleDetail } from "@/hook/article/useArticle";
 import type { IArticle, IArticleDetailPropos } from "@/types/main";
 const article = ref<IArticle>();
 
 const props = defineProps<IArticleDetailPropos>();
 
 const { articleDetail, getArticleDetail } = useArticleDetail();
-
+const { addView } = useAddView();
 // 目录组件实例
 const tocRef = ref<InstanceType<typeof VditorToc> | null>(null);
 const scrollContainer = ref<HTMLElement | null>(null);
@@ -42,6 +42,7 @@ onMounted(async () => {
     scrollContainer.value = document.querySelector(".main-content") as HTMLElement | null;
 
     await getArticleDetail(props.slug, true);
+    
 });
 
 // vditor-view 渲染完成后，把 root element 交给 toc 渲染
@@ -55,6 +56,9 @@ watch(
     (val) => {
         
         if (val) {
+            console.log('新增浏览量了');
+            
+            addView(val.id);
             article.value = val
         }
 

@@ -34,5 +34,8 @@ export const publishArticle = async (article_id:string): Promise<ApiReposeBase> 
     return requestHttp.post(`/article/${article_id}`)
 }
 
+export const addView = async (article_id:string): Promise<ApiReposeBase> => {
+    return requestHttp.post(`/publish/${article_id}/view`)
+}
 
 
