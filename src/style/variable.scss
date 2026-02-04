@@ -3,6 +3,7 @@ $header-h: 46px;
 $header-p:12px;
 $page-padding: 5px;
 $sticky-top: calc(var($header-h) + var($page-padding));
+$content-height :calc(100vh - var($sticky-top));
 $default-background: #f5f5f5;
 $dark-color:#d7d7d7;
 $editor-content-padding:10px;

@@ -1,13 +1,17 @@
 <template>
     <div class="article-detail-page">
         <div class="detail-layout">
+            <aside class="detail-aside detail-aside--toc sticky-aside">
+                <div class="card aside-padding">
+                    <detail-header v-model:data="articleDetail" />
+                </div>
+                <div class="card toc">
+                    <vditor-toc ref="tocRef" />
+                </div>
+            </aside>
             <!-- 中间：内容 -->
             <main class="detail-main card flex-start">
-                <aside class="detail-aside detail-aside--toc card sticky-aside">
-                    <vditor-toc ref="tocRef" />
-                </aside>
                 <div>
-                    <detail-header v-model:data="articleDetail" />
                     <vditor-view :markdown="articleDetail?.content_md ?? ''" @rendered="handleRendered" />
                 </div>
             </main>
@@ -43,32 +47,35 @@ function handleRendered(el: HTMLElement) {
 </script>
 
 <style scoped lang="scss">
-
 .article-detail-page {
     /* 统一可配置变量：集中管理尺寸，后续调整只改这里 */
-    --header-h: var(--app-header-height, 56px);
     --gap: 20px;
     --page-padding: 5px;
+    --header-h: 46px;
 
     --toc-w: 220px;
     --right-w: 200px;
+    --toc-height: 400px;
 
-    --sticky-top: calc(var(--header-h) + var(--page-padding));
-    --sticky-max-h: calc(100vh - var(--header-h) - 32px);
+    --sticky-top: calc( var(--header-h) + var(--page-padding));
+    --sticky-max-h: calc(100vh - 80px);
 
     background-color: #F5F6F7;
-    min-height: 100%;
+    height: 100%;
+    overflow: auto;
+    box-sizing: border-box;
 
     /* Layout：只关心布局，不关心颜色皮肤 */
     .detail-layout {
         display: flex;
         align-items: flex-start;
-        gap: var(--gap);
 
         width: min(1240px, 100%);
         margin: 0 auto;
-        padding: var(--page-padding);
-
+        padding: var($page-padding);
+        min-height: 100%;
+        box-sizing: border-box;
+        gap: var(--gap);
         /* 允许 sticky 元素可见 */
         overflow: visible;
     }
@@ -77,20 +84,31 @@ function handleRendered(el: HTMLElement) {
     .card {
         background: #fff;
         border-right: 1px solid $dark-color ;
+        border-radius: 5px;
     }
 
     /* 通用：sticky 侧栏能力 */
     .sticky-aside {
         position: sticky;
-        top: var(--sticky-top);
         align-self: flex-start;
         max-height: var(--sticky-max-h);
         overflow: auto;
+        flex: 1;
+    }
+    .aside-padding {
+        padding: 10px;
     }
 
+    .toc {
+        min-height: var(--toc-height);
+    }
     /* 通用：侧栏基础 */
     .detail-aside {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
         flex: 0 0;
+        padding: 5px
     }
 
     /* 左侧目录宽度 */
@@ -108,13 +126,20 @@ function handleRendered(el: HTMLElement) {
     /* 主内容：自适应占满剩余空间 */
     .detail-main {
         flex: 1;
-        min-width: 1024px;
+        min-width: 0;
+        min-height:var(--sticky-max-h);
+        align-items: flex-start;
         /* 关键：防止中间内容把 flex 撑爆导致横向溢出 */
         padding: 10px;
         margin-top: 5px;
         /* 你原来 content 的 margin-top/内边距，这里统一一下 */
-        height: $sticky-top;
-        gap: var(--gap)
+        gap: var(--gap);
+        box-sizing: border-box;
+    }
+
+    .detail-main>div {
+        flex: 1 1 auto;
+        min-width: 0;
     }
 
     /**

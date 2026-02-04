@@ -58,6 +58,7 @@ const isLogin = computed(() => {
 // 解决菜单项聚焦问题
 const routeToKey = (path: string) => {
     if (path.startsWith('/admin')) return 'admin'
+    if (path.startsWith('/article/')) return 'article-detail'
     if (path.startsWith('/article')) return 'article'
     if (path.startsWith('/about')) return 'about'
     return 'home'
