@@ -1,18 +1,23 @@
 <template>
     <div class="article">
         <div class="list">
-            <article-list :data="data" @click-title="getDetail"/>
+            <article-search-list :data="searchList ?? []" v-if="isSearch" />
+            <article-list v-else :data="data" @click-title="getDetail" />
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
 import ArticleList from '@/components/article/list.vue';
-import { useArticleList } from '@/hook/article/useArticle';
+import ArticleSearchList from '@/components/article/search.list.vue';
+import { useArticleList, useSearchList } from '@/hook/article/useArticle';
 import type { IArticle } from '@/types/main';
 import { onMounted, ref, watch } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 const router = useRouter();
+const route = useRoute();
+
+const isSearch = ref<boolean>(false);
 
 const {
     params,
@@ -24,25 +29,43 @@ const {
     rowSelection,
     selectedRows
 } = useArticleList(true);
-const article_list = ref<IArticle[] | null>()
+
+const { searchParams, searchList, fetchSearchList } = useSearchList()
 
 
 onMounted(async () => {
-    await fetchList()
-    console.log(data);
+    // 判断是否是进行关键字搜索模式
+    getData()
 })
 
-
-const getDetail = (slug:string)=>{
-    router.push(`/article/${slug}`)
+const getData = async () => {
+    getSearchRouter();
+    if (isSearch.value) await fetchSearchList();
+    else await fetchList();
 }
 
 
+const getSearchRouter = () => {
+    const kw = route.query.kw as string || undefined
+
+    if (kw) {
+        searchParams.value.kw = kw
+        isSearch.value = true
+    }
+    else{
+        isSearch.value = false;
+    }
+}
+
+const getDetail = (slug: string) => {
+    router.push(`/article/${slug}`)
+}
 
 watch(
-    () => data.value,
-    (data) => article_list.value = data
+    () => route.query.kw,
+    () => getData()
 )
+
 
 
 </script>
@@ -50,6 +73,6 @@ watch(
 <style scoped lang="scss">
 .article {
     margin: 0 auto;
-    width: $content-width  ;
+    width: $content-width ;
 }
 </style>

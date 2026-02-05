@@ -56,8 +56,6 @@ watch(
     (val) => {
         
         if (val) {
-            console.log('新增浏览量了');
-            
             addView(val.id);
             article.value = val
         }

@@ -10,9 +10,7 @@
                 </div>
             </header>
 
-            <p class="card__excerpt">
-                {{ excerpt(article.content_md) }}
-            </p>
+            <p class="card__excerpt" v-html="renderSnippet(excerpt(article.snippet))"></p>
 
             <p class="meta">
                 <span class="meta__item">
@@ -66,12 +64,12 @@
 </template>
 
 <script setup lang="ts">
-import type { IArticle, IArticleSearchList } from "@/types/main";
+import type { IArticleSearchList } from "@/types/main";
 import { formatDate } from "@/utils/date";
-import { computed } from "vue";
+import { computed, h } from "vue";
 import { Tag } from "ant-design-vue";
 const ATag = Tag;
-const props = defineProps<{ data: IArticle[] }>();
+const props = defineProps<{ data: IArticleSearchList[]}>();
 
 const items = computed(() => props.data ?? []);
 const emit = defineEmits<{
@@ -82,24 +80,26 @@ const emit = defineEmits<{
 
 }>();
 
-/**
- * 简易“去 Markdown 标记”版本：先把常见符号去掉，做列表摘要足够用。
- * 以后你想要更强的效果，可以换成 markdown-it + strip 或者后端生成 excerpt。
- */
-const stripMd = (md: string) =>
-    md
-        .replace(/```[\s\S]*?```/g, "") // code block
-        .replace(/`[^`]*`/g, "")       // inline code
-        .replace(/!\[[^\]]*]\([^)]*\)/g, "") // images
-        .replace(/\[[^\]]*]\([^)]*\)/g, "$1") // links (keep text)
-        .replace(/[#>*_~\-]+/g, " ")    // common marks
-        .replace(/\s+/g, " ")
-        .trim();
-
 const excerpt = (md: string | null) => {
-    const raw = stripMd(md ?? "");
+    const raw = md ?? "";
     return raw.length > 200 ? raw.slice(0, 200) + "…" : raw;
 };
+
+const escapeHtml = (s:string) =>{
+    return s
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;')
+    }
+
+function renderSnippet(snippet: string) {
+  const escaped = escapeHtml(snippet) // 先转义，防注入
+  return escaped
+    .replace(/\[\[\[/g, '<mark>')
+    .replace(/\]\]\]/g, '</mark>')
+}
 </script>
 
 <style scoped lang="scss">

@@ -1,9 +1,13 @@
 import { requestHttp } from '@/utils/http';
-import type { IArticleQuery, IArticle, IAritcleCreate,IAritcleUpdate } from '@/types/main';
+import type { IArticleQuery, IArticle, IAritcleCreate,IAritcleUpdate, IArticleSearchQuery, IArticleSearchList } from '@/types/main';
 import type { ApiResponse, ApiReposeBase } from '@/types/http'
 
 export const getList = async (params: IArticleQuery): Promise<ApiResponse<IArticle[]>> => {
     return requestHttp.get('/article', params)
+}
+
+export const getSearchList = async (params: IArticleSearchQuery): Promise<ApiResponse<IArticleSearchList[]>> => {
+    return requestHttp.get('/publish/search/list', params)
 }
 
 export const getPublishList = async (params: IArticleQuery): Promise<ApiResponse<IArticle[]>> => {

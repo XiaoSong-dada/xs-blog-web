@@ -120,6 +120,25 @@ export type IArticleQuery = IPages<{
     content_md: string | undefined;
 }>;
 
+export type IArticleSearchQuery = IPages<{
+    kw?:string
+}>;
+
+
+// 文章接口
+export interface IArticleSearchList {
+    id: string;
+    slug: string;
+    title: string;
+    snippet:string;
+    view_count: number;
+    published_at: string | null;
+    rank: number;
+    hit_title:boolean;
+    hit_content:boolean;
+}
+
+
 // 新建文章
 export interface IAritcleCreate {
     title: string;

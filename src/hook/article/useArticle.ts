@@ -1,4 +1,11 @@
-import type { IAritcleCreate, IAritcleUpdate, IArticle, IArticleQuery } from "@/types/main";
+import type {
+    IAritcleCreate,
+    IAritcleUpdate,
+    IArticle,
+    IArticleQuery,
+    IArticleSearchList,
+    IArticleSearchQuery
+} from "@/types/main";
 import type { ArticlePayload } from '@/types/vditor';
 import { ref } from "vue";
 import {
@@ -7,7 +14,8 @@ import {
     createArticle as create,
     updateArticle, publishArticle,
     getDetailBySulg, getDetailById,
-    addView
+    addView,
+    getSearchList
 } from '@/api/article/article';
 import { useBuildQueryParams } from '@/hook/useBuilding';
 import { message } from "ant-design-vue";
@@ -54,17 +62,11 @@ export const useArticleList = (publish_flag: boolean = false) => {
         loading.value = true
         try {
             const query = { ...params.value, ...overrides }
-            console.log(query);
-            
             const bulid = buildQueryParams<IArticleQuery>(query)
-            console.log(bulid);
-
             const res = publish_flag ? await getPublishList(bulid) : await getList(bulid)
             const resTotal = (res as { total?: number }).total
             const normalized = normalizeArticleList(res.data, resTotal)
             data.value = normalized.list
-            console.log(data.value);
-
             total.value = normalized.total
         } finally {
             loading.value = false
@@ -187,11 +189,49 @@ export const useArticleDetailById = () => {
     }
 }
 
-export const useAddView = ()=>{
-    return{
-        addView:(id:string)=>{
+export const useAddView = () => {
+    return {
+        addView: (id: string) => {
             // 直接增加
             addView(id)
         }
+    }
+}
+
+const createSearchDefaultParams = (): IArticleSearchQuery => ({
+    kw: ''
+})
+export const useSearchList = () => {
+    const searchParams = ref<IArticleSearchQuery>(createSearchDefaultParams());
+    const searchList = ref<IArticleSearchList[]>();
+    const searchTotal = ref(0);
+    const loading = ref(false);
+
+    const fetchSearchList = async (overrides: Partial<IArticleSearchQuery> = {}) => {
+        loading.value = true
+        try {
+            const query = { ...searchParams.value, ...overrides }
+            const bulid = buildQueryParams<IArticleSearchQuery>(query)
+            const res = await getSearchList(bulid)
+            searchList.value = res.data
+            searchTotal.value = res.total ?? 0
+        } finally {
+            loading.value = false
+        }
+    }
+
+    const resetParams = () => {
+        searchParams.value = createDefaultParams()
+    }
+
+    return {
+        searchParams,
+        searchList,
+        searchTotal,
+        loading,
+        fetchSearchList,
+        resetParams,
+        rowSelection,
+        selectedRows
     }
 }
