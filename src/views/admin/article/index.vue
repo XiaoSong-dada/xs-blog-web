@@ -80,7 +80,6 @@
                 <CheckOutlined />
                 提交文件
             </a-button>
-
         </a-modal>
     </div>
 </template>
@@ -107,7 +106,7 @@ import { useBuildTableIndex } from '@/hook/useBuilding';
 import { useRouter } from 'vue-router';
 import { useTableHeight } from '@/hook/layout/useLayout';
 import { omitString } from '@/utils/utils';
-import { useSession } from '@/hook/file/useSession';
+import { useFiles, useSession } from '@/hook/file/useSession';
 
 const ATable = Table;
 const AButton = Button;
@@ -118,15 +117,15 @@ const AUploadDragger = UploadDragger;
 const AUpload = Upload;
 const AModal = Modal;
 const { columns, params, data, total, loading, fetchList, resetParams, rowSelection, selectedRows } = useArticleList();
-const { session, createSession } = useSession()
+const { session, createSession } = useSession();
+const { extractImagePaths, isMdFile, readMdFromFileList, isImageFile } = useFiles();
 const { buildIndex } = useBuildTableIndex();
 const { tableHeight, tableHeightOnMounted } = useTableHeight();
 const router = useRouter();
 const fileList = ref<UploadFile[]>();
 const openUpload = ref<boolean>(false);
-const selectedCount = ref<number>(0);
 const filteredCount = ref<number>(0);
-const selectedFolder = ref<string>('');
+const GROUP_COUNT = 10;
 
 
 const onSearch = () => {
@@ -184,9 +183,91 @@ const beforeUpload = (file: UploadFile) => {
 }
 
 
-const submitFile = () => {
-    console.log('这里执行提交了');
+const submitFile = async () => {
+    session.value
 
+    console.log(fileList.value);
+    /**
+     * step0: 将文件转存为has Map <url , str>
+     * step1: 先判断是否为md
+     * step2: 抽取md中的图片的相对路径
+     * step3: 判断has map 中是否有相对路径的文件
+     * step4：进行分组，将附件图片与md作为一组上传 || 无图片附件的md 以10个为单位上传
+     */
+
+    const url_file_map = new Map<string, UploadFile>()
+    const map_error: Array<string> = []
+    // 图片map 用于分组
+    const img_map = new Map<string, UploadFile>();
+    // 怎么感觉这么写损耗性能，无所谓了
+    fileList.value?.forEach((file: UploadFile) => {
+        const path = file.originFileObj?.webkitRelativePath
+        if (path) {
+            url_file_map.set(path, file);
+            if (isImageFile(file)) img_map.set(path, file);
+        }
+        else {
+            map_error.push(`文件${file.name}获取相对路径失败`)
+        }
+    });
+    if (map_error.length > 0) message.warn(map_error.join('\n'));
+
+    // 二维数组 分组
+    const group_array: Array<UploadFile[]> = []
+
+    // 记录索引
+
+    // 图片分组游标
+    let img_index = 0;
+    // md分组游标
+    let md_index = 0;
+
+    fileList.value?.forEach(async (file: UploadFile) => {
+        if (!isMdFile(file)) {
+            return;
+        }
+
+        const md = await readMdFromFileList(file)
+        if (!md) return;
+
+        const path = extractImagePaths(md.mdText);
+        // 图片与md分组 可能丢失图片文件,无所谓了不考虑后续再做
+        // TODO: 上传图片丢失
+        if (path.length > 0) {
+
+            img_index > md_index ? img_index++ : img_index = md_index + 1;   
+
+            if(!group_array[img_index]) {
+                group_array[img_index] = []
+            }
+
+            group_array[img_index]?.push(file);
+
+            return path.forEach(url => {
+                if (img_map.has(url)) group_array[img_index]?.push(img_map.get(url) as UploadFile);
+            })
+        }
+
+        let md_group_item = group_array[md_index]
+
+        if (!md_group_item) {
+            group_array[md_index] = [];
+            md_group_item = group_array[md_index]
+        }
+
+        // 超出分组游标加一
+        if (md_group_item && md_group_item.length >= GROUP_COUNT) {
+            md_index++;
+            group_array.push([]);
+        }
+        group_array[md_index]?.push(file);
+    })
+    // 测试一下
+    console.log(group_array);
+    
+    console.log('this is session ', session);
+
+    console.log('这里执行提交了');
 }
 
 
