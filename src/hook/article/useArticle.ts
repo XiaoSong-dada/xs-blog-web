@@ -49,7 +49,63 @@ const rowSelection = ref({
         selectedRows.value = selecteds
     }
 })
+const columns = [
+    {
+        title: '序号',
+        key: 'index',
+        dataIndex: 'index',
+        width: '80px'
+    },
+    {
+        title: '标识',
+        key: 'slug',
+        width: '200px',
+        dataIndex: 'slug'
+    },
+    {
+        title: '标题',
+        key: 'title',
+        width: '200px',
+        dataIndex: 'title'
+    },
+    {
+        title: '内容',
+        key: 'content_md',
+        with: '150px',
+        dataIndex: 'content_md'
+    },
+    {
+        title: '浏览',
+        key: 'view_count',
+        width: '150px',
+        dataIndex: 'view_count'
+    },
+    {
+        title: '创建时间',
+        key: 'created_at',
+        width: '200px',
+        dataIndex: 'created_at'
+    },
 
+    {
+        title: '修改时间',
+        key: 'updated_at',
+        width: '200px',
+        dataIndex: 'updated_at'
+    },
+
+    {
+        title: '发布时间',
+        key: 'published_at',
+        width: '200px',
+        dataIndex: 'published_at'
+    },
+    {
+        title: '操作',
+        key: 'action',
+        width: '200px'
+    },
+];
 
 export const useArticleList = (publish_flag: boolean = false) => {
     const params = ref<IArticleQuery>(createDefaultParams());
@@ -85,7 +141,8 @@ export const useArticleList = (publish_flag: boolean = false) => {
         fetchList,
         resetParams,
         rowSelection,
-        selectedRows
+        selectedRows,
+        columns
     }
 }
 

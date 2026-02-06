@@ -30,13 +30,20 @@
                 </a-flex>
                 <a-flex gap="small" align="center">
                     <a-button type="primary" :icon="h(SearchOutlined)" @click="onSearch">搜索</a-button>
-                    <a-button :icon="h(ReloadOutlined)" @click="onReset">重置</a-button>
+                    <a-button :icon="h(SyncOutlined)" @click="onReset">重置</a-button>
                 </a-flex>
             </a-flex>
             <a-flex class="tools" gap="small">
                 <a-button type="primary" :icon="h(PlusOutlined)"
                     @click="() => router.push('./article/new')">新增</a-button>
-                <a-button type="primary" danger :icon="h(CloseOutlined)" @click="notDevelopedMessage()">删除</a-button>
+                <a-button type="primary" @click="openUploadModal">
+                    <upload-outlined></upload-outlined>
+                    导入
+                </a-button>
+
+
+                <!-- <a-button type="primary" :icon="h(VerticalAlignTopOutlined)" @click="importMarkDown">导入</a-button> -->
+                <a-button type="primary" :icon="h(VerticalAlignBottomOutlined)" @click="downMarkDown">导出</a-button>
             </a-flex>
         </div>
         <a-table :columns="columns" :data-source="data" :scroll="{ x: '100%', y: computTableHeight }" :loading="loading"
@@ -61,89 +68,65 @@
                 </template>
             </template>
         </a-table>
+        <a-modal v-model:open="openUpload" title="上传文件" okText="确认" cancelText="取消">
+            <a-upload v-model:file-list="fileList" name="file" directory accept=".png,.jpg,.jpeg,.md"
+                :before-upload="beforeUpload">
+                <a-button>
+                    <upload-outlined />
+                    上传文件
+                </a-button>
+            </a-upload>
+            <a-button @click="submitFile" class="submit-button">
+                <CheckOutlined />
+                提交文件
+            </a-button>
+
+        </a-modal>
     </div>
 </template>
 
 <script setup lang="ts">
-import { Table, Button, Flex, Input, Popconfirm, message } from 'ant-design-vue';
+import { Table, Button, Flex, Input, Popconfirm, message, UploadDragger, type UploadFile, Modal, Upload } from 'ant-design-vue';
 import { PlusOutlined, CloseOutlined } from '@ant-design/icons-vue';
 import { useArticleList } from '@/hook/article/useArticle'
-import { EditOutlined, DeleteOutlined, SearchOutlined, ReloadOutlined } from '@ant-design/icons-vue';
-import { computed, h, onMounted } from 'vue'
+import {
+    EditOutlined,
+    DeleteOutlined,
+    SearchOutlined,
+    VerticalAlignBottomOutlined,
+    VerticalAlignTopOutlined,
+    UploadOutlined,
+    SyncOutlined,
+    InboxOutlined,
+    CheckOutlined
+} from '@ant-design/icons-vue';
+import { computed, h, onMounted, ref } from 'vue'
 import { notDevelopedMessage } from '@/ui/status/not-developed';
 import { formatDate } from '@/utils/date';
 import { useBuildTableIndex } from '@/hook/useBuilding';
 import { useRouter } from 'vue-router';
 import { useTableHeight } from '@/hook/layout/useLayout';
 import { omitString } from '@/utils/utils';
+import { useSession } from '@/hook/file/useSession';
 
 const ATable = Table;
 const AButton = Button;
 const AFlex = Flex;
 const AInput = Input;
 const APopconfirm = Popconfirm;
-const { params, data, total, loading, fetchList, resetParams, rowSelection, selectedRows } = useArticleList();
+const AUploadDragger = UploadDragger;
+const AUpload = Upload;
+const AModal = Modal;
+const { columns, params, data, total, loading, fetchList, resetParams, rowSelection, selectedRows } = useArticleList();
+const { session, createSession } = useSession()
 const { buildIndex } = useBuildTableIndex();
 const { tableHeight, tableHeightOnMounted } = useTableHeight();
 const router = useRouter();
-
-const columns = [
-    {
-        title: '序号',
-        key: 'index',
-        dataIndex: 'index',
-        width: '80px'
-    },
-    {
-        title: '标识',
-        key: 'slug',
-        width: '200px',
-        dataIndex: 'slug'
-    },
-    {
-        title: '标题',
-        key: 'title',
-        width: '200px',
-        dataIndex: 'title'
-    },
-    {
-        title: '内容',
-        key: 'content_md',
-        with: '150px',
-        dataIndex: 'content_md'
-    },
-    {
-        title: '浏览',
-        key: 'view_count',
-        width: '150px',
-        dataIndex: 'view_count'
-    },
-    {
-        title: '创建时间',
-        key: 'created_at',
-        width: '200px',
-        dataIndex: 'created_at'
-    },
-
-    {
-        title: '修改时间',
-        key: 'updated_at',
-        width: '200px',
-        dataIndex: 'updated_at'
-    },
-
-    {
-        title: '发布时间',
-        key: 'published_at',
-        width: '200px',
-        dataIndex: 'published_at'
-    },
-    {
-        title: '操作',
-        key: 'action',
-        width: '200px'
-    },
-];
+const fileList = ref<UploadFile[]>();
+const openUpload = ref<boolean>(false);
+const selectedCount = ref<number>(0);
+const filteredCount = ref<number>(0);
+const selectedFolder = ref<string>('');
 
 
 const onSearch = () => {
@@ -169,11 +152,41 @@ const paginationComputed = computed(() => ({
     showSizeChanger: true,
     onChange: onTableChange,
     onShowSizeChange: onTableChange,
-    showTotal: () => `共${total.value} 条`
+    showTotal: () => `共?{total.value} 条`
 }))
 
 const updateArticle = (article_id: string): void => {
     router.push(`./article/edit/${article_id}`)
+}
+
+// 导入功能
+const importMarkDown = () => {
+    console.log("导入成功");
+}
+
+const downMarkDown = () => {
+    console.log("导出成功");
+
+}
+
+const openUploadModal = async () => {
+    await createSession();
+    openUpload.value = true;
+}
+
+const beforeUpload = (file: UploadFile) => {
+    const allow = /\.(png|jpe?g|md)$/i.test(file.name);
+    if (!allow) {
+        filteredCount.value += 1;
+        return Upload.LIST_IGNORE;
+    }
+    return false;
+}
+
+
+const submitFile = () => {
+    console.log('这里执行提交了');
+
 }
 
 
@@ -181,10 +194,14 @@ onMounted(async () => {
     await fetchList()
 })
 tableHeightOnMounted('main-content', 'toobar')
-const computTableHeight = computed(() =>tableHeight.value)
+const computTableHeight = computed(() => tableHeight.value)
 
 </script>
 
 <style scoped lang="scss">
 .center-article {}
+
+.submit-button {
+    margin-top: 20px;
+}
 </style>

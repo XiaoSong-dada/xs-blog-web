@@ -161,3 +161,12 @@ export interface IArticleDetailPropos {
 export interface IArticleMeta {
     published_at?: string ;
 }
+
+// 创建文件上传session
+export interface IUplaodSession {
+    id:string;
+    status:string;
+    upload_url:string;
+    commit_url:string;
+    expires_at:string;
+}
