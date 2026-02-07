@@ -152,7 +152,7 @@ const paginationComputed = computed(() => ({
     showSizeChanger: true,
     onChange: onTableChange,
     onShowSizeChange: onTableChange,
-    showTotal: () => `�?{total.value} 条`
+    showTotal: () => `共${total.value} 条`
 }))
 
 const updateArticle = (article_id: string): void => {

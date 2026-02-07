@@ -1,7 +1,7 @@
 <template>
     <vditor-compoment :upload-url="upload.upload_url" upload-type="image" @save-draft="createArticle" :mode="modle"
         @edit-draft="editArticle" @publish="publishArticle" @is-dirty="(dirty) => isDirty = dirty" :form="vditroFrom"
-        :markdown="markdown" :initial="initVditor" />
+        :autosave="false" :markdown="markdown" :initial="initVditor" />
 </template>
 
 <script setup lang="ts">
@@ -40,6 +40,8 @@ onMounted(() => {
 watch(
     () => articleDetail.value,
     (article) => {
+        console.log(article);
+        
         initVditor.value.content_md  = article?.content_md ?? '';
         initVditor.value.title = article?.title ?? '';
         initVditor.value.slug = article?.slug ?? '';

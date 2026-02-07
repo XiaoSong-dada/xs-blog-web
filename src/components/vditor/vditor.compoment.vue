@@ -141,6 +141,7 @@ const dirty = ref(false); // 是否有未保存修改
 const lastSavedAt = ref<string>("");
 const isVditorReady = ref(false);
 const pendingMarkdown = ref<string | null>(null);
+const hydratingFromInitial = ref(false);
 
 
 // 统计
@@ -167,6 +168,27 @@ function buildPayload(): ArticlePayload {
         slug: form.slug?.trim() || "",
         content_md: getMarkdown(),
     };
+}
+
+function syncFromInitial(initial?: Partial<ArticlePayload>) {
+    hydratingFromInitial.value = true;
+
+    form.title = initial?.title ?? "";
+    form.slug = initial?.slug ?? "";
+
+    const nextMarkdown = initial?.content_md ?? "";
+    pendingMarkdown.value = nextMarkdown;
+
+    if (isVditorReady.value && vditor.value) {
+        const currentMarkdown = vditor.value.getValue() ?? "";
+        if (currentMarkdown !== nextMarkdown) {
+            vditor.value.setValue(nextMarkdown);
+        }
+    }
+
+    Promise.resolve().then(() => {
+        hydratingFromInitial.value = false;
+    });
 }
 
 
@@ -320,8 +342,9 @@ function initVditor() {
         // 初始化完成回填内容（编辑模式）
         after: () => {
             isVditorReady.value = true;
-            const initMd = props.initial?.content_md ?? "";
-            if (initMd) vditor.value?.setValue(initMd);
+            const initMd = pendingMarkdown.value ?? props.initial?.content_md ?? "";
+            vditor.value?.setValue(initMd);
+            pendingMarkdown.value = null;
         },
     });
 }
@@ -360,6 +383,7 @@ const reDoSlug = () => {
 watch(
     () => [form.title, form.slug],
     () => {
+        if (hydratingFromInitial.value) return;
         markDirtyAndNotify();
     }
 );
@@ -370,14 +394,12 @@ watch(dirty, () => {
 })
 
 watch(
-    () => [props.initial.title, props.initial.slug],
+    () => [props.initial?.title, props.initial?.slug, props.initial?.content_md],
     () => {
-        console.log('init !');
-
-        form.title = props.initial.title ?? '',
-            form.slug = props.initial.slug ?? ''
-    }
-)
+        syncFromInitial(props.initial);
+    },
+    { immediate: true }
+);
 
 
 /** ---------------------------
