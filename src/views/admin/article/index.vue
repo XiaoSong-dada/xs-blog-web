@@ -152,7 +152,7 @@ const paginationComputed = computed(() => ({
     showSizeChanger: true,
     onChange: onTableChange,
     onShowSizeChange: onTableChange,
-    showTotal: () => `共?{total.value} 条`
+    showTotal: () => `�?{total.value} 条`
 }))
 
 const updateArticle = (article_id: string): void => {
@@ -210,6 +210,8 @@ const submitFile = async () => {
         has_img: false,
     }
     // 记录索引
+    if (!fileList.value) return message.warn('文件上传列表不存在');
+
 
     // 图片分组游标
     let img_index = 0;
@@ -217,13 +219,13 @@ const submitFile = async () => {
     let md_index = 0;
 
     // 修改上传文件类型
-    fileList.value?.forEach(async (file: UploadFile, index) => {
+    for (const [index, file] of fileList.value.entries()) {
         if (!isMdFile(file)) {
-            return;
+            continue;
         }
 
         const md = await readMdFromFileList(file)
-        if (!md) return;
+        if (!md) continue;
 
         const path = extractImagePaths(md.mdText);
         // 图片与md分组 可能丢失图片文件,无所谓了不考虑后续再做
@@ -235,16 +237,20 @@ const submitFile = async () => {
                 group_array[img_index] = deepClone(base_group);
             }
             const group = group_array[img_index]
-            if (!group) return message.info(`${index}个文件的游标丢失`);
+            if (!group){
+                message.info(`${index}个文件的游标丢失`);
+                continue;
+            }
 
             group.file_array.push(file);
             group.has_img = true;
-            return path.forEach(url => {
+            path.forEach(url => {
                 console.log(url);
                 for (const img of img_map.keys()) {
                     if (img.indexOf(url) >= 0) group.file_array.push(img_map.get(img) as UploadFile);
                 }
             })
+            continue;
         }
 
         let md_group_item = group_array[md_index]
@@ -261,7 +267,7 @@ const submitFile = async () => {
             group_array.push(deepClone(base_group));
         }
         group_array[md_index]?.file_array.push(file);
-    })
+    }
     // 测试一下
     console.log(group_array);
 
@@ -298,3 +304,4 @@ const computTableHeight = computed(() => tableHeight.value)
     margin-top: 20px;
 }
 </style>
+
