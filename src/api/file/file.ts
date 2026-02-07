@@ -20,6 +20,6 @@ export const uploadSession = async (session_id: string, group: IUploadGroup): Pr
     return requestHttp.post(`/file/${session_id}/upload`, formData);
 }
 
-export const commitSession = async (url: string): Promise<ApiReposeBase> => {
-    return requestHttp.post(url)
+export const commitSession = async (session_id: string): Promise<ApiReposeBase> => {
+    return requestHttp.post(`/file/${session_id}/commit`)
 }

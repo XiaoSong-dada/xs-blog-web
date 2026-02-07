@@ -1,6 +1,6 @@
 import type { IUplaodSession, IUploadGroup, IUploadResult } from "@/types/main"
 import { ref, h } from "vue"
-import { createSession as create, uploadSession as upload } from "@/api/file/file";
+import { createSession as create, uploadSession as upload ,commitSession as commit} from "@/api/file/file";
 import type { ApiResponse } from '@/types/http';
 import { message, type UploadFile, Modal } from 'ant-design-vue';
 import { withLock } from "@/utils/request.lock";
@@ -116,11 +116,16 @@ export const useSession = () => {
         upload_result.value = result
         return result
     }
+
+    const commitSession = async (session_id:string)=>{
+        return await commit(session_id)
+    }
     return {
         createSession,
         session,
         uploadSession: (id: string, groups: IUploadGroup[], opts?: { concurrency?: number; onProgress?: (done: number, total: number) => void }) =>
             withLock(`upload-session:${id}`, () => uploadSession(id, groups, opts)),
+        commitSession
     }
 }
 

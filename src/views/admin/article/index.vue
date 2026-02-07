@@ -68,7 +68,7 @@
                 </template>
             </template>
         </a-table>
-        <a-modal v-model:open="openUpload" title="上传文件" okText="确认" cancelText="取消">
+        <a-modal v-model:open="openUpload" title="上传文件" okText="确认" cancelText="取消" @ok="commitFile">
             <a-upload v-model:file-list="fileList" name="file" directory accept=".png,.jpg,.jpeg,.md"
                 :before-upload="beforeUpload">
                 <a-button>
@@ -118,7 +118,7 @@ const AUploadDragger = UploadDragger;
 const AUpload = Upload;
 const AModal = Modal;
 const { columns, params, data, total, loading, fetchList, resetParams, rowSelection, selectedRows } = useArticleList();
-const { session, createSession, uploadSession } = useSession();
+const { session, createSession, uploadSession, commitSession } = useSession();
 const { extractImagePaths, isMdFile, readMdFromFileList, isImageFile } = useFiles();
 const { buildIndex } = useBuildTableIndex();
 const { tableHeight, tableHeightOnMounted } = useTableHeight();
@@ -237,7 +237,7 @@ const submitFile = async () => {
                 group_array[img_index] = deepClone(base_group);
             }
             const group = group_array[img_index]
-            if (!group){
+            if (!group) {
                 message.info(`${index}个文件的游标丢失`);
                 continue;
             }
@@ -288,6 +288,15 @@ const submitFile = async () => {
     else message.warn('未获取session')
 }
 
+const commitFile = async () => {
+    const sessionId = session.value?.session_id
+    if (!sessionId) {
+        return message.warn('未找到对话')
+    }
+
+    const res = await commitSession(sessionId)
+    console.log(res)
+}
 
 onMounted(async () => {
     await fetchList()
@@ -304,4 +313,3 @@ const computTableHeight = computed(() => tableHeight.value)
     margin-top: 20px;
 }
 </style>
-
