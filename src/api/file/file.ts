@@ -1,5 +1,5 @@
 import type { ApiResponse, ApiReposeBase } from "@/types/http"
-import type { IUplaodSession } from "@/types/main"
+import type { IUplaodSession, IUploadGroup, IUploadResult } from "@/types/main"
 import { requestHttp } from "@/utils/http"
 
 export const createSession = async (): Promise<ApiResponse<IUplaodSession>> => {
@@ -7,8 +7,8 @@ export const createSession = async (): Promise<ApiResponse<IUplaodSession>> => {
 }
 
 
-export const uploadSession = async (url: string): Promise<ApiResponse<IUplaodSession>> => {
-    return requestHttp.post(url)
+export const uploadSession = async (session_id: string , file:IUploadGroup): Promise<ApiResponse<IUploadResult>> => {
+    return requestHttp.post(`/file/${session_id}/upload`, file);
 }
 
 export const commitSession = async (url: string): Promise<ApiReposeBase> => {

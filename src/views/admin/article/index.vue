@@ -105,8 +105,9 @@ import { formatDate } from '@/utils/date';
 import { useBuildTableIndex } from '@/hook/useBuilding';
 import { useRouter } from 'vue-router';
 import { useTableHeight } from '@/hook/layout/useLayout';
-import { omitString } from '@/utils/utils';
+import { deepClone, omitString } from '@/utils/utils';
 import { useFiles, useSession } from '@/hook/file/useSession';
+import type { IUploadGroup } from '@/types/main';
 
 const ATable = Table;
 const AButton = Button;
@@ -117,7 +118,7 @@ const AUploadDragger = UploadDragger;
 const AUpload = Upload;
 const AModal = Modal;
 const { columns, params, data, total, loading, fetchList, resetParams, rowSelection, selectedRows } = useArticleList();
-const { session, createSession } = useSession();
+const { session, createSession, uploadSession } = useSession();
 const { extractImagePaths, isMdFile, readMdFromFileList, isImageFile } = useFiles();
 const { buildIndex } = useBuildTableIndex();
 const { tableHeight, tableHeightOnMounted } = useTableHeight();
@@ -186,16 +187,6 @@ const beforeUpload = (file: UploadFile) => {
 const submitFile = async () => {
     session.value
 
-    console.log(fileList.value);
-    /**
-     * step0: 将文件转存为has Map <url , str>
-     * step1: 先判断是否为md
-     * step2: 抽取md中的图片的相对路径
-     * step3: 判断has map 中是否有相对路径的文件
-     * step4：进行分组，将附件图片与md作为一组上传 || 无图片附件的md 以10个为单位上传
-     */
-
-    const url_file_map = new Map<string, UploadFile>()
     const map_error: Array<string> = []
     // 图片map 用于分组
     const img_map = new Map<string, UploadFile>();
@@ -203,7 +194,6 @@ const submitFile = async () => {
     fileList.value?.forEach((file: UploadFile) => {
         const path = file.originFileObj?.webkitRelativePath
         if (path) {
-            url_file_map.set(path, file);
             if (isImageFile(file)) img_map.set(path, file);
         }
         else {
@@ -211,10 +201,14 @@ const submitFile = async () => {
         }
     });
     if (map_error.length > 0) message.warn(map_error.join('\n'));
+    console.log(img_map);
 
     // 二维数组 分组
-    const group_array: Array<UploadFile[]> = []
-
+    const group_array: Array<IUploadGroup> = []
+    const base_group: IUploadGroup = {
+        file_array: [],
+        has_img: false,
+    }
     // 记录索引
 
     // 图片分组游标
@@ -222,7 +216,8 @@ const submitFile = async () => {
     // md分组游标
     let md_index = 0;
 
-    fileList.value?.forEach(async (file: UploadFile) => {
+    // 修改上传文件类型
+    fileList.value?.forEach(async (file: UploadFile, index) => {
         if (!isMdFile(file)) {
             return;
         }
@@ -235,39 +230,56 @@ const submitFile = async () => {
         // TODO: 上传图片丢失
         if (path.length > 0) {
 
-            img_index > md_index ? img_index++ : img_index = md_index + 1;   
-
-            if(!group_array[img_index]) {
-                group_array[img_index] = []
+            img_index > md_index ? img_index++ : img_index = md_index + 1;
+            if (!group_array[img_index]) {
+                group_array[img_index] = deepClone(base_group);
             }
+            const group = group_array[img_index]
+            if (!group) return message.info(`${index}个文件的游标丢失`);
 
-            group_array[img_index]?.push(file);
-
+            group.file_array.push(file);
+            group.has_img = true;
             return path.forEach(url => {
-                if (img_map.has(url)) group_array[img_index]?.push(img_map.get(url) as UploadFile);
+                console.log(url);
+                for (const img of img_map.keys()) {
+                    if (img.indexOf(url) >= 0) group.file_array.push(img_map.get(img) as UploadFile);
+                }
             })
         }
 
         let md_group_item = group_array[md_index]
 
         if (!md_group_item) {
-            group_array[md_index] = [];
+            group_array[md_index] = deepClone(base_group);
             md_group_item = group_array[md_index]
         }
 
         // 超出分组游标加一
-        if (md_group_item && md_group_item.length >= GROUP_COUNT) {
-            md_index++;
-            group_array.push([]);
+        if (md_group_item && md_group_item.file_array.length >= GROUP_COUNT) {
+            // 判断当前是
+            md_index > img_index ? md_index++ : md_index = img_index + 1;
+            group_array.push(deepClone(base_group));
         }
-        group_array[md_index]?.push(file);
+        group_array[md_index]?.file_array.push(file);
     })
     // 测试一下
     console.log(group_array);
-    
+
     console.log('this is session ', session);
 
     console.log('这里执行提交了');
+    if (session.value?.session_id) {
+        uploadSession(session.value?.session_id, group_array).then(res => {
+            Modal.success({
+                title: "上传成功",
+                content: h('div', {}, [
+                    h('p', `成功上传临时区文件${res.uploaded.join('\n')}`),
+                    h('p', `未成功上传临时区文件${res.errors.join('\n')}`),
+                ]),
+            })
+        })
+    }
+    else message.warn('未获取session')
 }
 
 

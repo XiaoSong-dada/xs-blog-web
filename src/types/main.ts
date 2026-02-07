@@ -1,4 +1,5 @@
 // /types/main.ts
+import type { UploadFile } from "ant-design-vue";
 import type { IPages } from "./http";
 
 // 用户登录数据模型
@@ -121,7 +122,7 @@ export type IArticleQuery = IPages<{
 }>;
 
 export type IArticleSearchQuery = IPages<{
-    kw?:string
+    kw?: string
 }>;
 
 
@@ -130,12 +131,12 @@ export interface IArticleSearchList {
     id: string;
     slug: string;
     title: string;
-    snippet:string;
+    snippet: string;
     view_count: number;
     published_at: string | null;
     rank: number;
-    hit_title:boolean;
-    hit_content:boolean;
+    hit_title: boolean;
+    hit_content: boolean;
 }
 
 
@@ -143,30 +144,44 @@ export interface IArticleSearchList {
 export interface IAritcleCreate {
     title: string;
     slug: string;
-    content_md: string ;
+    content_md: string;
     author_id?: string;
 }
 
 // 新建文章
 export interface IAritcleUpdate extends IAritcleCreate {
-    id:string;
+    id: string;
 }
 
 // 文章详细信息接口
 export interface IArticleDetailPropos {
-    slug:string;
+    slug: string;
 }
 
 // 文章卡片用户介绍行
 export interface IArticleMeta {
-    published_at?: string ;
+    published_at?: string;
 }
 
 // 创建文件上传session
 export interface IUplaodSession {
-    id:string;
-    status:string;
-    upload_url:string;
-    commit_url:string;
-    expires_at:string;
+    session_id: string;
+    expires_at: string;
 }
+
+// 上传笔记类型
+export interface IUploadGroup {
+    file_array: UploadFile[];
+    has_img: boolean;
+}
+
+// 上传笔记时的返回结果
+export interface IUploadResult {
+    uploaded: string[];
+    errors: string[];
+}
+
+export interface UploadTaskOk {
+    uploaded: string[];
+    errors?: string[]
+} 
