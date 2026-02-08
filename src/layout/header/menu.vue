@@ -41,6 +41,7 @@ const homeTopMenuMap = reactive(new Map<string, HomeTopMenuItem>());
 const router = useRouter();
 const route = useRoute()
 const activeKey = ref('home');
+const headerSearch = ref<string>('');
 
 onMounted(() => {
     homeTopMenu.forEach(item => {
@@ -51,7 +52,12 @@ onMounted(() => {
 
 const handleTabChange = (key: string | number) => {
     const item = homeTopMenuMap.get(key as string);
-    if (item) router.push(item.route);
+    if (item){
+        if(item.route === '/article' && headerSearch.value){
+            return router.push(`/article?kw=${headerSearch.value}&offset=${0}&limit=${10}`)
+        }
+        return router.push(item.route);
+    }
 }
 
 const isLogin = computed(() => {
@@ -70,10 +76,12 @@ const routeToKey = (path: string) => {
 
 
 const search = (val:string) =>{
+    headerSearch.value = val;
     router.push(`/article?kw=${val}&offset=${0}&limit=${10}`)
 }
 
 const clear = ()=>{
+    headerSearch.value = '';
     router.push(`/article`)
 }
 

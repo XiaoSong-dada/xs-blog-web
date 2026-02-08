@@ -1,7 +1,7 @@
 <template>
     <div class="article overflow-scroll overflow-scroll--max flex-center" @scroll="handleScroll" ref="containerRef">
         <div class="list">
-            <article-search-list :data="searchList ?? []" v-if="isSearch" />
+            <article-search-list :data="searchList ?? []" v-if="isSearch" @click-title="getDetail"/>
             <article-list v-else :data="data" @click-title="getDetail" />
         </div>
     </div>
