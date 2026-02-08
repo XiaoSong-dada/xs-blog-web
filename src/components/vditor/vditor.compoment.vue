@@ -1,35 +1,44 @@
 <template>
     <div class="article-editor">
         <!-- 顶部工具栏：标题 + 操作按钮 -->
-        <div class="toolbar">
+        <div class="toolbar flex-between">
+            <div class="flex-start gap-12 " >
+                <div>
+                    <a-input class="title" v-model:value="form.title" size="large" :maxlength="40" show-count
+                        @change="titleChange" placeholder="请输入文章标题" @pressEnter="onPublish" />
+                </div>
+
+
+                <div class="flex-start">
+                    <a-input-group compact>
+                        <a-input class="slug" v-model:value="form.slug" size="large" :maxlength="120" show-count
+                            placeholder="请输入文章标识" @pressEnter="onPublish" />
+                        <a-button :icon="h(RedoOutlined)" @click="reDoSlug"></a-button>
+                    </a-input-group>
+                </div>
+
+
+                <div class="toolbar-actions">
+                    <a-tag v-if="lastSavedAt" color="blue">
+                        上次保存：{{ lastSavedAt }}
+                    </a-tag>
+
+                    <a-button :loading="saving" @click="onSaveDraft">
+                        保存草稿
+                    </a-button>
+
+                    <a-button type="primary" :loading="publishing" @click="onPublish">
+                        发布
+                    </a-button>
+                </div>
+            </div>
             <div>
-                <a-input class="title" v-model:value="form.title" size="large" :maxlength="40" show-count
-                    @change="titleChange" placeholder="请输入文章标题" @pressEnter="onPublish" />
-            </div>
-
-
-            <div class="flex-start">
-                <a-input-group compact>
-                    <a-input class="slug" v-model:value="form.slug" size="large" :maxlength="120" show-count
-                        placeholder="请输入文章标识" @pressEnter="onPublish" />
-                    <a-button :icon="h(RedoOutlined)" @click="reDoSlug"></a-button>
-                </a-input-group>
-            </div>
-
-
-            <div class="toolbar-actions">
-                <a-tag v-if="lastSavedAt" color="blue">
-                    上次保存：{{ lastSavedAt }}
-                </a-tag>
-
-                <a-button :loading="saving" @click="onSaveDraft">
-                    保存草稿
-                </a-button>
-
-                <a-button type="primary" :loading="publishing" @click="onPublish">
-                    发布
+                <a-button @click="goBack" type="primary">
+                    <ArrowLeftOutlined />
+                    返回文章列表
                 </a-button>
             </div>
+
         </div>
 
         <!-- Vditor 容器 -->
@@ -61,7 +70,7 @@ import "vditor/dist/index.css";
 import type { Props, ArticlePayload } from '@/types/vditor';
 import { convertToPinyin } from "@/utils/pinyin";
 import type { ChangeEvent } from "ant-design-vue/es/_util/EventInterface";
-import { RedoOutlined } from '@ant-design/icons-vue'
+import { RedoOutlined, ArrowLeftOutlined } from '@ant-design/icons-vue'
 import { AuthService } from "@/service/auth.service";
 import { config } from '@/config/local.env'
 
@@ -118,6 +127,11 @@ const emit = defineEmits<{
      * 保存状态监听
      */
     (e: "isDirty", dirty: boolean): Promise<void> | void;
+
+    /**
+     * 返回文章列表
+     */
+    (e: "goBack"): void;
 }>();
 
 /** ---------------------------
@@ -449,6 +463,10 @@ function setupBeforeUnloadWarn() {
 
 let cleanupBeforeUnload: (() => void) | undefined;
 
+const goBack = ()=>{
+    emit("goBack");
+}
+
 onMounted(() => {
     initVditor();
     startAutosave();
@@ -528,6 +546,9 @@ onBeforeUnmount(() => {
         display: flex;
         justify-content: space-between;
         align-items: center;
+    }
+    .gap-12 {
+        gap: 12px;
     }
 
 }

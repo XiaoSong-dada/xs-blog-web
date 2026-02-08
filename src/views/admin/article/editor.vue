@@ -1,12 +1,14 @@
 <template>
     <vditor-compoment :upload-url="upload.upload_url" upload-type="image" @save-draft="createArticle" :mode="modle"
         @edit-draft="editArticle" @publish="publishArticle" @is-dirty="(dirty) => isDirty = dirty" :form="vditroFrom"
+        @go-back="goBackToAdmin"
         :autosave="false" :markdown="markdown" :initial="initVditor" />
 </template>
 
 <script setup lang="ts">
 import VditorCompoment from '@/components/vditor/vditor.compoment.vue';
 import { useArticleDetailById, useArticleEditor } from '@/hook/article/useArticle';
+import router from '@/router/main';
 import type { IActicleFrom, ArticlePayload } from '@/types/vditor';
 import { onMounted, reactive, ref, watch } from 'vue';
 
@@ -29,6 +31,10 @@ const upload = reactive({
     upload_url: '/api/file',
     upload_type: 'image'
 })
+
+const goBackToAdmin = () => {
+    router.push({ path: '/admin/article' });
+}
 
 onMounted(() => {
     // 当传入prop时则设置当前页面为修改页面
