@@ -30,7 +30,6 @@ export const useDownload = () => {
 
                 try {
                     const blob = await downloadFile(url.value);
-
                     const objectUrl = window.URL.createObjectURL(blob);
                     const link = document.createElement('a');
                     link.href = objectUrl;
@@ -38,8 +37,9 @@ export const useDownload = () => {
                     document.body.appendChild(link);
                     link.click();
                     document.body.removeChild(link);
-                    window.URL.revokeObjectURL(objectUrl);
-
+                    setTimeout(() => {
+                        window.URL.revokeObjectURL(objectUrl);
+                    }, 1500);
                 } catch (e: any) {
                     message.error(`下载失败：${e?.message ?? String(e)}`);
                 } finally {
