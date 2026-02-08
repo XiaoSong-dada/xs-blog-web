@@ -36,12 +36,45 @@ body,
   .main-content {
     height: calc(100% - $header-h);
     background-color: $default-background;
-    overflow: auto;
+    overflow: hidden;
+  }
+
+  .overflow-content {
     box-sizing: border-box;
+    overflow: auto;
   }
 }
 
 .admin-layout,
 .admin-content {
   height: 100%;
+}
+
+/* Generic overflow scroll utilities: 可在任意需要滚动的容器上使用，保留老类 `.overflow-content` 兼容性 */
+.overflow-content,
+.overflow-scroll {
+  box-sizing: border-box;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* 可选：限制最大高度（按需添加此类 `overflow-scroll--max`），也可直接在组件中单独设置 max-height */
+.overflow-scroll--max {
+  max-height: calc(100vh - $header-h - 120px);
+}
+
+/* Optional: WebKit scrollbar custom styles（若使用 scoped 可能需去掉 scoped 或使用深度选择器） */
+.overflow-content::-webkit-scrollbar,
+.overflow-scroll::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+.overflow-content::-webkit-scrollbar-track,
+.overflow-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.overflow-content::-webkit-scrollbar-thumb,
+.overflow-scroll::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
 }

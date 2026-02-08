@@ -42,12 +42,12 @@ watch(
 
 <style scoped lang="scss">
 .detail-header {
-    height: 100px;
+    min-height: 100px;
     p {
         padding: 0;
     }
     .title {
-        font-size: 30px;
+        font-size: 20px;
         font-weight: bold;
         margin: 0 0 20px 0;
     }

@@ -1,5 +1,5 @@
 <template>
-    <div class="article-detail-page">
+    <div class="article-detail-page overflow-scroll overflow-scroll--max flex-center">
         <div class="detail-layout">
             <aside class="detail-aside detail-aside--toc sticky-aside">
                 <div class="card aside-padding">
