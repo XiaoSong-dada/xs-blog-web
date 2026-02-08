@@ -189,7 +189,7 @@ export interface UploadTaskOk {
 
 // 下载文件返回类型
 export interface IDownloadResult {
-    file_url: string;
+    download_url: string;
     session_id:string;
-    download_url:string[];
+    errors:string[];
 }

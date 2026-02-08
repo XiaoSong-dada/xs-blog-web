@@ -16,39 +16,40 @@ export const useDownload = () => {
     }
     const url = ref<string>();
 
-    const downLoad = ()=>{
-                const modal = Modal.confirm(
-            {
-                title: "确认下载",
-                content: h('div', {}, [
-                    h('p', `是否确认下载文章`),]),
-                okText: '确认',
-                onOk: async () => {
-                    if (!url.value) {
-                        message.error('下载链接不存在!');
-                        return;
-                    }
-                     downloadFile(url.value).then((result) => {
-                        const blob = new Blob([result], { type: 'application/octet-stream' });
-                        const link = document.createElement('a');
-                        link.href = window.URL.createObjectURL(blob);
-                        link.download = 'downloaded_file.zip';
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-                    })
+    const downLoad = () => {
+        const modal = Modal.confirm({
+            title: "确认下载",
+            content: h('div', {}, [h('p', `是否确认下载文章`)]),
+            okText: '确认',
+            cancelText: "取消",
+            onOk: async () => {
+                if (!url.value) {
+                    message.error('下载链接不存在!');
+                    return;
+                }
 
-                },
-                cancelText: "取消",
-                onCancel: () => {
+                try {
+                    const blob = await downloadFile(url.value);
+
+                    const objectUrl = window.URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = objectUrl;
+                    link.download = 'articles.zip'; // 或者你用后端返回的文件名
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    window.URL.revokeObjectURL(objectUrl);
+
+                } catch (e: any) {
+                    message.error(`下载失败：${e?.message ?? String(e)}`);
+                } finally {
                     modal.destroy();
                 }
-            }
-        )
-        return
-    }
-
-    const downloadArticlesAsNarkdown = (selectedRows:IArticle[]) => {
+            },
+            onCancel: () => modal.destroy(),
+        });
+    };
+    const downloadArticlesAsNarkdown = (selectedRows: IArticle[]) => {
 
         if ((!selectedRows) || selectedRows.length === 0) return message.info("请选择一行文章!");
 
@@ -73,12 +74,12 @@ export const useDownload = () => {
                     }
                     const res = await exportCommitSession(session.value.session_id, id)
 
-                    if (res.code === 200 && res.data && isNull(res.data?.file_url) === false) {
+                    if (res.code === 200 && res.data && isNull(res.data?.download_url) === false) {
                         message.success('导出成功');
-                        url.value = res.data.file_url;
+                        url.value = res.data.download_url;
                         downLoad();
                     } else {
-                        message.error('导出失败'+(res.message || ''));
+                        message.error('导出失败' + (res.message || ''));
                     }
 
                 },

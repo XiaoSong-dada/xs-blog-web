@@ -25,20 +25,19 @@ export const commitSession = async (session_id: string): Promise<ApiReposeBase> 
 }
 
 export const exportCommitSession = async (session_id: string, article_id_array: string[]): Promise<ApiResponse<IDownloadResult>> => {
-    return requestHttp.post(`/file/${session_id}/export`, {
-        article_id_array
-    })
+    return requestHttp.post(`/file/${session_id}/export`,  {
+    session_id,      // 可传可不传（后端会以 path 为准）
+    article_ids: article_id_array
+  })
 }
 
 
 export const downloadFile = async (file_url: string): Promise<Blob> => {
-    const response = await requestHttp.get<Blob>(file_url, {
-        responseType: 'blob',
-    });
+    const data = await requestHttp.download(file_url);
 
-    if (!response.data) {
+    if (!data) {
         throw new Error('下载失败：未获取到文件内容');
     }
 
-    return response.data;
+    return data;
 };

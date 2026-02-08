@@ -70,6 +70,13 @@ class RequestHttp {
          */
         this.service.interceptors.response.use(
             (response: AxiosResponse) => {
+
+                const rt = response.config.responseType;
+                if (rt === 'blob' || rt === 'arraybuffer') {
+                    return response;
+                }
+
+
                 const { data } = response; // 提取response的data部分
 
                 if (![RequestEnums.SUCCESS, RequestEnums.CREATED].includes(data.code)) {
@@ -85,7 +92,7 @@ class RequestHttp {
                     // 服务器响应失败
                     const status = error.response.status;
                     const msg = error.response.data?.message ?? error.message;
-                    
+
                     if (status === 401) {
                         AuthService.clearToken();
                         // router.push('/login');
@@ -159,6 +166,14 @@ class RequestHttp {
 
     public async delete<T, P = Record<string, any>>(url: string, params?: P): Promise<ResultData<T>> {
         return this.request<T>(url, { method: 'DELETE', params })
+    }
+    public async download(url: string): Promise<Blob> {
+        const res = await this.service.request<Blob>({
+            url,
+            method: 'GET',
+            responseType: 'blob',
+        });
+        return res.data;
     }
 
 }
