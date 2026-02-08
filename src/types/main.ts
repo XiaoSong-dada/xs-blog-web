@@ -119,6 +119,7 @@ export type IArticleQuery = IPages<{
     title: string | undefined;
     slug: string | undefined;
     content_md: string | undefined;
+    published_at:string | undefined;
 }>;
 
 export type IArticleSearchQuery = IPages<{

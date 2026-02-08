@@ -7,7 +7,7 @@ import type {
     IArticleSearchQuery
 } from "@/types/main";
 import type { ArticlePayload } from '@/types/vditor';
-import { ref } from "vue";
+import { ref, h, type VNode ,computed} from "vue";
 import {
     getList, getPublishList,
     getPublishDetailBySulg,
@@ -15,10 +15,11 @@ import {
     updateArticle, publishArticle,
     getDetailBySulg, getDetailById,
     addView,
-    getSearchList
+    getSearchList,
+    batchPublish as batch_publsih
 } from '@/api/article/article';
 import { useBuildQueryParams } from '@/hook/useBuilding';
-import { message } from "ant-design-vue";
+import { message, Modal } from "ant-design-vue";
 import { AuthService } from "@/service/auth.service";
 import { isNull } from "@/utils/verification";
 
@@ -28,6 +29,7 @@ const createDefaultParams = (): IArticleQuery => ({
     title: "",
     content_md: "",
     slug: "",
+    published_at: '',
 })
 
 const normalizeArticleList = (data?: IArticle[], totalOverride?: number) => {
@@ -42,13 +44,15 @@ const normalizeArticleList = (data?: IArticle[], totalOverride?: number) => {
 
 
 const selectedRows = ref<IArticle[]>()
-
-const rowSelection = ref({
-    checkStrictly: false,
-    onSelect: (record: IArticle, selected: boolean, selecteds: IArticle[]) => {
-        selectedRows.value = selecteds
-    }
-})
+const selectedRowKeys = ref<(string | number)[]>([])
+const rowSelection = computed(() => ({
+  checkStrictly: true,
+  selectedRowKeys: selectedRowKeys.value,
+  onChange: (keys: (string | number)[], rows: IArticle[]) => {
+    selectedRowKeys.value = keys
+    selectedRows.value = rows
+  },
+}))
 const columns = [
     {
         title: '序号',
@@ -113,7 +117,6 @@ export const useArticleList = (publish_flag: boolean = false) => {
     const total = ref(0);
     const loading = ref(false);
 
-
     const fetchList = async (overrides: Partial<IArticleQuery> = {}) => {
         loading.value = true
         try {
@@ -133,6 +136,41 @@ export const useArticleList = (publish_flag: boolean = false) => {
         params.value = createDefaultParams()
     }
 
+    const batchPublish = () => {
+
+        if ((!selectedRows.value) || selectedRows.value.length === 0) return message.info("请选择一行文章!");
+
+        const id: string[] = []
+        const message_array: VNode[] = [];
+        message_array.push(h('p', `是否确认发布文章`));
+        selectedRows.value?.forEach(item => {
+            message_array.push(h('p', `文章标题:《${item.title}》`));
+            id.push(item.id);
+        })
+        const modal = Modal.confirm(
+            {
+                title: "发布确认",
+                content: h('div', {}, [
+                    ...message_array
+                ]),
+                okText:'确认',
+                onOk: () => {
+                    batch_publsih(id).then(res => {
+                        if (res.code == 200) {
+                            message.success('批量发布成功');
+                            fetchList();
+                        }
+                        else message.error('批量发布失败' + res.message);
+                    })
+                },
+                cancelText:"取消",
+                onCancel: ()=>{
+                    modal.destroy();
+                }
+            }
+        )
+    }
+
     return {
         params,
         data,
@@ -142,7 +180,8 @@ export const useArticleList = (publish_flag: boolean = false) => {
         resetParams,
         rowSelection,
         selectedRows,
-        columns
+        columns,
+        batchPublish
     }
 }
 

@@ -8,7 +8,7 @@
                             标记：
                         </text>
                         <div class="flex-center flex-column">
-                            <a-input v-model:value="params.slug" />
+                            <a-input class="toolbar-input" v-model:value="params.slug" />
                         </div>
                     </a-flex>
                     <a-flex class="search-item">
@@ -16,7 +16,7 @@
                             标题：
                         </text>
                         <div class="flex-center flex-column">
-                            <a-input v-model:value="params.title" />
+                            <a-input class="toolbar-input" v-model:value="params.title" />
                         </div>
                     </a-flex>
                     <a-flex class="search-item">
@@ -24,7 +24,16 @@
                             内容：
                         </text>
                         <div class="flex-center flex-column">
-                            <a-input v-model:value="params.content_md" />
+                            <a-input class="toolbar-input" v-model:value="params.content_md" />
+                        </div>
+                    </a-flex>
+                    <a-flex class="search-item">
+                        <text>
+                            是否发布：
+                        </text>
+                        <div class="flex-center flex-column">
+                            <a-select ref="select" class="toolbar-input" v-model:value="params.published_at"
+                                :options="common_dict" />
                         </div>
                     </a-flex>
                 </a-flex>
@@ -44,6 +53,7 @@
 
                 <!-- <a-button type="primary" :icon="h(VerticalAlignTopOutlined)" @click="importMarkDown">导入</a-button> -->
                 <a-button type="primary" :icon="h(VerticalAlignBottomOutlined)" @click="downMarkDown">导出</a-button>
+                <a-button type="primary" :icon="h(SendOutlined)" @click="batchPublish">批量发布</a-button>
             </a-flex>
         </div>
         <a-table :columns="columns" :data-source="data" :scroll="{ x: '100%', y: computTableHeight }" :loading="loading"
@@ -85,7 +95,7 @@
 </template>
 
 <script setup lang="ts">
-import { Table, Button, Flex, Input, Popconfirm, message, UploadDragger, type UploadFile, Modal, Upload } from 'ant-design-vue';
+import { Table, Button, Flex, Input, Popconfirm, message, UploadDragger, type UploadFile, Modal, Upload, Select } from 'ant-design-vue';
 import { PlusOutlined, CloseOutlined } from '@ant-design/icons-vue';
 import { useArticleList } from '@/hook/article/useArticle'
 import {
@@ -97,7 +107,8 @@ import {
     UploadOutlined,
     SyncOutlined,
     InboxOutlined,
-    CheckOutlined
+    CheckOutlined,
+    SendOutlined,
 } from '@ant-design/icons-vue';
 import { computed, h, onMounted, ref } from 'vue'
 import { notDevelopedMessage } from '@/ui/status/not-developed';
@@ -108,6 +119,7 @@ import { useTableHeight } from '@/hook/layout/useLayout';
 import { deepClone, omitString } from '@/utils/utils';
 import { useFiles, useSession } from '@/hook/file/useSession';
 import type { IUploadGroup } from '@/types/main';
+import { useCommonDict } from '@/hook/dict/useDict';
 
 const ATable = Table;
 const AButton = Button;
@@ -117,7 +129,9 @@ const APopconfirm = Popconfirm;
 const AUploadDragger = UploadDragger;
 const AUpload = Upload;
 const AModal = Modal;
-const { columns, params, data, total, loading, fetchList, resetParams, rowSelection, selectedRows } = useArticleList();
+const ASelect = Select;
+const { columns, params, data, total, loading, fetchList, resetParams, rowSelection, batchPublish } = useArticleList();
+const { common_dict } = useCommonDict();
 const { session, createSession, uploadSession, commitSession } = useSession();
 const { extractImagePaths, isMdFile, readMdFromFileList, isImageFile } = useFiles();
 const { buildIndex } = useBuildTableIndex();
@@ -307,9 +321,17 @@ const computTableHeight = computed(() => tableHeight.value)
 </script>
 
 <style scoped lang="scss">
-.center-article {}
+.center-article {
+    .toolbar {
+        &-input {
+            width: 180px;
+        }
+    }
+
+}
 
 .submit-button {
     margin-top: 20px;
+
 }
 </style>

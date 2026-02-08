@@ -70,11 +70,11 @@ const routeToKey = (path: string) => {
 
 
 const search = (val:string) =>{
-    router.push(`./article?kw=${val}&offset=${0}&limit=${10}`)
+    router.push(`/article?kw=${val}&offset=${0}&limit=${10}`)
 }
 
 const clear = ()=>{
-    router.push(`./article`)
+    router.push(`/article`)
 }
 
 watch(

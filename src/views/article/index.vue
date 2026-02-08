@@ -1,6 +1,6 @@
 <template>
     <div class="article">
-        <div class="list">
+        <div class="list" @scroll="handleScroll" ref="containerRef">
             <article-search-list :data="searchList ?? []" v-if="isSearch" />
             <article-list v-else :data="data" @click-title="getDetail" />
         </div>
@@ -16,7 +16,7 @@ import { onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 const router = useRouter();
 const route = useRoute();
-
+const containerRef = ref<HTMLDivElement | null>();
 const isSearch = ref<boolean>(false);
 
 const {
@@ -52,7 +52,7 @@ const getSearchRouter = () => {
         searchParams.value.kw = kw
         isSearch.value = true
     }
-    else{
+    else {
         isSearch.value = false;
     }
 }
@@ -66,6 +66,15 @@ watch(
     () => getData()
 )
 
+
+const handleScroll = () => {
+    const container = containerRef.value
+
+    if (container && container.scrollTop + container.clientHeight >= container.scrollHeight) {
+        // loadMore()
+        console.log('到底了');
+    }
+}
 
 
 </script>

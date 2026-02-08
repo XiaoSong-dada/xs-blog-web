@@ -42,4 +42,6 @@ export const addView = async (article_id:string): Promise<ApiReposeBase> => {
     return requestHttp.post(`/publish/${article_id}/view`)
 }
 
-
+export const batchPublish = async(article_id:string[]):Promise<ApiReposeBase> => {
+    return requestHttp.post(`/article/batch/publish`, article_id)
+}
