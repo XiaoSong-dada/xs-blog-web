@@ -49,9 +49,6 @@
                     <upload-outlined></upload-outlined>
                     导入
                 </a-button>
-
-
-                <!-- <a-button type="primary" :icon="h(VerticalAlignTopOutlined)" @click="importMarkDown">导入</a-button> -->
                 <a-button type="primary" :icon="h(VerticalAlignBottomOutlined)" @click="downMarkDown">导出</a-button>
                 <a-button type="primary" :icon="h(SendOutlined)" @click="batchPublish">批量发布</a-button>
             </a-flex>
@@ -120,6 +117,7 @@ import { deepClone, omitString } from '@/utils/utils';
 import { useFiles, useSession } from '@/hook/file/useSession';
 import type { IUploadGroup } from '@/types/main';
 import { useCommonDict } from '@/hook/dict/useDict';
+import { useDownload } from '@/hook/file/useDownload';
 
 const ATable = Table;
 const AButton = Button;
@@ -130,12 +128,13 @@ const AUploadDragger = UploadDragger;
 const AUpload = Upload;
 const AModal = Modal;
 const ASelect = Select;
-const { columns, params, data, total, loading, fetchList, resetParams, rowSelection, batchPublish } = useArticleList();
+const { columns, params, data, total, loading, fetchList, resetParams, rowSelection, batchPublish, selectedRows } = useArticleList();
 const { common_dict } = useCommonDict();
 const { session, createSession, uploadSession, commitSession } = useSession();
 const { extractImagePaths, isMdFile, readMdFromFileList, isImageFile } = useFiles();
 const { buildIndex } = useBuildTableIndex();
 const { tableHeight, tableHeightOnMounted } = useTableHeight();
+const { downloadSession, createDownloadSession, downloadArticlesAsNarkdown } = useDownload();
 const router = useRouter();
 const fileList = ref<UploadFile[]>();
 const openUpload = ref<boolean>(false);
@@ -178,7 +177,22 @@ const importMarkDown = () => {
     console.log("导入成功");
 }
 
-const downMarkDown = () => {
+const downMarkDown = async () => {
+    if ((!selectedRows.value) || selectedRows.value.length == 0) {
+        return message.warn('请选择要导出的文章');
+    }
+
+
+    await createDownloadSession();
+
+    if (!downloadSession.value?.session_id) {
+        return message.warn('未创建下载会话');
+    }
+
+
+
+    await downloadArticlesAsNarkdown(selectedRows.value);
+
     console.log("导出成功");
 
 }

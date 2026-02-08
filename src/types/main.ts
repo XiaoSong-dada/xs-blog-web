@@ -186,3 +186,10 @@ export interface UploadTaskOk {
     uploaded: string[];
     errors?: string[]
 } 
+
+// 下载文件返回类型
+export interface IDownloadResult {
+    file_url: string;
+    session_id:string;
+    download_url:string[];
+}

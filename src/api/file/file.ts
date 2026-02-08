@@ -1,5 +1,5 @@
 import type { ApiResponse, ApiReposeBase } from "@/types/http"
-import type { IUplaodSession, IUploadGroup, IUploadResult } from "@/types/main"
+import type { IDownloadResult, IUplaodSession, IUploadGroup, IUploadResult } from "@/types/main"
 import { requestHttp } from "@/utils/http"
 
 export const createSession = async (): Promise<ApiResponse<IUplaodSession>> => {
@@ -13,8 +13,8 @@ export const uploadSession = async (session_id: string, group: IUploadGroup): Pr
     const formData = new FormData()
 
     group.file_array.forEach(file => {
-    // ⚠️ 注意：这里的 key 必须和后端参数名一致
-    formData.append("file_array", file.originFileObj as File)
+        // ⚠️ 注意：这里的 key 必须和后端参数名一致
+        formData.append("file_array", file.originFileObj as File)
     })
 
     return requestHttp.post(`/file/${session_id}/upload`, formData);
@@ -23,3 +23,22 @@ export const uploadSession = async (session_id: string, group: IUploadGroup): Pr
 export const commitSession = async (session_id: string): Promise<ApiReposeBase> => {
     return requestHttp.post(`/file/${session_id}/commit`)
 }
+
+export const exportCommitSession = async (session_id: string, article_id_array: string[]): Promise<ApiResponse<IDownloadResult>> => {
+    return requestHttp.post(`/file/${session_id}/export`, {
+        article_id_array
+    })
+}
+
+
+export const downloadFile = async (file_url: string): Promise<Blob> => {
+    const response = await requestHttp.get<Blob>(file_url, {
+        responseType: 'blob',
+    });
+
+    if (!response.data) {
+        throw new Error('下载失败：未获取到文件内容');
+    }
+
+    return response.data;
+};
