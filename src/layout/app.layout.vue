@@ -15,8 +15,15 @@ import { useRoute } from "vue-router";
 
 const route = useRoute();
 
-const isNeedPadding = computed(() => route.path.startsWith('/admin') || route.path.startsWith('/me'));
+const isNeedPadding = computed(() => {
+  const path = route.path;
 
+  return (
+    path === '/' ||
+    path.startsWith('/admin') ||
+    path.startsWith('/me')
+  );
+});
 </script>
 
 <style scoped lang="scss">
