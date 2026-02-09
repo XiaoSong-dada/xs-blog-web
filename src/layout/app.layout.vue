@@ -1,7 +1,7 @@
 <template>
   <div class="app-layout">
     <header-menu />
-    <div class="main-content" :class="{ 'admin-layout': isAdmin }">
+    <div class="main-content" :class="{ 'admin-layout': isNeedPadding }">
       <router-view />
     </div>
   </div>
@@ -15,7 +15,7 @@ import { useRoute } from "vue-router";
 
 const route = useRoute();
 
-const isAdmin = computed(() => route.path.startsWith('/admin'));
+const isNeedPadding = computed(() => route.path.startsWith('/admin') || route.path.startsWith('/me'));
 
 </script>
 

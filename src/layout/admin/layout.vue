@@ -1,7 +1,7 @@
 <template>
     <a-layout class="admin-layout">
         <a-layout-sider class="cover-width-height">
-            <sider @menu-select="onMenuClick" />
+            <sider @menu-select="onMenuClick" :items="centerMenu.map(item => buildMenuItem(item))" />
         </a-layout-sider>
         <a-layout-content class="admin-content">
             <router-view />
@@ -16,6 +16,7 @@ import { onMounted, reactive } from 'vue';
 import type { CenterMenuItem } from '@/types/main';
 import { centerMenu } from '@/constants/center-menu';
 import { useRouter } from 'vue-router';
+import { buildMenuItem } from '@/ui/menu/build-menu-item';
 const ALayout = Layout;
 const ALayoutContent = Layout.Content;
 const ALayoutSider = Layout.Sider;

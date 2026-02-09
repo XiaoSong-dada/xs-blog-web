@@ -75,3 +75,11 @@
 .flex-no-shrink {
   flex-shrink: 0;
 }
+
+$gaps: 0, 4, 8, 12, 16, 20, 24, 32, 50, 64;
+
+@each $gap in $gaps {
+  .gap-#{$gap} {
+    gap: #{$gap}px;
+  }
+}

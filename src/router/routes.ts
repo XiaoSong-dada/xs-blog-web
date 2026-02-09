@@ -37,6 +37,15 @@ export const routes = [
                 ]
             },
             {
+                path:"/me",
+                meta: { requiresAuth: true},
+                component: () => import('@/layout/me/index.vue'),
+                children: [
+                    { path: "base", name: "MeBase", component: () => import("@/views/me/base.vue")},
+                    { path: "security", name: "MeSecurity", component: () => import("@/views/me/security.vue") },
+                ]
+            },
+            {
                 path: "/admin",
                 component: AdminEditorLayout,
                 meta: { requiresAuth: true, requiresAdmin: true },
@@ -44,7 +53,7 @@ export const routes = [
                     { path: "article/new", name: "AdminArticleCreate", component: () => import("@/views/admin/article/editor.vue") },
                     { path: "article/edit/:id", name: "AdminArticleEdit", component: () => import("@/views/admin/article/editor.vue"), props: true },
                 ],
-            },
+            }
         ],
     },
     { path: '/login', component: Login, name: 'Login' },
