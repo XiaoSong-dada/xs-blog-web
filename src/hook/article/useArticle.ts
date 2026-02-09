@@ -16,7 +16,8 @@ import {
     getDetailBySulg, getDetailById,
     addView,
     getSearchList,
-    batchPublish as batch_publsih
+    batchPublish as batch_publsih,
+    deleteArticle as deleteArticleApi
 } from '@/api/article/article';
 import { useBuildQueryParams } from '@/hook/useBuilding';
 import { message, Modal } from "ant-design-vue";
@@ -171,6 +172,17 @@ export const useArticleList = (publish_flag: boolean = false) => {
         )
     }
 
+    const deleteArticle = (article_id:string) => {
+        deleteArticleApi(article_id).then(res => {
+            if (res.code === 200) {
+                message.success('删除成功');
+                fetchList();
+            } else {
+                message.error('删除失败: ' + res.message);
+            }
+        })
+    }
+
     return {
         params,
         data,
@@ -181,7 +193,8 @@ export const useArticleList = (publish_flag: boolean = false) => {
         rowSelection,
         selectedRows,
         columns,
-        batchPublish
+        batchPublish,
+        deleteArticle
     }
 }
 

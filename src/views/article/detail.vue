@@ -39,7 +39,7 @@ const tocRef = ref<InstanceType<typeof VditorToc> | null>(null);
 const scrollContainer = ref<HTMLElement | null>(null);
 
 onMounted(async () => {
-    scrollContainer.value = document.querySelector(".main-content") as HTMLElement | null;
+    scrollContainer.value = document.querySelector(".article-detail-page") as HTMLElement | null;
 
     await getArticleDetail(props.slug, true);
     

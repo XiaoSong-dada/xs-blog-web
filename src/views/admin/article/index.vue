@@ -69,13 +69,13 @@
                 <template v-if="column.key === 'action'">
                     <a-button type="link" :icon="h(EditOutlined)" @click="updateArticle(record.id)">修改</a-button>
                     <a-popconfirm :title="`是否确认删除文章${record.slug}`" ok-text="确认" cancel-text="取消"
-                        @confirm="notDevelopedMessage()">
+                        @confirm="() => deleteArticle(record.id)">
                         <a-button type="link" danger :icon="h(DeleteOutlined)">删除</a-button>
                     </a-popconfirm>
                 </template>
             </template>
         </a-table>
-        <a-modal v-model:open="openUpload" title="上传文件" okText="确认" cancelText="取消" @ok="commitFile">
+        <a-modal v-model:open="openUpload" title="上传文件" okText="确认" cancelText="取消" @ok="commitFile" @cancel="cancelImport">
             <a-upload v-model:file-list="fileList" name="file" directory accept=".png,.jpg,.jpeg,.md"
                 :before-upload="beforeUpload">
                 <a-button>
@@ -107,7 +107,7 @@ import {
     CheckOutlined,
     SendOutlined,
 } from '@ant-design/icons-vue';
-import { computed, h, onMounted, ref } from 'vue'
+import { computed, h, onMounted, ref, type VNode } from 'vue'
 import { notDevelopedMessage } from '@/ui/status/not-developed';
 import { formatDate } from '@/utils/date';
 import { useBuildTableIndex } from '@/hook/useBuilding';
@@ -128,7 +128,8 @@ const AUploadDragger = UploadDragger;
 const AUpload = Upload;
 const AModal = Modal;
 const ASelect = Select;
-const { columns, params, data, total, loading, fetchList, resetParams, rowSelection, batchPublish, selectedRows } = useArticleList();
+
+const { columns, params, data, total, loading, fetchList, resetParams, rowSelection, batchPublish, selectedRows, deleteArticle } = useArticleList();
 const { common_dict } = useCommonDict();
 const { session, createSession, uploadSession, commitSession } = useSession();
 const { extractImagePaths, isMdFile, readMdFromFileList, isImageFile } = useFiles();
@@ -172,16 +173,11 @@ const updateArticle = (article_id: string): void => {
     router.push(`./article/edit/${article_id}`)
 }
 
-// 导入功能
-const importMarkDown = () => {
-    console.log("导入成功");
-}
 
 const downMarkDown = async () => {
     if ((!selectedRows.value) || selectedRows.value.length == 0) {
         return message.warn('请选择要导出的文章');
     }
-
 
     await createDownloadSession();
 
@@ -189,11 +185,7 @@ const downMarkDown = async () => {
         return message.warn('未创建下载会话');
     }
 
-
-
     await downloadArticlesAsNarkdown(selectedRows.value);
-
-    console.log("导出成功");
 
 }
 
@@ -297,23 +289,37 @@ const submitFile = async () => {
         group_array[md_index]?.file_array.push(file);
     }
     // 测试一下
-    console.log(group_array);
-
-    console.log('this is session ', session);
-
-    console.log('这里执行提交了');
     if (session.value?.session_id) {
+
+
         uploadSession(session.value?.session_id, group_array).then(res => {
+            // 
+            const success_array: VNode[] = [];
+            res.uploaded?.forEach(item => {
+                success_array.push(h('p', `文件:《${item}》`));
+            })
+            const error_array: VNode[] = [];
+            res.errors?.forEach(item => {
+                error_array.push(h('p', `文件:《${item}》`));
+            })
+
+
             Modal.success({
                 title: "上传成功",
                 content: h('div', {}, [
-                    h('p', `成功上传临时区文件${res.uploaded.join('\n')}`),
-                    h('p', `未成功上传临时区文件${res.errors.join('\n')}`),
+                    h('p', `成功上传临时区文件:`),
+                    ...success_array,
+                    h('p', `未成功上传临时区文件:`),
+                    ...error_array,
                 ]),
             })
         })
     }
     else message.warn('未获取session')
+}
+const cancelImport = () => {
+    openUpload.value = false;
+    fileList.value = [];
 }
 
 const commitFile = async () => {
@@ -323,13 +329,20 @@ const commitFile = async () => {
     }
 
     const res = await commitSession(sessionId)
-    console.log(res)
+    if (res.code === 200) {
+        message.success('提交成功');
+        fetchList();
+        cancelImport();
+    }
+    else {
+        message.error(`提交失败:${res.message}`)
+    }
 }
 
 onMounted(async () => {
     await fetchList()
 })
-tableHeightOnMounted('main-content', 'toobar')
+tableHeightOnMounted()
 const computTableHeight = computed(() => tableHeight.value)
 
 </script>
