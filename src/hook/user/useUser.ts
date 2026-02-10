@@ -1,8 +1,9 @@
-import type { IUserBaseFrom, IUserListResponse, IUserSearch, IUserCell, IUserUpdate } from "@/types/main"
+import type { IUserBaseFrom, IUserListResponse, IUserSearch, IUserCell, IUserUpdate, IUserPassword } from "@/types/main"
 import { reactive, ref } from "vue"
-import { getList, getUserInfo, updateUserInfo } from "@/api/user/user"
+import { getList, getUserInfo, updateUserInfo, updateUserPassword } from "@/api/user/user"
 import { message } from "ant-design-vue"
 import { isNull } from "@/utils/verification"
+import { AuthService } from "@/service/auth.service"
 
 const createDefaultParams = (): IUserSearch => ({
     username: "",
@@ -114,3 +115,46 @@ export const useUser = () => {
     return { user, getOwnerInfo, updateUser, checkUserFrom };
 }
 
+export const useUpdatePassword = () => {
+    const passwordUser = ref<IUserPassword>({
+        old_password: '',
+        password: '',
+    })
+
+    const modalVisible = ref(false);
+
+    const updatePassword = () => {
+        let checked = true;
+        ['old_password', 'password'].forEach(item => {
+            if (isNull(passwordUser.value[item as keyof IUserPassword])) {
+                message.warn(`${item}不能为空`)
+                checked = false;
+                return;
+            }
+        });
+
+        if (!checked) return;
+
+        updateUserPassword(passwordUser.value).then(res => {
+            if (res.code === 200) {
+                message.success("密码更新成功，请重新登录");
+                AuthService.clearToken();
+                modalVisible.value = false;
+                window.location.reload();
+            } else {
+                message.error("密码更新失败:" + res.message);
+            }
+        });
+    }
+
+    const resetPassword = () =>{
+        passwordUser.value = {
+            old_password: '',
+            password: '',
+        }
+
+        modalVisible.value = false;
+    }
+
+    return { passwordUser, updatePassword ,modalVisible,resetPassword };
+}

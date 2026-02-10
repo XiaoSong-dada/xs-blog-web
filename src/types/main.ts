@@ -213,3 +213,9 @@ export interface IUserUpdate {
     email: string ;
     avatar_url: string;
 }
+
+// 修改密码
+export interface IUserPassword {
+    old_password:string;
+    password:string;
+}
