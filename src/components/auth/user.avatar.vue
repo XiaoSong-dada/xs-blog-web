@@ -16,7 +16,7 @@ import { AuthService } from '@/service/auth.service';
 import { useRouter } from 'vue-router';
 import { adminMenus,userMenus } from '@/constants/auth-menu';
 import userDropDown from './user.drop.down.vue';
-import { getList } from '@/api/user/user';
+import { getUserInfo } from '@/api/user/user';
 import { config } from '@/config/local.env';
 import { Avatar } from 'ant-design-vue';
 
@@ -33,8 +33,8 @@ const resolveAvatarUrl = (path?: string | null) => {
 }
 
 const fetchAvatar = async (username: string) => {
-    const res = await getList({ username, offset: 0, limit: 1 })
-    const candidate = Array.isArray(res.data) ? res.data[0] : res.data?.list?.[0]
+    const res = await getUserInfo()
+    const candidate = res.data
     avatarUrl.value = resolveAvatarUrl(candidate?.avatar_url)
 }
 
