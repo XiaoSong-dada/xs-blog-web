@@ -1,6 +1,6 @@
 <template>
     <div class="user-avatar flex-end align-center">
-        <user-drop-down :items="authMenus" @select="handleSelect">
+        <user-drop-down :items="userInfo?.is_admin ? adminMenus :userMenus" @select="handleSelect">
             <template #image>
                 <a-avatar :src="avatarUrl" ></a-avatar>
             </template>
@@ -14,7 +14,7 @@ import { onMounted, ref } from 'vue';
 import type { IDropDownItem, IUserInfo } from '@/types/main';
 import { AuthService } from '@/service/auth.service';
 import { useRouter } from 'vue-router';
-import { authMenus } from '@/constants/auth-menu';
+import { adminMenus,userMenus } from '@/constants/auth-menu';
 import userDropDown from './user.drop.down.vue';
 import { getList } from '@/api/user/user';
 import { config } from '@/config/local.env';

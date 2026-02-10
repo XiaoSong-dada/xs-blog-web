@@ -1,7 +1,7 @@
 import type { IDropDownItem } from '@/types/main'
 
 // Pure menu data (no side effects). Actions are handled by the caller.
-export const authMenus: IDropDownItem[] = [
+export const adminMenus: IDropDownItem[] = [
   {
      key: 1,
     label: '个人中心',
@@ -27,3 +27,17 @@ export const authMenus: IDropDownItem[] = [
   },
 ]
 
+export const userMenus: IDropDownItem[] = [
+  {
+     key: 1,
+    label: '个人中心',
+    route: '/me',
+  },
+  {
+    key: 4,
+    label: '退出',
+    route: '/',
+    before_need_driver: true,
+    action: 'logout',
+  },
+]
