@@ -193,3 +193,16 @@ export interface IDownloadResult {
     session_id:string;
     errors:string[];
 }
+
+// 修改基本信息
+export interface IUserBaseFrom extends IUserCell{
+    nick_name: string;
+    email: string ;
+    avatar_url: string;
+}
+
+// 上传图片文件基本类型
+export interface IUplaodFile {
+    original_name:string;
+    stored_path:string;
+}

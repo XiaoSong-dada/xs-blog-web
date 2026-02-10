@@ -2,7 +2,7 @@
     <div class="user-avatar flex-end align-center">
         <user-drop-down :items="authMenus" @select="handleSelect">
             <template #image>
-                <img :src="avatarUrl"></img>
+                <a-avatar :src="avatarUrl" ></a-avatar>
             </template>
         </user-drop-down>
     </div>
@@ -18,7 +18,9 @@ import { authMenus } from '@/constants/auth-menu';
 import userDropDown from './user.drop.down.vue';
 import { getList } from '@/api/user/user';
 import { config } from '@/config/local.env';
+import { Avatar } from 'ant-design-vue';
 
+const AAvatar = Avatar;
 const userInfo = ref<IUserInfo>()
 const avatarUrl = ref<string>(defaultAvatar)
 const router = useRouter()

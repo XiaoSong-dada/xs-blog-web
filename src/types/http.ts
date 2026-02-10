@@ -17,3 +17,8 @@ export interface ApiResponse<T> extends ApiReposeBase {
     data?: T;
     total?: number;
 }
+
+// 定义 API 响应数据类型
+export interface ApiResponseDetail<T> extends ApiReposeBase {
+    data?: T;
+}

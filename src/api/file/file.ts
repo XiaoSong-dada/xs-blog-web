@@ -1,6 +1,15 @@
 import type { ApiResponse, ApiReposeBase } from "@/types/http"
-import type { IDownloadResult, IUplaodSession, IUploadGroup, IUploadResult } from "@/types/main"
+import type { IDownloadResult, IUplaodFile, IUplaodSession, IUploadGroup, IUploadResult } from "@/types/main"
 import { requestHttp } from "@/utils/http"
+import { Form, type UploadFile } from "ant-design-vue"
+
+export const uploadFile = async (file:File , bucket:string ): Promise<ApiResponse<IUplaodFile>> => {
+    const form = new FormData();
+    form.append('file' , file)
+    form.append('bucket' , bucket)
+    return requestHttp.post(`/file`,form)
+}
+
 
 export const createSession = async (): Promise<ApiResponse<IUplaodSession>> => {
     return requestHttp.post(`/file/session`)
