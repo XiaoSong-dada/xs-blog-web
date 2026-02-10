@@ -93,14 +93,6 @@ export interface IResetPassword {
     isPassword: string;
 }
 
-// 注册账号
-export interface IRegister {
-    username: string;
-    password: string;
-    email: string;
-    nick_name: string;
-}
-
 // 文章接口
 export interface IArticle {
     id: string;
@@ -218,4 +210,13 @@ export interface IUserUpdate {
 export interface IUserPassword {
     old_password:string;
     password:string;
+}
+
+// 注册用户类型
+export interface IRegister {
+    username: string;
+    password: string;
+    nick_name: string;
+    email: string;
+    code: string;
 }

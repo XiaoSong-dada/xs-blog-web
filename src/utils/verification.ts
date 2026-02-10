@@ -6,3 +6,8 @@ export const isNull = (params: any): boolean => {
     if (typeof params === 'object' && Object.keys(params).length === 0) return true; // 处理空对象
     return false;
 }
+
+export const isEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}

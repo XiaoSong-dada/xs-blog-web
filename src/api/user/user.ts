@@ -28,3 +28,7 @@ export const updateUserInfo = async (params: IUserUpdate): Promise<ApiReposeBase
 export const updateUserPassword = async (params: IUserPassword): Promise<ApiReposeBase> => {
     return requestHttp.put('/users/owner/password', params)
 }
+
+export const sendRegisterCode = async (email: string): Promise<ApiReposeBase> => {
+    return requestHttp.post('/email/register', { email })
+}

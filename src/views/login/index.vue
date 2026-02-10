@@ -23,7 +23,7 @@
                     <a-button type="primary" html-type="submit" class="login-button" @click="handleLogin">
                         登录
                     </a-button>
-                    <p>还没有账号？点击<a>注册</a>一个账号</p>
+                    <p>还没有账号？点击<a @click="handleRegister">注册</a>一个账号</p>
                 </a-form-item>
             </a-form>
         </a-card>
@@ -79,11 +79,15 @@ const handleLogin = async () => {
 
 };
 
+const handleRegister = () => {
+    router.push({ path: '/register' })
+}
+
 </script>
 <style scoped lang="scss">
 .login {
     display: flex;
-    justify-content: flex-end;
+    justify-content: center;
     align-items: center;
     background: url('../../assets/login.png') center/cover no-repeat;
 
