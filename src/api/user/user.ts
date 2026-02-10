@@ -1,5 +1,5 @@
 import { requestHttp } from '@/utils/http';
-import type { UserLoginData, IUserSearch, IUserListResponse, IRegister, IUserCell } from '@/types/main';
+import type { UserLoginData, IUserSearch, IUserListResponse, IRegister, IUserCell, IUserUpdate } from '@/types/main';
 import type { ApiReposeBase, ApiResponse, ApiResponseDetail } from '@/types/http'
 export const login = async (data: UserLoginData): Promise<ApiResponse<{ token: string }>> => {
     return requestHttp.post<{ token: string }>('/auth/login', data);
@@ -19,4 +19,8 @@ export const registerUser = async (params: IRegister): Promise<ApiReposeBase> =>
 
 export const getUserInfo = async (): Promise<ApiResponseDetail<IUserCell>> => {
     return requestHttp.get('/users/owner/info')
+}
+
+export const updateUserInfo = async (params: IUserUpdate): Promise<ApiReposeBase> => {
+    return requestHttp.put('/users/owner/info', params)
 }

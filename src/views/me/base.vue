@@ -1,6 +1,7 @@
 <template>
     <div class="me-base flex-start gap-64">
         <a-form class="form" :model="user" name="basic" :label-col="{ span: 8 }" :wrapper-col="{ span: 16 }"
+            @submit="submit" 
             autocomplete="off" layout="vertical" labelWrap>
             <a-form-item label="邮箱" name="email">
                 <a-input v-model:value="user.email" />
@@ -44,7 +45,7 @@ const AImage = Image;
 const AUpload = Upload;
 const AButton = Button;
 
-const {user , getOwnerInfo} = useUser();
+const {user , getOwnerInfo,updateUser } = useUser();
 const {uploadFile} = useUplaodImgFile();
 
 const fileList = reactive<UploadFile[]>([]);
@@ -53,6 +54,10 @@ const beforeUpload = async (file:File)=>{
     const res = await uploadFile(file)
     user.value.avatar_url = res.data?.stored_path ?? ''
     return false;
+}
+
+const submit = ()=>{
+    updateUser()
 }
 
 onMounted(()=>{

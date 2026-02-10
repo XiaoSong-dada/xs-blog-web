@@ -206,3 +206,10 @@ export interface IUplaodFile {
     original_name:string;
     stored_path:string;
 }
+
+// 修改用户基本信息
+export interface IUserUpdate {
+    nick_name: string;
+    email: string ;
+    avatar_url: string;
+}

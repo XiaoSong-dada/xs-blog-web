@@ -1,7 +1,8 @@
-import type { IUserBaseFrom, IUserListResponse, IUserSearch, IUserCell } from "@/types/main"
-import { ref } from "vue"
-import { getList, getUserInfo } from "@/api/user/user"
+import type { IUserBaseFrom, IUserListResponse, IUserSearch, IUserCell, IUserUpdate } from "@/types/main"
+import { reactive, ref } from "vue"
+import { getList, getUserInfo, updateUserInfo } from "@/api/user/user"
 import { message } from "ant-design-vue"
+import { isNull } from "@/utils/verification"
 
 const createDefaultParams = (): IUserSearch => ({
     username: "",
@@ -82,6 +83,34 @@ export const useUser = () => {
         })
     }
 
+    const updateUser = () => {
+        if (!checkUserFrom()) return;
+        updateUserInfo(user.value).then(res => {
+            if (res.code === 200) {
+                message.success("更新成功");
+                getOwnerInfo();
+            } else {
+                message.error("更新失败:" + res.message);
+            }
+        })
+    }
 
-    return { user, getOwnerInfo };
+    const checkUserFrom = (): boolean => {
+        const notNullArray: Array<keyof IUserBaseFrom> = ['nick_name', 'email', 'avatar_url']
+        let isPass: boolean = true
+        notNullArray.forEach(item => {
+
+            if (isNull(user.value[item])) {
+                message.warn(`${item}不能为空`)
+                isPass = false
+                return;
+            }
+        })
+
+        return isPass
+    }
+
+
+    return { user, getOwnerInfo, updateUser, checkUserFrom };
 }
+
