@@ -72,8 +72,7 @@ const routeToKey = (path: string) => {
     if (path.startsWith('/article')) return 'article'
     if (path.startsWith('/about')) return 'about'
     if (path.startsWith('/me')) return 'me'
-
-    return 'home'
+    return ''
 }
 
 

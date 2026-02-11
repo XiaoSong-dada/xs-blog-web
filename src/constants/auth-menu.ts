@@ -19,7 +19,7 @@ export const adminMenus: IDropDownItem[] = [
     route: '/admin',
   },
   {
-    key: 4,
+    key: 10,
     label: '退出',
     route: '/',
     before_need_driver: true,

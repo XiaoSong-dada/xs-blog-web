@@ -30,7 +30,7 @@ const RequestEnums = {
 } as const;
 
 const config = {
-    baseURL: local_config.PROXY_URL,
+    baseURL: local_config.PROXY_NAME,
     timeout: local_config.TIMEOUT,
     withCredentials: true
 };

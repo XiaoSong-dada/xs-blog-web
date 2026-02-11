@@ -1,11 +1,12 @@
 import { h } from 'vue'
 import type { ItemType } from 'ant-design-vue'
-import { FileTextOutlined, UserOutlined } from '@ant-design/icons-vue'
+import { FileTextOutlined, UserOutlined, LinkOutlined } from '@ant-design/icons-vue'
 import type { CenterMenuItem } from '@/types/main'
 
 const iconMap = {
   user: () => h(UserOutlined),
   article: () => h(FileTextOutlined),
+  link: () => h(LinkOutlined),
 } as const
 
 export const buildMenuItem = (
@@ -19,5 +20,5 @@ export const buildMenuItem = (
     children,
     label: item.label,
     type,
-  } 
+  }
 }

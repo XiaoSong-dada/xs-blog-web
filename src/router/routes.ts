@@ -21,6 +21,11 @@ export const routes = [
                         name: 'ArticleDetail',
                         props: true
                     },
+                    {
+                        path: 'friend-link',
+                        component: () => import('@/views/link/FriendLink.vue'),
+                        name: 'FriendLink'
+                    },
                     { path: 'about', component: () => import('@/views/about/index.vue'), name: 'About' }
                 ],
             },
@@ -34,14 +39,19 @@ export const routes = [
                         component: () => import('@/views/admin/article/index.vue'),
                         name: 'AdminArticleList',
                     },
+                    {
+                        path: 'friend-link',
+                        component: () => import('@/views/admin/link/FriendLink.vue'),
+                        name: 'AdminFriendLinkList',
+                    }
                 ]
             },
             {
-                path:"/me",
-                meta: { requiresAuth: true},
+                path: "/me",
+                meta: { requiresAuth: true },
                 component: () => import('@/layout/me/index.vue'),
                 children: [
-                    { path: "base", name: "MeBase", component: () => import("@/views/me/base.vue")},
+                    { path: "base", name: "MeBase", component: () => import("@/views/me/base.vue") },
                     { path: "security", name: "MeSecurity", component: () => import("@/views/me/security.vue") },
                 ]
             },

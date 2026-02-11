@@ -58,7 +58,7 @@ export interface IItemCompoment {
 export interface CenterMenuItem {
     key: string;
     label: string;
-    icon?: 'user' | 'article';
+    icon?: 'user' | 'article' | 'link';
     route: string
 }
 
@@ -220,3 +220,17 @@ export interface IRegister {
     email: string;
     code: string;
 }
+
+// 友链接口
+export interface IFriendLink {
+    id: string;
+    name: string;
+    url: string;
+    description: string | null;
+    log_url: string | null;
+    created_at: string;
+    updated_at: string;
+}
+export type IFriendLinkQuery = IPages<{
+    name?: string;
+}>;
