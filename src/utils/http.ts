@@ -7,7 +7,6 @@ import axios, {
 } from 'axios';
 import { message } from 'ant-design-vue';
 import { config as local_config } from '@/config/local.env';
-import router from '@/router/main';
 import { AuthService } from '@/service/auth.service';
 
 // 数据返回的接口
@@ -31,7 +30,7 @@ const RequestEnums = {
 } as const;
 
 const config = {
-    baseURL: local_config.PROXY_NAME,
+    baseURL: local_config.PROXY_URL,
     timeout: local_config.TIMEOUT,
     withCredentials: true
 };

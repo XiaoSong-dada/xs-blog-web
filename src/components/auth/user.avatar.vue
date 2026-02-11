@@ -32,7 +32,7 @@ const resolveAvatarUrl = (path?: string | null) => {
     return `${config.VITE_STATIC_URL.replace(/\/$/, '')}/${normalizedPath}`
 }
 
-const fetchAvatar = async (username: string) => {
+const fetchAvatar = async () => {
     const res = await getUserInfo()
     const candidate = res.data
     avatarUrl.value = resolveAvatarUrl(candidate?.avatar_url)
@@ -44,7 +44,7 @@ onMounted(async () => {
     if (user) {
         userInfo.value = user;
         try {
-            await fetchAvatar(user.username)
+            await fetchAvatar()
         } catch {
             avatarUrl.value = defaultAvatar
         }

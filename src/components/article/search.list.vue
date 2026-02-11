@@ -66,7 +66,7 @@
 <script setup lang="ts">
 import type { IArticleSearchList } from "@/types/main";
 import { formatDate } from "@/utils/date";
-import { computed, h } from "vue";
+import { computed } from "vue";
 import { Tag } from "ant-design-vue";
 const ATag = Tag;
 const props = defineProps<{ data: IArticleSearchList[]}>();

@@ -1,8 +1,8 @@
 import type { IUplaodSession, IUploadGroup, IUploadResult } from "@/types/main"
-import { ref, h } from "vue"
+import { ref } from "vue"
 import { createSession as create, uploadSession as upload ,commitSession as commit} from "@/api/file/file";
 import type { ApiResponse } from '@/types/http';
-import { message, type UploadFile, Modal } from 'ant-design-vue';
+import { message, type UploadFile } from 'ant-design-vue';
 import { withLock } from "@/utils/request.lock";
 import { ConcurrencyPool } from "@/utils/concurrency";
 

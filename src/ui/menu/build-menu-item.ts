@@ -15,7 +15,7 @@ export const buildMenuItem = (
 ): ItemType => {
   return {
     key: item.key,
-    icon: iconMap[item.icon],
+    icon: item.icon ? iconMap[item.icon] : undefined,
     children,
     label: item.label,
     type,

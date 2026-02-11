@@ -8,8 +8,6 @@
       "@/*": ["src/*"],
       "@config/*": ["src/config/*"]
     },
-    "ignoreDeprecations": "6.0",
-
     /* Linting */
     "strict": true,
     "noUnusedLocals": true,

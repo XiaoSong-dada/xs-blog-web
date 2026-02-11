@@ -1,5 +1,5 @@
-import type { IUserBaseFrom, IUserListResponse, IUserSearch, IUserCell, IUserUpdate, IUserPassword } from "@/types/main"
-import { reactive, ref } from "vue"
+import type { IUserBaseFrom, IUserListResponse, IUserSearch, IUserCell, IUserPassword } from "@/types/main"
+import { ref } from "vue"
 import { getList, getUserInfo, updateUserInfo, updateUserPassword } from "@/api/user/user"
 import { message } from "ant-design-vue"
 import { isNull } from "@/utils/verification"

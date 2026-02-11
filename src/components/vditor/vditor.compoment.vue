@@ -172,10 +172,6 @@ function getMarkdown(): string {
     return vditor.value?.getValue() ?? "";
 }
 
-function getHTML(): string {
-    return vditor.value?.getHTML() ?? "";
-}
-
 function buildPayload(): ArticlePayload {
     return {
         title: form.title.trim(),

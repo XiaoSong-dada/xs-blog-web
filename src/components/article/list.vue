@@ -66,7 +66,7 @@
 </template>
 
 <script setup lang="ts">
-import type { IArticle, IArticleSearchList } from "@/types/main";
+import type { IArticle } from "@/types/main";
 import { formatDate } from "@/utils/date";
 import { computed } from "vue";
 import { Tag } from "ant-design-vue";

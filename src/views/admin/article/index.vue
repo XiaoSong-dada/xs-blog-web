@@ -92,23 +92,20 @@
 </template>
 
 <script setup lang="ts">
-import { Table, Button, Flex, Input, Popconfirm, message, UploadDragger, type UploadFile, Modal, Upload, Select } from 'ant-design-vue';
-import { PlusOutlined, CloseOutlined } from '@ant-design/icons-vue';
+import { Table, Button, Flex, Input, Popconfirm, message, type UploadFile, Modal, Upload, Select } from 'ant-design-vue';
+import { PlusOutlined } from '@ant-design/icons-vue';
 import { useArticleList } from '@/hook/article/useArticle'
 import {
     EditOutlined,
     DeleteOutlined,
     SearchOutlined,
     VerticalAlignBottomOutlined,
-    VerticalAlignTopOutlined,
     UploadOutlined,
     SyncOutlined,
-    InboxOutlined,
     CheckOutlined,
     SendOutlined,
 } from '@ant-design/icons-vue';
 import { computed, h, onMounted, ref, type VNode } from 'vue'
-import { notDevelopedMessage } from '@/ui/status/not-developed';
 import { formatDate } from '@/utils/date';
 import { useBuildTableIndex } from '@/hook/useBuilding';
 import { useRouter } from 'vue-router';
@@ -124,7 +121,6 @@ const AButton = Button;
 const AFlex = Flex;
 const AInput = Input;
 const APopconfirm = Popconfirm;
-const AUploadDragger = UploadDragger;
 const AUpload = Upload;
 const AModal = Modal;
 const ASelect = Select;

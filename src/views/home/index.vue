@@ -146,7 +146,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref } from "vue";
+import { onBeforeUnmount, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
@@ -159,9 +159,6 @@ const previewItems = ref([
 
 function go(path: string) {
     router.push(path);
-}
-function goHome() {
-    router.push("/");
 }
 
 function scrollTo(id: string) {
