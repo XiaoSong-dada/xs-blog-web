@@ -1,7 +1,10 @@
-import type { IFriendLink, IFriendLinkQuery } from "@/types/main"
-import { computed, ref } from "vue"
-import { getList } from "@/api/link/link"
+import type { IFriendLink, IFriendLinkForm, IFriendLinkQuery } from "@/types/main"
+import { computed, reactive, ref } from "vue"
+import { addFriendLink, deleteFriendLink, getDetail, getList, updateFriendLink } from "@/api/link/link"
 import { useBuildQueryParams } from "../useBuilding";
+import { useForm } from "ant-design-vue/es/form";
+import { message } from "ant-design-vue";
+import { id } from "date-fns/locale";
 
 const buildQueryParams = useBuildQueryParams;
 
@@ -50,18 +53,6 @@ const columns = [
         dataIndex: 'updated_at'
     },
     {
-        title: 'Logo',
-        key: 'log_url',
-        width: '200px',
-        dataIndex: 'log_url'
-    },
-    {
-        title: '发布时间',
-        key: 'published_at',
-        width: '200px',
-        dataIndex: 'published_at'
-    },
-    {
         title: '操作',
         key: 'action',
         width: '200px'
@@ -78,41 +69,38 @@ const createDefaultParams = (): IFriendLinkQuery => ({
 const selectedRows = ref<IFriendLink[]>()
 const selectedRowKeys = ref<(string | number)[]>([])
 const rowSelection = computed(() => ({
-  checkStrictly: true,
-  selectedRowKeys: selectedRowKeys.value,
-  onChange: (keys: (string | number)[], rows: IFriendLink[]) => {
-    selectedRowKeys.value = keys
-    selectedRows.value = rows
-  },
+    checkStrictly: true,
+    selectedRowKeys: selectedRowKeys.value,
+    onChange: (keys: (string | number)[], rows: IFriendLink[]) => {
+        selectedRowKeys.value = keys
+        selectedRows.value = rows
+    },
 }))
 
+const params = ref<IFriendLinkQuery>(createDefaultParams())
+const data = ref<IFriendLink[]>([])
+const total = ref(0)
+const loading = ref(false)
+
+const fetchList = async (overrides: Partial<IFriendLinkQuery> = {}) => {
+    loading.value = true
+    try {
+        const query = buildQueryParams({ ...params.value, ...overrides })
+
+        const res = await getList(query)
+        const resTotal = (res as { total?: number }).total
+        data.value = res.data ?? []
+        total.value = resTotal ?? 0
+
+    } finally {
+        loading.value = false
+    }
+}
+const resetParams = () => {
+    params.value = createDefaultParams()
+}
+
 export const useFriendLinkList = () => {
-    const params = ref<IFriendLinkQuery>(createDefaultParams())
-    const data = ref<IFriendLink[]>([])
-    const total = ref(0)
-    const loading = ref(false)
-
-    const fetchList = async (overrides: Partial<IFriendLinkQuery> = {}) => {
-        loading.value = true
-        try {
-            const query = buildQueryParams({ ...params.value, ...overrides })
-            console.log(query);
-
-            const res = await getList(query)
-            const resTotal = (res as { total?: number }).total
-            data.value = res.data ?? []
-            total.value = resTotal ?? 0
-            console.log(res);
-
-        } finally {
-            loading.value = false
-        }
-    }
-
-    const resetParams = () => {
-        params.value = createDefaultParams()
-    }
-
     return {
         params,
         data,
@@ -122,5 +110,120 @@ export const useFriendLinkList = () => {
         resetParams,
         columns,
         rowSelection
+    }
+}
+
+const modalOpen = ref<boolean>(false);
+const title = ref<string>('');
+const isAdd = ref<boolean>(false);
+const formModel = ref<IFriendLinkForm>({
+    id: '',
+    name: '',
+    url: '',
+    description: '',
+})
+const rulesRef = reactive({
+    name: [
+        {
+            required: true,
+            message: '请输入名称',
+        },
+    ],
+    url: [
+        {
+            required: true,
+            message: '请输入地址',
+        },
+    ]
+});
+const { validateInfos, validate ,resetFields } = useForm(formModel, rulesRef)
+
+const cancel = () => {
+    modalOpen.value = false;
+    formModel.value = {
+        id: '',
+        name: '',
+        url: '',
+        description: '',
+    }
+    resetFields();
+}
+
+
+const submit = async () => {
+    validate();
+
+    if (isAdd.value) {
+        const res = await addFriendLink(formModel.value)
+        if (res.code !== 201) return message.error(`新增失败: ${res.message}`);
+        message.success('新增成功');
+        fetchList();
+    }
+    else {
+        const res = await updateFriendLink(formModel.value);
+        if (res.code !== 200) return message.error(`修改失败: ${res.message}`);
+        message.success('修改成功');
+        fetchList();
+    }
+
+    cancel();
+
+}
+
+export const useDelteFriendLink = () => {
+    const delteLink = async (id: string) => {
+        const res = await deleteFriendLink(id)
+        if (res.code !== 200) return message.error('删除失败');
+        message.success('删除成功')
+        fetchList();
+    }
+    return {
+        delteLink
+    }
+}
+export const useFriendLinkModal = () => {
+
+    return {
+        modalOpen,
+        submit,
+        cancel,
+        title,
+        formModel,
+        validateInfos,
+        validate
+    }
+
+}
+
+export const useUpdateFriendLink = () => {
+    const updateLink = async (id: string) => {
+        const res = await getDetail(id);
+        if (res.code !== 200) return message.error('获取详细信息失败');
+        //  拼接数据
+        Object.assign(formModel.value, res.data);
+        modalOpen.value = true
+        title.value = '修改友链信息'
+        isAdd.value = false;
+        
+    }
+
+    return {
+        updateLink,
+        cancel
+    }
+}
+
+export const useAddFriendLink = () => {
+    const addLink = () => {
+        modalOpen.value = true
+        title.value = '新增友链'
+        isAdd.value = true;
+
+    }
+
+
+    return {
+        addLink,
+        cancel
     }
 }

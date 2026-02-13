@@ -1,11 +1,11 @@
 <template>
-    <div class="center-article">
+    <div class="friend-link">
         <div class="toobar">
             <a-flex class="header" :gap="40">
                 <a-flex gap="small">
                     <a-flex class="search-item">
                         <text>
-                            标记：
+                            名称：
                         </text>
                         <div class="flex-center flex-column">
                             <a-input class="toolbar-input" v-model:value="params.name" />
@@ -18,13 +18,13 @@
                 </a-flex>
             </a-flex>
             <a-flex class="tools" gap="small">
-                <a-button type="primary" :icon="h(PlusOutlined)" @click="notDevelopedMessage">
+                <a-button type="primary" :icon="h(PlusOutlined)" @click="addLink">
                     新增
                 </a-button>
             </a-flex>
         </div>
         <a-table :columns="columns" :data-source="data" :scroll="{ x: '100%', y: computTableHeight }" :loading="loading"
-            :pagination="paginationComputed" :row-selection="rowSelection" row-key="slug">
+            :pagination="paginationComputed" :row-selection="rowSelection" row-key="id">
             <template #bodyCell="{ column, record, index }">
                 <template v-if="column.key === 'index'">
                     {{ buildIndex(params, index) }}
@@ -37,21 +37,34 @@
                     {{ (column.key && record[column.key]) ? formatDate(record[column.key]) : '' }}
                 </template>
                 <template v-if="column.key === 'action'">
-                    <a-button type="link" :icon="h(EditOutlined)" @click="notDevelopedMessage">修改</a-button>
-                    <a-popconfirm :title="`是否确认删除文章${record.slug}`" ok-text="确认" cancel-text="取消"
-                        @confirm="() => notDevelopedMessage()">
+                    <a-button type="link" :icon="h(EditOutlined)" @click="updateLink(record.id)">修改</a-button>
+                    <a-popconfirm :title="`是否确认删除删除连接${record.name}`" ok-text="确认" cancel-text="取消"
+                        @confirm="() => delteLink(record.id)">
                         <a-button type="link" danger :icon="h(DeleteOutlined)">删除</a-button>
                     </a-popconfirm>
                 </template>
             </template>
         </a-table>
+
+        <a-modal v-model:open="modalOpen" :title="title" okText="确认" cancelText="取消" @ok="submit" @cancel="cancel">
+            <a-from :model="formModel" labelAlign="right" :labelCol="{ span: 3 }" name="friend_link" autocomplete="off">
+                <a-from-item label="名称" v-bind="validateInfos.name">
+                    <a-input v-model:value="formModel.name" />
+                </a-from-item>
+                <a-from-item label="地址" name="url" v-bind="validateInfos.url">
+                    <a-input v-model:value="formModel.url" />
+                </a-from-item>
+                <a-from-item label="介绍" name="description">
+                    <a-text-area v-model:value="formModel.description" :rows="4" />
+                </a-from-item>
+            </a-from>
+        </a-modal>
     </div>
 </template>
 
 <script setup lang="ts">
-import { Table, Button, Flex, Input, Popconfirm } from 'ant-design-vue';
+import { Table, Button, Flex, Input, Popconfirm, Modal, Form, Textarea } from 'ant-design-vue';
 import { PlusOutlined } from '@ant-design/icons-vue';
-
 import {
     EditOutlined,
     DeleteOutlined,
@@ -64,18 +77,25 @@ import { formatDate } from '@/utils/date';
 import { useBuildTableIndex } from '@/hook/useBuilding';
 import { useTableHeight } from '@/hook/layout/useLayout';
 import { omitString } from '@/utils/utils';
-import { useFriendLinkList } from '@/hook/link/useFriendLink';
+import { useAddFriendLink, useDelteFriendLink, useFriendLinkList, useFriendLinkModal, useUpdateFriendLink } from '@/hook/link/useFriendLink';
 
 const ATable = Table;
 const AButton = Button;
 const AFlex = Flex;
 const AInput = Input;
+const ATextArea = Textarea;
 const APopconfirm = Popconfirm;
+const AModal = Modal;
+const AFrom = Form;
+const AFromItem = Form.Item
 
 const { columns, params, data, total, loading, fetchList, resetParams, rowSelection } = useFriendLinkList();
 const { buildIndex } = useBuildTableIndex();
 const { tableHeight, tableHeightOnMounted } = useTableHeight();
-
+const { updateLink } = useUpdateFriendLink();
+const { addLink } = useAddFriendLink();
+const { modalOpen, submit, cancel, title, formModel, validateInfos } = useFriendLinkModal();
+const { delteLink } = useDelteFriendLink();
 const onSearch = () => {
     params.value.offset = 1
     fetchList()
@@ -112,11 +132,15 @@ const computTableHeight = computed(() => tableHeight.value)
 </script>
 
 <style scoped lang="scss">
-.center-article {
+.friend-link {
     .toolbar {
         &-input {
             width: 180px;
         }
+    }
+
+    .area {
+        min-height: 400px;
     }
 
 }

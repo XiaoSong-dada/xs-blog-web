@@ -234,3 +234,10 @@ export interface IFriendLink {
 export type IFriendLinkQuery = IPages<{
     name?: string;
 }>;
+
+export interface IFriendLinkForm {
+    id: string;
+    name: string;
+    url: string;
+    description: string;
+}

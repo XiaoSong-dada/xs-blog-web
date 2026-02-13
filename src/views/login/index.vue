@@ -34,7 +34,7 @@
 
 <script lang="ts" setup>
 import { reactive } from 'vue';
-import { Form, Input, Button, Card } from 'ant-design-vue';
+import { Form, Input, Button, Card, message } from 'ant-design-vue';
 import { UserOutlined, LockOutlined } from '@ant-design/icons-vue';
 import type { UnwrapRef } from 'vue';
 import type { FormProps } from 'ant-design-vue';
@@ -42,6 +42,7 @@ import type { UserLoginData } from '@/types/main';
 import { login as loginApi } from '@/api/user/user';
 import { useRouter } from 'vue-router';
 import { AuthService } from '@/service/auth.service';
+import { isNull } from '@/utils/verification';
 const router = useRouter();
 const AForm = Form;
 const AFormItem = Form.Item;
@@ -70,8 +71,26 @@ const handleLogin = async () => {
         password: formState.password,
     };
 
+    let checked = true;
+    const require_array: { key: keyof UserLoginData, message: string }[] = [
+        {
+            key: 'username',
+            message: '用户名不能为空'
+        },
+        {
+            key: 'password'
+            , message: '密码不能为空'
+        }
+    ]
+    require_array.forEach(item => {
+        data[item.key as keyof UserLoginData]
+        if (isNull(item)) return message.warn(item.message)
+    })
+
+    if (!checked) return;
+
     loginApi(data).then(res => {
-        if(res.code === 200){
+        if (res.code === 200) {
             AuthService.setToken(res.data?.token || '')
             router.push({ path: '/' })
         }
