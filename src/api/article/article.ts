@@ -7,6 +7,11 @@ export interface IArticleLikeResult {
     like_count: number;
 }
 
+export interface IArticleBookmarkResult {
+    bookmarked: boolean;
+    bookmark_count: number;
+}
+
 export const getList = async (params: IArticleQuery): Promise<ApiResponse<IArticle[]>> => {
     return requestHttp.get('/article', params)
 }
@@ -57,4 +62,8 @@ export const deleteArticle = async(article_id:string):Promise<ApiReposeBase> => 
 
 export const toggleLike = async (article_id: string): Promise<ApiResponse<IArticleLikeResult>> => {
     return requestHttp.post(`/article/${article_id}/like`)
+}
+
+export const toggleBookmark = async (article_id: string): Promise<ApiResponse<IArticleBookmarkResult>> => {
+    return requestHttp.post(`/article/${article_id}/bookmark`)
 }

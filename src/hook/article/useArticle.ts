@@ -19,6 +19,7 @@ import {
     batchPublish as batch_publsih,
     deleteArticle as deleteArticleApi,
     toggleLike as toggleLikeApi,
+    toggleBookmark as toggleBookmarkApi,
 } from '@/api/article/article';
 import { useBuildQueryParams } from '@/hook/useBuilding';
 import { message, Modal } from "ant-design-vue";
@@ -119,6 +120,7 @@ export const useArticleList = (publish_flag: boolean = false) => {
     const total = ref(0);
     const loading = ref(false);
     const likeLoadingMap = ref<Record<string, boolean>>({});
+    const bookmarkLoadingMap = ref<Record<string, boolean>>({});
 
     const toggleLike = async (article: IArticle) => {
         const userInfo = AuthService.getUserInfo();
@@ -147,6 +149,36 @@ export const useArticleList = (publish_flag: boolean = false) => {
             message.error('点赞失败，请稍后重试');
         } finally {
             likeLoadingMap.value[articleId] = false;
+        }
+    }
+
+    const toggleBookmark = async (article: IArticle) => {
+        const userInfo = AuthService.getUserInfo();
+        if (!userInfo) {
+            message.warn('请先登录后再收藏');
+            return;
+        }
+
+        const articleId = article.id;
+        if (bookmarkLoadingMap.value[articleId]) return;
+
+        const prevBookmarked = !!article.bookmarked;
+        const prevCount = article.bookmark_count ?? 0;
+
+        article.bookmarked = !prevBookmarked;
+        article.bookmark_count = Math.max(0, prevCount + (prevBookmarked ? -1 : 1));
+        bookmarkLoadingMap.value[articleId] = true;
+
+        try {
+            const res = await toggleBookmarkApi(articleId);
+            article.bookmarked = !!res.data?.bookmarked;
+            article.bookmark_count = res.data?.bookmark_count ?? article.bookmark_count;
+        } catch {
+            article.bookmarked = prevBookmarked;
+            article.bookmark_count = prevCount;
+            message.error('收藏失败，请稍后重试');
+        } finally {
+            bookmarkLoadingMap.value[articleId] = false;
         }
     }
 
@@ -221,6 +253,7 @@ export const useArticleList = (publish_flag: boolean = false) => {
         total,
         loading,
         toggleLike,
+        toggleBookmark,
         fetchList,
         resetParams,
         rowSelection,
@@ -349,6 +382,7 @@ export const useSearchList = () => {
     const searchTotal = ref(0);
     const loading = ref(false);
     const likeLoadingMap = ref<Record<string, boolean>>({});
+    const bookmarkLoadingMap = ref<Record<string, boolean>>({});
 
     const toggleLike = async (article: IArticleSearchList) => {
         const userInfo = AuthService.getUserInfo();
@@ -380,6 +414,36 @@ export const useSearchList = () => {
         }
     }
 
+    const toggleBookmark = async (article: IArticleSearchList) => {
+        const userInfo = AuthService.getUserInfo();
+        if (!userInfo) {
+            message.warn('请先登录后再收藏');
+            return;
+        }
+
+        const articleId = article.id;
+        if (bookmarkLoadingMap.value[articleId]) return;
+
+        const prevBookmarked = !!article.bookmarked;
+        const prevCount = article.bookmark_count ?? 0;
+
+        article.bookmarked = !prevBookmarked;
+        article.bookmark_count = Math.max(0, prevCount + (prevBookmarked ? -1 : 1));
+        bookmarkLoadingMap.value[articleId] = true;
+
+        try {
+            const res = await toggleBookmarkApi(articleId);
+            article.bookmarked = !!res.data?.bookmarked;
+            article.bookmark_count = res.data?.bookmark_count ?? article.bookmark_count;
+        } catch {
+            article.bookmarked = prevBookmarked;
+            article.bookmark_count = prevCount;
+            message.error('收藏失败，请稍后重试');
+        } finally {
+            bookmarkLoadingMap.value[articleId] = false;
+        }
+    }
+
     const fetchSearchList = async (overrides: Partial<IArticleSearchQuery> = {}) => {
         loading.value = true
         try {
@@ -403,6 +467,7 @@ export const useSearchList = () => {
         searchTotal,
         loading,
         toggleLike,
+        toggleBookmark,
         fetchSearchList,
         resetParams,
         rowSelection,

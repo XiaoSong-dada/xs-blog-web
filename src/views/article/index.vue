@@ -1,8 +1,8 @@
 <template>
     <div class="article overflow-scroll overflow-scroll--max flex-center" @scroll="handleScroll" ref="containerRef">
         <div class="list">
-            <article-search-list :data="searchList ?? []" v-if="isSearch" @click-title="getDetail" @click-like="onToggleSearchLike"/>
-            <article-list v-else :data="data" @click-title="getDetail" @click-like="onToggleArticleLike" />
+            <article-search-list :data="searchList ?? []" v-if="isSearch" @click-title="getDetail" @click-like="onToggleSearchLike" @click-bookmark="onToggleSearchBookmark"/>
+            <article-list v-else :data="data" @click-title="getDetail" @click-like="onToggleArticleLike" @click-bookmark="onToggleArticleBookmark" />
         </div>
     </div>
 </template>
@@ -24,10 +24,18 @@ const {
     data,
     total,
     toggleLike: toggleArticleLike,
+    toggleBookmark: toggleArticleBookmark,
     fetchList,
 } = useArticleList(true);
 
-const { searchParams, searchList, fetchSearchList, searchTotal, toggleLike: toggleSearchLike } = useSearchList()
+const {
+    searchParams,
+    searchList,
+    fetchSearchList,
+    searchTotal,
+    toggleLike: toggleSearchLike,
+    toggleBookmark: toggleSearchBookmark,
+} = useSearchList()
 const DEFAULT_LIMIT = 10;
 
 
@@ -92,6 +100,14 @@ const onToggleArticleLike = (article: IArticle) => {
 
 const onToggleSearchLike = (article: IArticleSearchList) => {
     toggleSearchLike(article)
+}
+
+const onToggleArticleBookmark = (article: IArticle) => {
+    toggleArticleBookmark(article)
+}
+
+const onToggleSearchBookmark = (article: IArticleSearchList) => {
+    toggleSearchBookmark(article)
 }
 
 watch(

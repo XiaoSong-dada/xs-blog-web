@@ -103,6 +103,8 @@ export interface IArticle {
     view_count: number;
     like_count?: number;
     liked?: boolean;
+    bookmark_count?: number;
+    bookmarked?: boolean;
     created_at: string;
     updated_at: string;
     published_at: string | null;
@@ -130,6 +132,8 @@ export interface IArticleSearchList {
     view_count: number;
     like_count?: number;
     liked?: boolean;
+    bookmark_count?: number;
+    bookmarked?: boolean;
     published_at: string | null;
     rank: number;
     hit_title: boolean;

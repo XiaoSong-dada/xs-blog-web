@@ -71,8 +71,7 @@ import {
     SearchOutlined,
     SyncOutlined,
 } from '@ant-design/icons-vue';
-import { notDevelopedMessage } from "@/ui/status/not-developed";
-import { computed, h, onMounted, ref } from 'vue'
+import { computed, h, onMounted } from 'vue'
 import { formatDate } from '@/utils/date';
 import { useBuildTableIndex } from '@/hook/useBuilding';
 import { useTableHeight } from '@/hook/layout/useLayout';

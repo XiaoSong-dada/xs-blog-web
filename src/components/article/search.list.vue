@@ -29,9 +29,9 @@
             </p>
 
             <footer class="footer">
-                <span class="footer__item">
-                    <img src="@/assets/icon/collection.svg" alt="收藏" />
-                    <span>0</span>
+                <span class="footer__item footer__item--clickable" @click="emit('clickBookmark', article)">
+                    <img :src="article.bookmarked ? hasCollectionIcon : collectionIcon" alt="收藏" />
+                    <span>{{ article.bookmark_count ?? 0 }}</span>
                 </span>
 
                 <span class="footer__divider"></span>
@@ -70,6 +70,8 @@ import { computed } from "vue";
 import { Tag } from "ant-design-vue";
 import likeIcon from '@/assets/icon/like.svg'
 import hasLikeIcon from '@/assets/icon/has_like.svg'
+import collectionIcon from '@/assets/icon/collection.svg'
+import hasCollectionIcon from '@/assets/icon/has_collection.svg'
 const ATag = Tag;
 const props = defineProps<{ data: IArticleSearchList[]}>();
 
@@ -80,6 +82,7 @@ const emit = defineEmits<{
      */
     (e: "clickTitle", slug: string): Promise<void> | void;
     (e: "clickLike", article: IArticleSearchList): Promise<void> | void;
+    (e: "clickBookmark", article: IArticleSearchList): Promise<void> | void;
 
 }>();
 
