@@ -20,4 +20,6 @@ export const deleteFriendLink = async (id: string): Promise<ApiReposeBase> => {
     return requestHttp.delete(`/friend_link/${id}`)
 }
 
-
+export const getPublishList = async (): Promise<ApiResponse<IFriendLink[]>> => {
+    return requestHttp.get('/friend_link/publish/links')
+}

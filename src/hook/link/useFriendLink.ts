@@ -1,10 +1,9 @@
 import type { IFriendLink, IFriendLinkForm, IFriendLinkQuery } from "@/types/main"
 import { computed, reactive, ref } from "vue"
-import { addFriendLink, deleteFriendLink, getDetail, getList, updateFriendLink } from "@/api/link/link"
+import { addFriendLink, deleteFriendLink, getDetail, getList, updateFriendLink, getPublishList as getPublishListAPi } from "@/api/link/link"
 import { useBuildQueryParams } from "../useBuilding";
 import { useForm } from "ant-design-vue/es/form";
 import { message } from "ant-design-vue";
-import { id } from "date-fns/locale";
 
 const buildQueryParams = useBuildQueryParams;
 
@@ -136,7 +135,7 @@ const rulesRef = reactive({
         },
     ]
 });
-const { validateInfos, validate ,resetFields } = useForm(formModel, rulesRef)
+const { validateInfos, validate, resetFields } = useForm(formModel, rulesRef)
 
 const cancel = () => {
     modalOpen.value = false;
@@ -204,7 +203,7 @@ export const useUpdateFriendLink = () => {
         modalOpen.value = true
         title.value = '修改友链信息'
         isAdd.value = false;
-        
+
     }
 
     return {
@@ -225,5 +224,23 @@ export const useAddFriendLink = () => {
     return {
         addLink,
         cancel
+    }
+}
+
+export const usePublishLinkList = () => {
+    const publishLinks = ref<IFriendLink[]>([])
+    const total = ref<number>(0)
+    const getPublishList = () => {
+        getPublishListAPi().then(res => {
+            if (res.code !== 200) return message.error('获取发布友链失败: ' + res.message);
+            publishLinks.value = res.data ?? [];
+            total.value = res.total ?? 0;
+        })
+    }
+
+    return {
+        total,
+        publishLinks,
+        getPublishList,
     }
 }
