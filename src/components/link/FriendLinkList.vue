@@ -22,6 +22,7 @@
 import type { IFriendLink } from '@/types/main';
 import { List } from 'ant-design-vue';
 const AList = List;
+const AListItem = List.Item;  
 const props = withDefaults(defineProps<{
   data?: IFriendLink[]
 }>(), {
