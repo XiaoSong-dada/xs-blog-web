@@ -1,5 +1,5 @@
 import { requestHttp } from '@/utils/http';
-import type { IArticleQuery, IArticle, IAritcleCreate,IAritcleUpdate, IArticleSearchQuery, IArticleSearchList } from '@/types/main';
+import type { IArticleQuery, IArticle, IAritcleCreate,IAritcleUpdate, IArticleSearchQuery, IArticleSearchList, IBookmarkQuery } from '@/types/main';
 import type { ApiResponse, ApiReposeBase } from '@/types/http'
 
 export interface IArticleLikeResult {
@@ -66,4 +66,8 @@ export const toggleLike = async (article_id: string): Promise<ApiResponse<IArtic
 
 export const toggleBookmark = async (article_id: string): Promise<ApiResponse<IArticleBookmarkResult>> => {
     return requestHttp.post(`/article/${article_id}/bookmark`)
+}
+
+export const getBookmarks = async (params: IBookmarkQuery): Promise<ApiResponse<IArticle[]>> => {
+    return requestHttp.get('/article/bookmarks/list', params)
 }

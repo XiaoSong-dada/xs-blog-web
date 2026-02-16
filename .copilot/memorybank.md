@@ -13,21 +13,25 @@
 ## 项目架构
 
 ### 目录结构
-
-- `src/api/` - API 接口定义（按功能分类：article、user、link 等）
 - `src/components/` - Vue 组件库（按功能分类）
 - `src/hook/` - 自定义 Hooks（useBuilding、useDict、useFile 等）
 - `src/layout/` - 布局组件（AppLayout、HomeLayout、AdminLayout）
 - `src/router/` - 路由配置
 - `src/stores/` - Pinia 状态管理（auth store 等）
-- `src/style/` - 全局样式（main.scss、flex.scss、layout.scss 等）
-- `src/types/` - TypeScript 类型定义
 - `src/utils/` - 工具函数（http、jwt、pinyin、verification 等）
 - `src/views/` - 页面级组件（home、article、user、login 等）
 - `src/icon/` - 页面使用的小图标(已经点赞，未点赞，评论，浏览)
 ### 核心模块
 
 #### 认证系统
+#### 收藏功能
+ - **功能描述**：用户可以收藏/取消收藏文章，显示收藏数和状态图标（未收藏：collection.svg，已收藏：has_collection.svg）。
+ - **实现细节**：
+   - API：`POST /article/{id}/bookmark`（切换），`GET /article/bookmarks/list`（当前用户收藏列表）；POST 接口返回 `{bookmarked: boolean, bookmark_count: number}`。
+   - 类型：`IArticle` 和 `IArticleSearchList` 添加 `bookmarked?` 和 `bookmark_count?` 字段。
+   - Hook：`useArticleList` 和 `useSearchList` 提供 `toggleBookmark` 方法，支持乐观更新、登录检查和错误回滚。
+   - 组件：`list.vue` 和 `search.list.vue` 根据 `bookmarked` 切换图标，绑定点击事件；新增用户侧页面 `src/views/me/bookmark.vue`，以卡片网格展示用户收藏（卡片头部为文章标题，内容为 `content_md` 前100字符）。
+   - 页面路由：`/me/bookmark`（在用户中心菜单中已注册）。
 - JWT 令牌管理（`src/utils/jwt.ts`）
 - Auth 服务（`src/service/auth.service.ts`）
 - Pinia Auth Store（`src/stores/auth.ts`）
@@ -80,6 +84,14 @@
 - 路由守卫保护需要登录的页面
 - 使用 Ant Design Vue 提供一致的 UI 体验
 - Vditor 用于富文本编辑，支持 Markdown 预览
+
+## Hook 设计模式（新增约定）
+
+- 列表型页面优先采用 `useHook` 分层：页面只负责展示与事件，数据获取/状态管理放在 `src/hook/**`。
+- 标准返回结构：`params`、`data`、`total`、`loading`、`fetchList`、`resetParams`。
+- 分页参数统一通过 `useBuildQueryParams` 转换（UI 的页码 `offset=1` 转 API 偏移量 `offset=0`），避免首条数据被跳过。
+- API 参数类型按业务单独定义（如 `IBookmarkQuery`），避免复用不匹配的查询类型导致取数异常。
+- 收藏页 `src/views/me/bookmark.vue` 采用该模式，实际数据逻辑在 `useBookmarkList`（`src/hook/article/useArticle.ts`）。
 
 ## 性能优化
 

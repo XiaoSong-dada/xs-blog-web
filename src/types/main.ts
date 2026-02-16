@@ -122,6 +122,8 @@ export type IArticleSearchQuery = IPages<{
     kw?: string
 }>;
 
+export type IBookmarkQuery = IPages<{}>;
+
 
 // 文章接口
 export interface IArticleSearchList {

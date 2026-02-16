@@ -2,6 +2,7 @@ import type {
     IAritcleCreate,
     IAritcleUpdate,
     IArticle,
+    IBookmarkQuery,
     IArticleQuery,
     IArticleSearchList,
     IArticleSearchQuery
@@ -16,6 +17,7 @@ import {
     getDetailBySulg, getDetailById,
     addView,
     getSearchList,
+    getBookmarks,
     batchPublish as batch_publsih,
     deleteArticle as deleteArticleApi,
     toggleLike as toggleLikeApi,
@@ -376,6 +378,49 @@ export const useAddView = () => {
 const createSearchDefaultParams = (): IArticleSearchQuery => ({
     kw: ''
 })
+
+const createBookmarkDefaultParams = (): IBookmarkQuery => ({
+    offset: 1,
+    limit: 10,
+})
+
+export const useBookmarkList = () => {
+    const params = ref<IBookmarkQuery>(createBookmarkDefaultParams())
+    const data = ref<IArticle[]>([])
+    const total = ref(0)
+    const loading = ref(false)
+
+    const fetchList = async (overrides: Partial<IBookmarkQuery> = {}) => {
+        loading.value = true
+        try {
+            const query = { ...params.value, ...overrides }
+            const build = useBuildQueryParams<IBookmarkQuery>(query)
+            const res = await getBookmarks(build)
+            console.log(res);
+            
+            const resTotal = (res as { total?: number }).total
+            const normalized = normalizeArticleList(res.data, resTotal)
+            data.value = normalized.list
+            total.value = normalized.total
+        } finally {
+            loading.value = false
+        }
+    }
+
+    const resetParams = () => {
+        params.value = createBookmarkDefaultParams()
+    }
+
+    return {
+        params,
+        data,
+        total,
+        loading,
+        fetchList,
+        resetParams,
+    }
+}
+
 export const useSearchList = () => {
     const searchParams = ref<IArticleSearchQuery>(createSearchDefaultParams());
     const searchList = ref<IArticleSearchList[]>();

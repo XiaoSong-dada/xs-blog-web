@@ -52,7 +52,8 @@ export const routes = [
                 component: () => import('@/layout/me/index.vue'),
                 children: [
                     { path: "base", name: "MeBase", component: () => import("@/views/me/base.vue") },
-                    { path: "security", name: "MeSecurity", component: () => import("@/views/me/security.vue") },
+                    { path: "security", name: "MeSecurity", component: () => import("@/views/me/security.vue"), },
+                    { path: "bookmark", name: "MeBookmark", component: () => import("@/views/me/bookmark.vue") },
                 ]
             },
             {
