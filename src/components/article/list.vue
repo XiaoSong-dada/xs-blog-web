@@ -38,9 +38,9 @@
 
                 <span class="footer__divider"></span>
 
-                <span class="footer__item">
-                    <img src="@/assets/icon/like.svg" alt="点赞" />
-                    <span>0</span>
+                <span class="footer__item footer__item--clickable" @click="emit('clickLike', article)">
+                    <img :src="article.liked ? hasLikeIcon : likeIcon" alt="点赞" />
+                    <span>{{ article.like_count ?? 0 }}</span>
                 </span>
 
                 <span class="footer__divider"></span>
@@ -70,6 +70,8 @@ import type { IArticle } from "@/types/main";
 import { formatDate } from "@/utils/date";
 import { computed } from "vue";
 import { Tag } from "ant-design-vue";
+import likeIcon from '@/assets/icon/like.svg'
+import hasLikeIcon from '@/assets/icon/has_like.svg'
 const ATag = Tag;
 const props = defineProps<{ data: IArticle[] }>();
 
@@ -79,6 +81,7 @@ const emit = defineEmits<{
      * 标题点击事件获取当前文章的slug
      */
     (e: "clickTitle", slug: string): Promise<void> | void;
+    (e: "clickLike", article: IArticle): Promise<void> | void;
 
 }>();
 
@@ -187,6 +190,11 @@ const excerpt = (md: string | null) => {
             height: 23px;
             display: block;
         }
+    }
+
+    &__item--clickable {
+        cursor: pointer;
+        user-select: none;
     }
 
     &__divider {

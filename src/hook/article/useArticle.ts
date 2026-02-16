@@ -17,7 +17,8 @@ import {
     addView,
     getSearchList,
     batchPublish as batch_publsih,
-    deleteArticle as deleteArticleApi
+    deleteArticle as deleteArticleApi,
+    toggleLike as toggleLikeApi,
 } from '@/api/article/article';
 import { useBuildQueryParams } from '@/hook/useBuilding';
 import { message, Modal } from "ant-design-vue";
@@ -117,6 +118,37 @@ export const useArticleList = (publish_flag: boolean = false) => {
     const data = ref<IArticle[]>([]);
     const total = ref(0);
     const loading = ref(false);
+    const likeLoadingMap = ref<Record<string, boolean>>({});
+
+    const toggleLike = async (article: IArticle) => {
+        const userInfo = AuthService.getUserInfo();
+        if (!userInfo) {
+            message.warn('请先登录后再点赞');
+            return;
+        }
+
+        const articleId = article.id;
+        if (likeLoadingMap.value[articleId]) return;
+
+        const prevLiked = !!article.liked;
+        const prevCount = article.like_count ?? 0;
+
+        article.liked = !prevLiked;
+        article.like_count = Math.max(0, prevCount + (prevLiked ? -1 : 1));
+        likeLoadingMap.value[articleId] = true;
+
+        try {
+            const res = await toggleLikeApi(articleId);
+            article.liked = !!res.data?.liked;
+            article.like_count = res.data?.like_count ?? article.like_count;
+        } catch {
+            article.liked = prevLiked;
+            article.like_count = prevCount;
+            message.error('点赞失败，请稍后重试');
+        } finally {
+            likeLoadingMap.value[articleId] = false;
+        }
+    }
 
     const fetchList = async (overrides: Partial<IArticleQuery> = {}) => {
         loading.value = true
@@ -188,6 +220,7 @@ export const useArticleList = (publish_flag: boolean = false) => {
         data,
         total,
         loading,
+        toggleLike,
         fetchList,
         resetParams,
         rowSelection,
@@ -315,6 +348,37 @@ export const useSearchList = () => {
     const searchList = ref<IArticleSearchList[]>();
     const searchTotal = ref(0);
     const loading = ref(false);
+    const likeLoadingMap = ref<Record<string, boolean>>({});
+
+    const toggleLike = async (article: IArticleSearchList) => {
+        const userInfo = AuthService.getUserInfo();
+        if (!userInfo) {
+            message.warn('请先登录后再点赞');
+            return;
+        }
+
+        const articleId = article.id;
+        if (likeLoadingMap.value[articleId]) return;
+
+        const prevLiked = !!article.liked;
+        const prevCount = article.like_count ?? 0;
+
+        article.liked = !prevLiked;
+        article.like_count = Math.max(0, prevCount + (prevLiked ? -1 : 1));
+        likeLoadingMap.value[articleId] = true;
+
+        try {
+            const res = await toggleLikeApi(articleId);
+            article.liked = !!res.data?.liked;
+            article.like_count = res.data?.like_count ?? article.like_count;
+        } catch {
+            article.liked = prevLiked;
+            article.like_count = prevCount;
+            message.error('点赞失败，请稍后重试');
+        } finally {
+            likeLoadingMap.value[articleId] = false;
+        }
+    }
 
     const fetchSearchList = async (overrides: Partial<IArticleSearchQuery> = {}) => {
         loading.value = true
@@ -338,6 +402,7 @@ export const useSearchList = () => {
         searchList,
         searchTotal,
         loading,
+        toggleLike,
         fetchSearchList,
         resetParams,
         rowSelection,

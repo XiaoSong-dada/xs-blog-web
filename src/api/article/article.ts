@@ -2,6 +2,11 @@ import { requestHttp } from '@/utils/http';
 import type { IArticleQuery, IArticle, IAritcleCreate,IAritcleUpdate, IArticleSearchQuery, IArticleSearchList } from '@/types/main';
 import type { ApiResponse, ApiReposeBase } from '@/types/http'
 
+export interface IArticleLikeResult {
+    liked: boolean;
+    like_count: number;
+}
+
 export const getList = async (params: IArticleQuery): Promise<ApiResponse<IArticle[]>> => {
     return requestHttp.get('/article', params)
 }
@@ -48,4 +53,8 @@ export const batchPublish = async(article_id:string[]):Promise<ApiReposeBase> =>
 
 export const deleteArticle = async(article_id:string):Promise<ApiReposeBase> => {
     return requestHttp.delete(`/article/${article_id}`)
+}
+
+export const toggleLike = async (article_id: string): Promise<ApiResponse<IArticleLikeResult>> => {
+    return requestHttp.post(`/article/${article_id}/like`)
 }

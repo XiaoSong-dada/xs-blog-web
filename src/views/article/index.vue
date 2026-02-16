@@ -1,8 +1,8 @@
 <template>
     <div class="article overflow-scroll overflow-scroll--max flex-center" @scroll="handleScroll" ref="containerRef">
         <div class="list">
-            <article-search-list :data="searchList ?? []" v-if="isSearch" @click-title="getDetail"/>
-            <article-list v-else :data="data" @click-title="getDetail" />
+            <article-search-list :data="searchList ?? []" v-if="isSearch" @click-title="getDetail" @click-like="onToggleSearchLike"/>
+            <article-list v-else :data="data" @click-title="getDetail" @click-like="onToggleArticleLike" />
         </div>
     </div>
 </template>
@@ -13,6 +13,7 @@ import ArticleSearchList from '@/components/article/search.list.vue';
 import { useArticleList, useSearchList } from '@/hook/article/useArticle';
 import { onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import type { IArticle, IArticleSearchList } from '@/types/main';
 const router = useRouter();
 const route = useRoute();
 const containerRef = ref<HTMLDivElement | null>();
@@ -22,10 +23,11 @@ const {
     params,
     data,
     total,
+    toggleLike: toggleArticleLike,
     fetchList,
 } = useArticleList(true);
 
-const { searchParams, searchList, fetchSearchList, searchTotal } = useSearchList()
+const { searchParams, searchList, fetchSearchList, searchTotal, toggleLike: toggleSearchLike } = useSearchList()
 const DEFAULT_LIMIT = 10;
 
 
@@ -82,6 +84,14 @@ const getSearchRouter = () => {
 
 const getDetail = (slug: string) => {
     router.push(`/article/${slug}`)
+}
+
+const onToggleArticleLike = (article: IArticle) => {
+    toggleArticleLike(article)
+}
+
+const onToggleSearchLike = (article: IArticleSearchList) => {
+    toggleSearchLike(article)
 }
 
 watch(

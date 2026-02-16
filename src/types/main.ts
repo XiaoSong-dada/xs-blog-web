@@ -101,6 +101,8 @@ export interface IArticle {
     slug: string;
     content_md: string | null;
     view_count: number;
+    like_count?: number;
+    liked?: boolean;
     created_at: string;
     updated_at: string;
     published_at: string | null;
@@ -126,6 +128,8 @@ export interface IArticleSearchList {
     title: string;
     snippet: string;
     view_count: number;
+    like_count?: number;
+    liked?: boolean;
     published_at: string | null;
     rank: number;
     hit_title: boolean;

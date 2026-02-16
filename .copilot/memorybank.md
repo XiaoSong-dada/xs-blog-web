@@ -24,7 +24,7 @@
 - `src/types/` - TypeScript 类型定义
 - `src/utils/` - 工具函数（http、jwt、pinyin、verification 等）
 - `src/views/` - 页面级组件（home、article、user、login 等）
-
+- `src/icon/` - 页面使用的小图标(已经点赞，未点赞，评论，浏览)
 ### 核心模块
 
 #### 认证系统
@@ -47,6 +47,23 @@
 - `pinyin.ts` - 中文拼音转换
 - `verification.ts` - 表单验证
 - `concurrency.ts` - 并发控制
+
+#### 点赞功能
+- **功能描述**：用户可以对文章进行点赞/取消点赞，显示点赞数和状态图标（未点赞：like.svg，已点赞：has_like.svg）。
+- **实现细节**：
+  - API：`POST /article/{id}/like`，返回 `{liked: boolean, like_count: number}`。
+  - 类型：`IArticle` 和 `IArticleSearchList` 添加 `liked?` 和 `like_count?` 字段。
+  - Hook：`useArticleList` 和 `useSearchList` 提供 `toggleLike` 方法，支持乐观更新、登录检查和错误回滚。
+  - 组件：`list.vue` 和 `search.list.vue` 根据 `liked` 切换图标，绑定点击事件。
+  - 页面：`index.vue` 连接事件到 Hook。
+- **技术点**：乐观更新（先本地更新，再同步服务器响应）；防重复点击；未登录提示；请求失败回滚。
+- **相关文件**：
+  - `src/api/article/article.ts`
+  - `src/types/main.ts`
+  - `src/hook/article/useArticle.ts`
+  - `src/components/article/list.vue`
+  - `src/components/article/search.list.vue`
+  - `src/views/article/index.vue`
 
 ### 页面流程
 
