@@ -93,6 +93,52 @@
 - API 参数类型按业务单独定义（如 `IBookmarkQuery`），避免复用不匹配的查询类型导致取数异常。
 - 收藏页 `src/views/me/bookmark.vue` 采用该模式，实际数据逻辑在 `useBookmarkList`（`src/hook/article/useArticle.ts`）。
 
+## 评论功能（前端）
+
+- 目标：支持文章的评论与回复展示、创建评论/回复、显示评论数量并与后端一致。
+
+- 主要改动点：
+  - 类型：在 `src/types/main.ts` 添加或补充 `IComment`、`ICommentThread`，并在 `IArticle` / `IArticleSearchList` 中增加 `comment_count?: number`。
+  - API：在 `src/api/article/article.ts` 增加 `getArticleComments(articleId, params)`, `createArticleComment(articleId, payload)`, `replyArticleComment(articleId, commentId, payload)`，与后端 `app/api/comment.py` 对齐。
+  - Hook：新增 `useArticleComment`（或在已有 `useArticle` 中扩展），提供 `commentThreads`、`fetchComments(limit, offset)`, `createComment(content)`, `replyComment(parentId, content)`、`loadMore()` 等，维护 `loading`、`submitting`、`hasMore` 状态并做乐观/回滚处理（必要时）。
+  - 组件：
+    - `src/components/article/comment.list.vue`：整体评论列表（分页/加载更多、发表评论输入框、loading 状态）。
+    - `src/components/article/comment.item.vue`：单条根评论与回复列表渲染（包含回复弹框/输入），通过 props 接收 `thread: ICommentThread`。
+    - `src/components/article/comment.body.vue`：抽象的头像 + 内容区复用组件（头像固定 40px，内容区弹性占位），被 `comment.item` 与回复条目复用。
+  - 页面集成：在 `src/views/article/detail.vue` 引入 `comment-list` 并在文章详情加载后触发 `fetchComments(false)`；评论创建/回复成功后刷新当前评论列表或在前端插入新条目以提升体验。
+
+- UX / 边界处理建议：
+  - 未登录发评论时引导登录（使用 `AuthService` 与 `require_login` 前端校验）。
+  - 回复支持 `reply_to_user_id`，前端在展示时可显示“回复 @昵称”。
+  - 时间使用 `src/utils/date.ts` 做相对时间/格式化显示。
+
+- 测试：前端端到端或集成测试应覆盖：加载评论、发表 root 评论、发表回复、评论数随新增而更新（或在后端测试中断言）。
+
+## 全局 SCSS 引入方法（Vite）
+
+项目通过 `vite.config.ts` 的 `css.preprocessorOptions.scss.additionalData` 在每个样式文件注入全局 SCSS 变量/混合、布局类等。配置示例如下：
+
+```ts
+scss: {
+        additionalData: `
+        @use "@/style/default.scss" as *;
+        @use "@/style/flex.scss" as *;
+        @use "@/style/layout.scss" as *;
+        @use "@/style/variable.scss" as *;
+        `
+      }
+```
+
+说明：
+- 使用 `@use ... as *` 可以将指定 SCSS 文件中导出的变量、mixin、函数等直接注入到每个组件的 `<style lang="scss">` 中，无需在每个文件单独 `@use`。
+- 如果后续希望使用命名空间以避免冲突，可以改为 `@use "@/style/variable.scss" as vars;` 并在组件中使用 `vars.$dark-color` 等。
+
+## 参考文件
+- API：`src/api/article/article.ts`（新增评论接口）
+- Hooks：`src/hook/article/useArticle.ts`、`src/hook/article/useArticleComment.ts`（建议）
+- 组件：`src/components/article/comment.list.vue`, `comment.item.vue`, `comment.body.vue`
+
+
 ## 性能优化
 
 - 路由懒加载提升首屏加载速度
