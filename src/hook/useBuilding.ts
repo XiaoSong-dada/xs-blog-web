@@ -1,7 +1,15 @@
 import type { IPages } from "@/types/http"
 
 export const useBuildQueryParams = <T extends Record<string, unknown>>(raw: IPages<T>): IPages<T> => {
-    const page = raw.offset ?? 1
+    let page = 1
+
+    if ((raw.offset === undefined && raw.limit === undefined) || (typeof raw.offset === 'number' && raw.offset <= 0)) {
+        page = 1
+    }
+    else {
+        page = raw.offset ?? 1
+    }
+
     const limit = raw.limit ?? 10
 
     const apiOffset = (page - 1) * limit

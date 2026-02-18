@@ -1,5 +1,18 @@
 import { requestHttp } from '@/utils/http';
-import type { IArticleQuery, IArticle, IAritcleCreate,IAritcleUpdate, IArticleSearchQuery, IArticleSearchList, IBookmarkQuery } from '@/types/main';
+import type {
+    IArticleQuery,
+    IArticle,
+    IAritcleCreate,
+    IAritcleUpdate,
+    IArticleSearchQuery,
+    IArticleSearchList,
+    IBookmarkQuery,
+    IComment,
+    ICommentCreate,
+    ICommentQuery,
+    ICommentReplyCreate,
+    ICommentThread,
+} from '@/types/main';
 import type { ApiResponse, ApiReposeBase } from '@/types/http'
 
 export interface IArticleLikeResult {
@@ -70,4 +83,26 @@ export const toggleBookmark = async (article_id: string): Promise<ApiResponse<IA
 
 export const getBookmarks = async (params: IBookmarkQuery): Promise<ApiResponse<IArticle[]>> => {
     return requestHttp.get('/article/bookmarks/list', params)
+}
+
+export const getArticleComments = async (
+    article_id: string,
+    params: ICommentQuery
+): Promise<ApiResponse<ICommentThread[]>> => {
+    return requestHttp.get(`/article/${article_id}/comments`, params)
+}
+
+export const createArticleComment = async (
+    article_id: string,
+    payload: ICommentCreate
+): Promise<ApiResponse<IComment>> => {
+    return requestHttp.post(`/article/${article_id}/comments`, payload)
+}
+
+export const replyArticleComment = async (
+    article_id: string,
+    comment_id: string,
+    payload: ICommentReplyCreate
+): Promise<ApiResponse<IComment>> => {
+    return requestHttp.post(`/article/${article_id}/comments/${comment_id}/reply`, payload)
 }

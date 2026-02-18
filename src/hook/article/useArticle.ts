@@ -5,7 +5,9 @@ import type {
     IBookmarkQuery,
     IArticleQuery,
     IArticleSearchList,
-    IArticleSearchQuery
+    IArticleSearchQuery,
+    ICommentQuery,
+    ICommentThread,
 } from "@/types/main";
 import type { ArticlePayload } from '@/types/vditor';
 import { ref, h, type VNode ,computed} from "vue";
@@ -18,6 +20,9 @@ import {
     addView,
     getSearchList,
     getBookmarks,
+    getArticleComments,
+    createArticleComment,
+    replyArticleComment,
     batchPublish as batch_publsih,
     deleteArticle as deleteArticleApi,
     toggleLike as toggleLikeApi,
@@ -384,6 +389,11 @@ const createBookmarkDefaultParams = (): IBookmarkQuery => ({
     limit: 10,
 })
 
+const createCommentDefaultParams = (): ICommentQuery => ({
+    offset: 0,
+    limit: 10,
+})
+
 export const useBookmarkList = () => {
     const params = ref<IBookmarkQuery>(createBookmarkDefaultParams())
     const data = ref<IArticle[]>([])
@@ -516,5 +526,140 @@ export const useSearchList = () => {
         resetParams,
         rowSelection,
         selectedRows
+    }
+}
+
+export const useArticleComment = (article_id: string | (() => string)) => {
+    const getArticleId = () => {
+        if (typeof article_id === 'function') return article_id()
+        return article_id
+    }
+
+    const params = ref<ICommentQuery>(createCommentDefaultParams())
+    const commentThreads = ref<ICommentThread[]>([])
+    const total = ref(0)
+    const loading = ref(false)
+    const submitting = ref(false)
+
+    const fetchComments = async (append: boolean = false) => {
+        const currentArticleId = getArticleId()
+        if (!currentArticleId) return
+        loading.value = true
+        try {
+            const query = useBuildQueryParams<ICommentQuery>(params.value)
+            console.log(query);
+            
+
+            const res = await getArticleComments(currentArticleId, query)
+            const list = res.data ?? []
+            total.value = res.total ?? 0
+            if (append) commentThreads.value = [...commentThreads.value, ...list]
+            else commentThreads.value = list
+        } finally {
+            loading.value = false
+        }
+    }
+
+    const resetAndFetch = async () => {
+        params.value = createCommentDefaultParams()
+        await fetchComments(false)
+    }
+
+    const createComment = async (content: string) => {
+        const currentArticleId = getArticleId()
+        if (!currentArticleId) return false
+
+        const userInfo = AuthService.getUserInfo();
+        if (!userInfo) {
+            message.warn('请先登录后再评论');
+            return false
+        }
+
+        const trimmed = content.trim()
+        if (!trimmed) {
+            message.warn('评论内容不能为空')
+            return false
+        }
+
+        if (submitting.value) return false
+        submitting.value = true
+
+        try {
+            const res = await createArticleComment(currentArticleId, { content: trimmed })
+            if (res.code === 201 || res.code === 200) {
+                await resetAndFetch()
+                message.success('评论成功')
+                return true
+            }
+            message.warn(res.message)
+            return false
+        } catch {
+            message.error('评论失败，请稍后重试')
+            return false
+        } finally {
+            submitting.value = false
+        }
+    }
+
+    const replyComment = async (comment_id: string, content: string) => {
+        const currentArticleId = getArticleId()
+        if (!currentArticleId) return false
+
+        const userInfo = AuthService.getUserInfo();
+        if (!userInfo) {
+            message.warn('请先登录后再回复');
+            return false
+        }
+
+        const trimmed = content.trim()
+        if (!trimmed) {
+            message.warn('回复内容不能为空')
+            return false
+        }
+
+        if (submitting.value) return false
+        submitting.value = true
+        try {
+            const res = await replyArticleComment(currentArticleId, comment_id, {
+                content: trimmed,
+            })
+            if (res.code === 201 || res.code === 200) {
+                await resetAndFetch()
+                message.success('回复成功')
+                return true
+            }
+            message.warn(res.message)
+            return false
+        } catch {
+            message.error('回复失败，请稍后重试')
+            return false
+        } finally {
+            submitting.value = false
+        }
+    }
+
+    const loadMore = async () => {
+        const nextOffset = (params.value.offset ?? 0) + (params.value.limit ?? 10)
+        if (nextOffset >= total.value) return
+        params.value.offset = nextOffset
+        await fetchComments(true)
+    }
+
+    const hasMore = computed(() => {
+        return commentThreads.value.length < total.value
+    })
+
+    return {
+        params,
+        commentThreads,
+        total,
+        loading,
+        submitting,
+        hasMore,
+        fetchComments,
+        resetAndFetch,
+        createComment,
+        replyComment,
+        loadMore,
     }
 }

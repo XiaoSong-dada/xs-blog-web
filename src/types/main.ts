@@ -124,6 +124,37 @@ export type IArticleSearchQuery = IPages<{
 
 export type IBookmarkQuery = IPages<{}>;
 
+export type ICommentQuery = IPages<{}>;
+
+export interface ICommentCreate {
+    content: string;
+}
+
+export interface ICommentReplyCreate {
+    content: string;
+    reply_to_user_id?: string;
+}
+
+export interface IComment {
+    id: string;
+    article_id: string;
+    user_id: string;
+    content: string;
+    parent_id: string | null;
+    root_id: string;
+    reply_to_user_id: string | null;
+    created_at: string;
+    updated_at: string;
+    username?: string | null;
+    nick_name?: string | null;
+    avatar_url?: string | null;
+}
+
+export interface ICommentThread {
+    comment: IComment;
+    replies: IComment[];
+}
+
 
 // 文章接口
 export interface IArticleSearchList {
