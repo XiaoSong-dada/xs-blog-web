@@ -160,6 +160,8 @@ watch(
 
     .toc {
         min-height: var(--toc-height);
+        flex: 1 1 auto;
+        overflow: auto;
     }
 
     .detail-aside {
