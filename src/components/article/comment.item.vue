@@ -1,20 +1,7 @@
 <template>
     <div class="comment-thread">
         <div class="comment-item">
-            <div class="flex-start">
-                <div class="comment-avatar">
-                    <a-avatar v-if="thread.comment.avatar_url" :src="computeImageUrl(thread.comment.avatar_url)"
-                        :size="40" />
-                </div>
-                <div class="comment-body">
-                    <div class="comment-meta flex-between">
-                        <span>{{ formatUserName(thread.comment) }}</span>
-                        <span class="comment-time">{{ formatDate(thread.comment.created_at) }}</span>
-                    </div>
-                    <div class="comment-content">{{ thread.comment.content }}</div>
-                </div>
-            </div>
-
+            <CommentBody :comment="thread.comment" />
             <div class="comment-action">
                 <button class="comment-link" @click="toggleReplyInput">
                     {{ replyOpen ? '取消回复' : '回复' }}
@@ -34,19 +21,7 @@
 
         <div v-if="thread.replies.length > 0" class="reply-list">
             <div v-for="reply in thread.replies" :key="reply.id" class="comment-item comment-item--reply">
-
-                <div class="flex-start">
-                    <div class="comment-avatar">
-                        <a-avatar v-if="reply.avatar_url" :src="computeImageUrl(reply.avatar_url)" :size="40" />
-                    </div>
-                    <div class="comment-body">
-                        <div class="comment-meta flex-between">
-                            <span>{{ formatUserName(reply) }}</span>
-                            <span class="comment-time">{{ formatDate(reply.created_at) }}</span>
-                        </div>
-                        <div class="comment-content">{{ reply.content }}</div>
-                    </div>
-                </div>
+                <CommentBody :comment="reply" />
             </div>
         </div>
     </div>
@@ -54,14 +29,11 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import type { IComment, ICommentThread } from '@/types/main'
-import { Textarea, Avatar } from 'ant-design-vue';
-import { formatDate } from '@/utils/date';
-import { useComputedUrl } from '@/hook/file/useFile';
+import type { ICommentThread } from '@/types/main'
+import { Textarea } from 'ant-design-vue';
+import CommentBody from '@/components/article/comment.body.vue'
 const ATextarea = Textarea;
-const AAvatar = Avatar;
 
-const { computeImageUrl } = useComputedUrl()
 interface Props {
     thread: ICommentThread;
     submitting: boolean;
@@ -72,10 +44,6 @@ const props = defineProps<Props>()
 
 const replyOpen = ref(false)
 const replyContent = ref('')
-
-const formatUserName = (comment: IComment) => {
-    return comment.nick_name || comment.username || '匿名用户'
-}
 
 const toggleReplyInput = () => {
     replyOpen.value = !replyOpen.value
