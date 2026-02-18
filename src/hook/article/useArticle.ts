@@ -547,12 +547,11 @@ export const useArticleComment = (article_id: string | (() => string)) => {
         loading.value = true
         try {
             const query = useBuildQueryParams<ICommentQuery>(params.value)
-            console.log(query);
-            
-
             const res = await getArticleComments(currentArticleId, query)
             const list = res.data ?? []
             total.value = res.total ?? 0
+
+            console.log('res', res)
             if (append) commentThreads.value = [...commentThreads.value, ...list]
             else commentThreads.value = list
         } finally {

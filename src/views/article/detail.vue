@@ -10,7 +10,7 @@
                 </div>
             </aside>
             <main class="detail-main card flex-start flex-column">
-                <div>
+                <div class="vditor-content">
                     <vditor-view :markdown="articleDetail?.content_md ?? ''" @rendered="handleRendered" />
                 </div>
                 <comment-list
@@ -109,6 +109,10 @@ watch(
         overflow: visible;
     }
 
+    .vditor-content {
+        width: 100%;
+    }
+
     .card {
         background: #fff;
         border-right: 1px solid $dark-color;
@@ -173,7 +177,7 @@ watch(
 
     .comment {
         width: 100%;
-        padding-bottom: 10px;
+        padding-bottom: 20px;
     }
 }
 </style>

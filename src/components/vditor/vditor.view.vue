@@ -97,6 +97,7 @@ watch(
 <style scoped lang="scss">
 .vditor-view {
   height: 100%;
+  width: 100%;
 }
 
 .image-preview-mask {

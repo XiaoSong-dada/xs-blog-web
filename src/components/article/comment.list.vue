@@ -2,11 +2,8 @@
     <div class="comment">
         <h3 class="comment-title">评论</h3>
         <div class="comment-editor">
-            <textarea
-                v-model="commentContent"
-                class="comment-textarea"
-                placeholder="写下你的评论..."
-            />
+            <a-textarea v-model:value="commentContent" class="comment-textarea" placeholder="写下你的评论..."
+                @press-enter="handleSubmitComment" />
             <div class="comment-editor-action">
                 <button class="comment-btn" :disabled="submitting" @click="handleSubmitComment">
                     发表评论
@@ -17,13 +14,8 @@
         <div v-if="loading" class="comment-loading">评论加载中...</div>
         <div v-else-if="threads.length === 0" class="comment-empty">暂无评论，来抢沙发吧~</div>
         <div v-else class="comment-list">
-            <comment-item
-                v-for="thread in threads"
-                :key="thread.comment.id"
-                :thread="thread"
-                :submitting="submitting"
-                :on-submit-reply="onSubmitReply"
-            />
+            <comment-item v-for="thread in threads" :key="thread.comment.id" :thread="thread" :submitting="submitting"
+                :on-submit-reply="onSubmitReply" />
         </div>
 
         <div v-if="hasMore" class="comment-more">
@@ -38,7 +30,10 @@
 import { ref } from 'vue'
 import type { ICommentThread } from '@/types/main'
 import CommentItem from './comment.item.vue'
+import { Textarea } from 'ant-design-vue';
 
+
+const ATextarea = Textarea;
 interface Props {
     threads: ICommentThread[];
     loading: boolean;
