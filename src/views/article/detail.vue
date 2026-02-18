@@ -1,5 +1,5 @@
 <template>
-    <div class="article-detail-page overflow-scroll overflow-scroll--max flex-center">
+    <div :class="['article-detail-page overflow-scroll overflow-scroll--max flex-center pt-5', { scrolled: isScrolled }]">
         <div class="detail-layout">
             <aside class="detail-aside detail-aside--toc sticky-aside">
                 <div class="card aside-padding">
@@ -29,7 +29,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch } from "vue";
+import { onMounted, onUnmounted, ref, watch } from "vue";
 
 import VditorView from "@/components/vditor/vditor.view.vue";
 import VditorToc from "@/components/vditor/vditor.toc.vue";
@@ -57,11 +57,29 @@ const {
 
 const tocRef = ref<InstanceType<typeof VditorToc> | null>(null);
 const scrollContainer = ref<HTMLElement | null>(null);
+const isScrolled = ref(false);
 
 onMounted(async () => {
     scrollContainer.value = document.querySelector(".article-detail-page") as HTMLElement | null;
     await getArticleDetail(props.slug, true);
 });
+
+const onScroll = () => {
+    if (!scrollContainer.value) return
+    isScrolled.value = scrollContainer.value.scrollTop > 0
+}
+
+onMounted(() => {
+    if (scrollContainer.value) {
+        scrollContainer.value.addEventListener('scroll', onScroll, { passive: true })
+    }
+})
+
+onUnmounted(() => {
+    if (scrollContainer.value) {
+        scrollContainer.value.removeEventListener('scroll', onScroll)
+    }
+})
 
 function handleRendered(el: HTMLElement) {
     tocRef.value?.render(el);
@@ -78,9 +96,8 @@ watch(
     },
 );
 </script>
-
 <style scoped lang="scss">
-.article-detail-page {
+    .article-detail-page {
     --gap: 20px;
     --page-padding: 5px;
     --header-h: 46px;
@@ -120,11 +137,21 @@ watch(
     }
 
     .sticky-aside {
-        position: sticky;
+        position: fixed;
+        top: $sticky-top;
         align-self: flex-start;
         max-height: var(--sticky-max-h);
         overflow: auto;
-        flex: 1;
+        width: var(--toc-w);
+        z-index: 10;
+        transition: top 0.18s ease;
+    }
+
+    /* when scrolled, remove the extra header padding distance */
+    &.scrolled {
+        .sticky-aside {
+            top: var(--header-h);
+        }
     }
 
     .aside-padding {
@@ -146,6 +173,23 @@ watch(
     .detail-aside--toc {
         flex-basis: var(--toc-w);
         min-height: var(--sticky-max-h);
+    }
+
+    @media (min-width: 1240px) {
+        .detail-aside--toc {
+            left: calc((100% - 1240px) / 2);
+        }
+
+        .detail-main {
+            margin-left: calc(var(--toc-w) + var(--gap));
+        }
+    }
+
+    @media (max-width: 1239px) {
+        .detail-aside--toc {
+            left: 10px;
+            width: calc(var(--toc-w) - 20px);
+        }
     }
 
     .detail-aside--right {

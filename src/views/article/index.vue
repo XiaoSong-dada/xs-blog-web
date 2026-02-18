@@ -1,5 +1,5 @@
 <template>
-    <div class="article overflow-scroll overflow-scroll--max flex-center" @scroll="handleScroll" ref="containerRef">
+    <div class="article overflow-scroll overflow-scroll--max flex-center pt-5" @scroll="handleScroll" ref="containerRef">
         <div class="list">
             <article-search-list :data="searchList ?? []" v-if="isSearch" @click-title="getDetail" @click-like="onToggleSearchLike" @click-bookmark="onToggleSearchBookmark"/>
             <article-list v-else :data="data" @click-title="getDetail" @click-like="onToggleArticleLike" @click-bookmark="onToggleArticleBookmark" />

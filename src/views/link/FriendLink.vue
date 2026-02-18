@@ -1,5 +1,5 @@
 <template>
-    <div class="link">
+    <div class="link pt-5">
         <div class="content">
             <p class="title">友情链接</p>
             <friend-link-list :data="publishLinks" />

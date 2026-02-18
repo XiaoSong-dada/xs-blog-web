@@ -21,7 +21,8 @@ const isNeedPadding = computed(() => {
   return (
     path === '/' ||
     path.startsWith('/admin') ||
-    path.startsWith('/me')
+    path.startsWith('/me') ||
+    path.startsWith('/article')
   );
 });
 </script>
@@ -29,7 +30,6 @@ const isNeedPadding = computed(() => {
 <style scoped lang="scss">
 .app-layout {
   .main-content {
-    padding-top: $editor-content-padding;
 
     &.admin-layout {
       padding-top: 0;

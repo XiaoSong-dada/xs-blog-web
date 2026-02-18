@@ -2,3 +2,17 @@
     width: 100%;
     height: 100%;
 }
+
+// 生成 padding-top 工具类：.pt-0 - .pt-50
+@for $i from 0 through 50 {
+  .pt-#{$i} {
+    padding-top: #{$i}px;
+  }
+}
+
+// 生成 margin-top 工具类：.mt-0 - .mt-50
+@for $i from 0 through 50 {
+  .mt-#{$i} {
+    margin-top: #{$i}px;
+  }
+}
