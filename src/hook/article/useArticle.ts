@@ -396,7 +396,6 @@ export const useBookmarkList = () => {
             const query = { ...params.value, ...overrides }
             const build = useBuildQueryParams<IBookmarkQuery>(query)
             const res = await getBookmarks(build)
-            console.log(res);
             
             const resTotal = (res as { total?: number }).total
             const normalized = normalizeArticleList(res.data, resTotal)

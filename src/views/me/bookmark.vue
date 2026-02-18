@@ -11,21 +11,15 @@
                             <a class="title" @click="goDetail(item)">{{ item.title }}</a>
                         </template>
                         <div class="bookmark-content">
-                            {{ (item.content_md || '').slice(0, 100) }}
+                            {{ omitString(item.content_md ?? '', 100) }}
                             <span v-if="(item.content_md || '').length > 100">...</span>
                         </div>
                     </a-card>
                 </div>
                 <div class="pagination-wrap">
-                    <a-pagination
-                        :current="pagination.current"
-                        :page-size="pagination.pageSize"
-                        :total="pagination.total"
-                        :show-size-changer="true"
-                        :show-total="pagination.showTotal"
-                        @change="onPageChange"
-                        @showSizeChange="onPageChange"
-                    />
+                    <a-pagination :current="pagination.current" :page-size="pagination.pageSize"
+                        :total="pagination.total" :show-size-changer="true" :show-total="pagination.showTotal"
+                        @change="onPageChange" @showSizeChange="onPageChange" />
                 </div>
             </div>
         </a-spin>
@@ -38,6 +32,7 @@ import { Card, Empty, Pagination, Spin } from 'ant-design-vue'
 import { useBookmarkList } from '@/hook/article/useArticle'
 import type { IArticle } from '@/types/main'
 import { useRouter } from 'vue-router'
+import { omitString } from '@/utils/utils'
 
 const ACard = Card
 const AEmpty = Empty
@@ -61,7 +56,7 @@ const pagination = computed(() => ({
 }))
 
 const goDetail = (item: IArticle) => {
-    router.push(`/publish/${item.slug}`)
+    router.push(`/article/${item.slug}`)
 }
 
 onMounted(() => {
@@ -87,8 +82,8 @@ onMounted(() => {
 
     .bookmark-list {
         display: grid;
-        grid-template-columns: repeat(auto-fill, 200px);
-        grid-auto-rows: 100px;
+        grid-template-columns: repeat(auto-fill, 230px);
+        grid-auto-rows: minmax(200px, auto);
         gap: 16px;
         justify-content: flex-start;
         overflow: auto;
@@ -96,8 +91,14 @@ onMounted(() => {
         padding: 8px 0;
     }
 
+    :deep(.ant-card-body) {
+        padding: 0;
+        height:100%;
+    }
+
     .bookmark-card {
         width: 200px;
+        min-height: 130px;
         display: flex;
         flex-direction: column;
 
@@ -122,6 +123,7 @@ onMounted(() => {
             font-size: 12px;
             line-height: 1.2;
             word-break: break-word;
+            max-height: calc(100% - 28px);
         }
     }
 
