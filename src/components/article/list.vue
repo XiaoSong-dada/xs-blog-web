@@ -47,7 +47,7 @@
 
                 <span class="footer__item">
                     <img src="@/assets/icon/comment.svg" alt="评论" />
-                    <span>0</span>
+                    <span>{{ article.comment_count ?? 0 }}</span>
                 </span>
 
                 <span class="footer__spacer"></span>

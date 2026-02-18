@@ -105,6 +105,7 @@ export interface IArticle {
     liked?: boolean;
     bookmark_count?: number;
     bookmarked?: boolean;
+    comment_count?: number;
     created_at: string;
     updated_at: string;
     published_at: string | null;
@@ -167,6 +168,7 @@ export interface IArticleSearchList {
     liked?: boolean;
     bookmark_count?: number;
     bookmarked?: boolean;
+    comment_count?: number;
     published_at: string | null;
     rank: number;
     hit_title: boolean;
