@@ -234,6 +234,7 @@ export interface IUserBaseFrom extends IUserCell{
     nick_name: string;
     email: string ;
     avatar_url: string;
+    code?:string;
 }
 
 // 上传图片文件基本类型

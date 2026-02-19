@@ -4,6 +4,7 @@ import { getList, getUserInfo, updateUserInfo, updateUserPassword } from "@/api/
 import { message } from "ant-design-vue"
 import { isNull } from "@/utils/verification"
 import { AuthService } from "@/service/auth.service"
+import { deepClone } from "@/utils/utils"
 
 const createDefaultParams = (): IUserSearch => ({
     username: "",
@@ -75,11 +76,17 @@ export const useUser = () => {
         nick_name: "",
         status: '',
         is_admin: false,
-        avatar_url: ''
+        avatar_url: '',
+        code: '',
     });
+
+    const _userInfo = ref<IUserBaseFrom>();
     const getOwnerInfo = () => {
         getUserInfo().then(res => {
-            if (res.code === 200 && res.data) Object.assign(user.value, res.data);
+            if (res.code === 200 && res.data) {
+                Object.assign(user.value, res.data);
+                _userInfo.value = deepClone(user.value);
+            }
             else message.error('获取用户信息失败:' + res.message);
         })
     }
@@ -100,8 +107,8 @@ export const useUser = () => {
         const notNullArray: Array<keyof IUserBaseFrom> = ['nick_name', 'email', 'avatar_url']
         let isPass: boolean = true
         notNullArray.forEach(item => {
-
-            if (isNull(user.value[item])) {
+            // 当前用户输入的值与原始用户信息中的值都为空时，提示不能为空；当当前用户输入的值与原始用户信息中的值不相等且当前用户输入的值为空时，提示不能为空
+            if (isNull(user.value[item]) && user.value[item] !== _userInfo.value?.[item]) {
                 message.warn(`${item}不能为空`)
                 isPass = false
                 return;
@@ -112,7 +119,7 @@ export const useUser = () => {
     }
 
 
-    return { user, getOwnerInfo, updateUser, checkUserFrom };
+    return { user, _userInfo, getOwnerInfo, updateUser, checkUserFrom };
 }
 
 export const useUpdatePassword = () => {
@@ -147,7 +154,7 @@ export const useUpdatePassword = () => {
         });
     }
 
-    const resetPassword = () =>{
+    const resetPassword = () => {
         passwordUser.value = {
             old_password: '',
             password: '',
@@ -156,5 +163,5 @@ export const useUpdatePassword = () => {
         modalVisible.value = false;
     }
 
-    return { passwordUser, updatePassword ,modalVisible,resetPassword };
+    return { passwordUser, updatePassword, modalVisible, resetPassword };
 }

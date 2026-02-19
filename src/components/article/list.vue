@@ -69,7 +69,7 @@
 import type { IArticle } from "@/types/main";
 import { formatDate } from "@/utils/date";
 import { computed } from "vue";
-import { Col, Row, Tag } from "ant-design-vue";
+import { Tag } from "ant-design-vue";
 import likeIcon from '@/assets/icon/like.svg'
 import hasLikeIcon from '@/assets/icon/has_like.svg'
 import collectionIcon from '@/assets/icon/collection.svg'
