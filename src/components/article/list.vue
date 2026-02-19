@@ -52,9 +52,9 @@
 
                 <span class="footer__spacer"></span>
 
-                <span class="footer__item">
+                <span class="footer__item view-count flex-between gap-2">
                     <img src="@/assets/icon/view.svg" alt="浏览" />
-                    <span>{{ article.view_count }}</span>
+                    <span class="view-count__num">{{ article.view_count>=100 ? '99+' : article.view_count }}</span>
                 </span>
             </footer>
         </article>
@@ -69,7 +69,7 @@
 import type { IArticle } from "@/types/main";
 import { formatDate } from "@/utils/date";
 import { computed } from "vue";
-import { Tag } from "ant-design-vue";
+import { Col, Row, Tag } from "ant-design-vue";
 import likeIcon from '@/assets/icon/like.svg'
 import hasLikeIcon from '@/assets/icon/has_like.svg'
 import collectionIcon from '@/assets/icon/collection.svg'
@@ -214,6 +214,17 @@ const excerpt = (md: string | null) => {
         width: 20px;
         width: 20px;
     }
+
+    .view-count {
+        width: 40px;
+
+        &__num, &-num, .view-count__num {
+            width: 20px;
+            display: inline-block;
+            text-align: right;
+        }
+    }
+
 }
 
 .empty {

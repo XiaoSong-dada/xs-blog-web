@@ -50,9 +50,9 @@
 
                 <span class="footer__spacer"></span>
 
-                <span class="footer__item">
+                <span class="footer__item view-count flex-between gap-2">
                     <img src="@/assets/icon/view.svg" alt="浏览" />
-                    <span>{{ article.view_count }}</span>
+                    <span class="view-count__num">{{ article.view_count>=100 ? '99+' : article.view_count }}</span>
                 </span>
             </footer>
         </article>
@@ -215,6 +215,15 @@ function renderSnippet(snippet: string) {
         width: 20px;
     }
 }
+    .view-count {
+        width: 40px;
+
+        &__num, &-num, .view-count__num {
+            width: 20px;
+            display: inline-block;
+            text-align: right;
+        }
+    }
 
 .empty {
     padding: 24px;
