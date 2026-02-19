@@ -82,7 +82,7 @@ onMounted(() => {
 
     .bookmark-list {
         display: grid;
-        grid-template-columns: repeat(auto-fill, 230px);
+        grid-template-columns: repeat(auto-fill, 300px);
         grid-auto-rows: minmax(200px, auto);
         gap: 16px;
         justify-content: flex-start;
@@ -96,8 +96,12 @@ onMounted(() => {
         height:100%;
     }
 
+    :deep(.ant-card-head) {
+        padding: 0;
+    }
+
     .bookmark-card {
-        width: 200px;
+        width: 300px;
         min-height: 130px;
         display: flex;
         flex-direction: column;
@@ -107,7 +111,7 @@ onMounted(() => {
             color: var(--ant-primary-color);
             display: block;
             padding: 4px 8px;
-            font-size: 13px;
+            font-size: 18px;
             line-height: 1.1;
             white-space: nowrap;
             overflow: hidden;
