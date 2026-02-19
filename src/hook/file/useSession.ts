@@ -1,8 +1,8 @@
 import type { IUplaodSession, IUploadGroup, IUploadResult } from "@/types/main"
-import { ref } from "vue"
-import { createSession as create, uploadSession as upload ,commitSession as commit} from "@/api/file/file";
+import { ref, createVNode } from "vue"
+import { createSession as create, uploadSession as upload, commitSession as commit } from "@/api/file/file";
 import type { ApiResponse } from '@/types/http';
-import { message, type UploadFile } from 'ant-design-vue';
+import { message, type UploadFile, Modal, Progress } from 'ant-design-vue';
 import { withLock } from "@/utils/request.lock";
 import { ConcurrencyPool } from "@/utils/concurrency";
 
@@ -74,13 +74,21 @@ export const useSession = () => {
 
         const total = groups.length
         let done = 0
-        
+        // 添加进度条：使用数字 percent，避免传 ref 对象导致 [object Object]%
+        let percent = 0
+        const modalRef = Modal.info({
+            title: '正在上传文件',
+            content: createVNode(Progress, { percent }),
+            okButtonProps: { disabled: true },
+        })
+
+
         const tasks = groups.map((group, index) =>
             pool.run(async () => {
                 try {
                     const res: ApiResponse<IUploadResult> = await upload(id, group)
-                    console.log('这是上传结果: ' ,res);
-                    
+                    console.log('这是上传结果: ', res);
+
                     // 你根据后端返回结构适配一下：
                     // 如果 upload 接口返回 { code, data: { uploaded:[], errors:[] } }
                     if (res.code !== 200) {
@@ -94,7 +102,12 @@ export const useSession = () => {
                     return { ok: false as const, error: e?.message ?? "网络错误", names }
                 } finally {
                     done++
+                    // 更新外部回调和模态框中的进度条
                     opts?.onProgress?.(done, total)
+                    percent = total > 0 ? Math.round((done / total) * 100) : 100
+                    modalRef.update({
+                        content: createVNode(Progress, { percent })
+                    })
                 }
             })
         )
@@ -113,11 +126,12 @@ export const useSession = () => {
             }
         }
 
+        modalRef.destroy()
         upload_result.value = result
         return result
     }
 
-    const commitSession = async (session_id:string)=>{
+    const commitSession = async (session_id: string) => {
         return await commit(session_id)
     }
     return {

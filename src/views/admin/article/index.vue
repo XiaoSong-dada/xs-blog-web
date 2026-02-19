@@ -75,7 +75,8 @@
                 </template>
             </template>
         </a-table>
-        <a-modal v-model:open="openUpload" title="上传文件" okText="确认" cancelText="取消" @ok="commitFile" @cancel="cancelImport">
+        <a-modal v-model:open="openUpload" title="上传文件" okText="确认" cancelText="取消" @ok="commitFile" @cancel="cancelImport"
+            :body-style="{ maxHeight: '400px', overflowY: 'auto', overflowX: 'hidden' }" centered>
             <a-upload v-model:file-list="fileList" name="file" directory accept=".png,.jpg,.jpeg,.md"
                 :before-upload="beforeUpload">
                 <a-button>
@@ -287,7 +288,6 @@ const submitFile = async () => {
     // 测试一下
     if (session.value?.session_id) {
 
-
         uploadSession(session.value?.session_id, group_array).then(res => {
             // 
             const success_array: VNode[] = [];
@@ -308,6 +308,11 @@ const submitFile = async () => {
                     h('p', `未成功上传临时区文件:`),
                     ...error_array,
                 ]),
+                bodyStyle:{
+                    maxHeight: '400px',
+                    overflowY: 'auto',
+                    overflowX: 'hidden',
+                }
             })
         })
     }
