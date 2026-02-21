@@ -184,6 +184,7 @@ export interface IAritcleCreate {
     slug: string;
     content_md: string;
     author_id?: string;
+    tag_ids?: string[];
 }
 
 // 新建文章

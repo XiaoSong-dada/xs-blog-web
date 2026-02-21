@@ -40,6 +40,7 @@ const createDefaultParams = (): IArticleQuery => ({
     content_md: "",
     slug: "",
     published_at: '',
+    tag_id: undefined,
 })
 
 const normalizeArticleList = (data?: IArticle[], totalOverride?: number) => {
@@ -81,6 +82,12 @@ const columns = [
         key: 'title',
         width: '200px',
         dataIndex: 'title'
+    },
+    {
+        title: '标签',
+        key: 'tags',
+        width: '240px',
+        dataIndex: 'tags'
     },
     {
         title: '内容',
@@ -276,16 +283,23 @@ export const useArticleEditor = () => {
     const article_id = ref<string>('');
     const modle = ref<'create' | 'edit'>('create');
     const isDirty = ref<boolean>(false);
+    const selectedTagIds = ref<string[]>([]);
+
+    const setTagIds = (tagIds: string[]) => {
+        selectedTagIds.value = [...tagIds];
+    }
+
     const createArticle = (article: ArticlePayload) => {
         // 获取用户id
         const user_id = AuthService.getUserInfo()?.user_id
         const article_create: IAritcleCreate = {
             ...article,
+            tag_ids: selectedTagIds.value,
         }
         if (user_id) {
             article_create.author_id = user_id
         }
-        create(article).then(res => {
+        create(article_create).then(res => {
 
             if (res.code === 201) {
                 article_id.value = res.data?.article_id ?? '';
@@ -302,7 +316,8 @@ export const useArticleEditor = () => {
 
         const update_article: IAritcleUpdate = {
             ...article,
-            id: article_id.value
+            id: article_id.value,
+            tag_ids: selectedTagIds.value,
         }
         updateArticle(update_article).then(res => {
             if (res.code === 200) message.success('编辑成功');
@@ -314,6 +329,8 @@ export const useArticleEditor = () => {
         article_id,
         modle,
         isDirty,
+        selectedTagIds,
+        setTagIds,
         createArticle,
         editArticle,
         publishArticle: async () => {

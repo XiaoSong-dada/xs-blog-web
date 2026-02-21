@@ -36,6 +36,20 @@
                                 :options="common_dict" />
                         </div>
                     </a-flex>
+                    <a-flex class="search-item">
+                        <text>
+                            标签：
+                        </text>
+                        <div class="flex-center flex-column">
+                            <a-select
+                                class="toolbar-input"
+                                v-model:value="params.tag_id"
+                                :options="tagOptions"
+                                :allow-clear="true"
+                                placeholder="请选择标签"
+                            />
+                        </div>
+                    </a-flex>
                 </a-flex>
                 <a-flex gap="small" align="center">
                     <a-button type="primary" :icon="h(SearchOutlined)" @click="onSearch">搜索</a-button>
@@ -61,6 +75,13 @@
                 </template>
                 <template v-else-if="column.key === 'content_md'">
                     {{ omitString(record.content_md) }}
+                </template>
+                <template v-else-if="column.key === 'tags'">
+                    <a-flex :gap="6" wrap="wrap">
+                        <a-tag v-for="tag in (record.tags ?? [])" :key="tag.id" color="blue">
+                            {{ tag.name }}
+                        </a-tag>
+                    </a-flex>
                 </template>
                 <template
                     v-if="['created_at', 'updated_at', 'published_at', 'deleted_at'].includes(String(column.key))">
@@ -93,7 +114,7 @@
 </template>
 
 <script setup lang="ts">
-import { Table, Button, Flex, Input, Popconfirm, message, type UploadFile, Modal, Upload, Select } from 'ant-design-vue';
+import { Table, Button, Flex, Input, Popconfirm, message, type UploadFile, Modal, Upload, Select, Tag } from 'ant-design-vue';
 import { PlusOutlined } from '@ant-design/icons-vue';
 import { useArticleList } from '@/hook/article/useArticle'
 import {
@@ -116,6 +137,8 @@ import { useFiles, useSession } from '@/hook/file/useSession';
 import type { IUploadGroup } from '@/types/main';
 import { useCommonDict } from '@/hook/dict/useDict';
 import { useDownload } from '@/hook/file/useDownload';
+import { getTagList } from '@/api/tag/tag';
+import type { ITag } from '@/types/main';
 
 const ATable = Table;
 const AButton = Button;
@@ -125,6 +148,7 @@ const APopconfirm = Popconfirm;
 const AUpload = Upload;
 const AModal = Modal;
 const ASelect = Select;
+const ATag = Tag;
 
 const { columns, params, data, total, loading, fetchList, resetParams, rowSelection, batchPublish, selectedRows, deleteArticle } = useArticleList();
 const { common_dict } = useCommonDict();
@@ -138,6 +162,16 @@ const fileList = ref<UploadFile[]>();
 const openUpload = ref<boolean>(false);
 const filteredCount = ref<number>(0);
 const GROUP_COUNT = 10;
+const tagOptions = ref<{ label: string; value: string }[]>([]);
+
+const loadTagOptions = async () => {
+    const res = await getTagList({ limit: 1000, offset: 0, name: '', slug: '' });
+    const list: ITag[] = res.data ?? [];
+    tagOptions.value = list.map((tag) => ({
+        label: `${tag.name} (${tag.slug})`,
+        value: tag.id,
+    }));
+}
 
 
 const onSearch = () => {
@@ -341,6 +375,7 @@ const commitFile = async () => {
 }
 
 onMounted(async () => {
+    await loadTagOptions()
     await fetchList()
 })
 tableHeightOnMounted()
