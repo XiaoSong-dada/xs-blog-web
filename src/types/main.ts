@@ -110,6 +110,7 @@ export interface IArticle {
     updated_at: string;
     published_at: string | null;
     deleted_at: string | null;
+    tags?: ITag[];
 }
 
 export type IArticleQuery = IPages<{
@@ -117,6 +118,7 @@ export type IArticleQuery = IPages<{
     slug: string | undefined;
     content_md: string | undefined;
     published_at:string | undefined;
+    tag_id?: string | undefined;
 }>;
 
 export type IArticleSearchQuery = IPages<{
@@ -284,4 +286,26 @@ export interface IFriendLinkForm {
     name: string;
     url: string;
     description: string;
+}
+
+export interface ITag {
+    id: string;
+    name: string;
+    slug: string;
+    created_at: string;
+}
+
+export interface ITagWithCount extends ITag {
+    article_count: number;
+}
+
+export type ITagQuery = IPages<{
+    name?: string;
+    slug?: string;
+}>;
+
+export interface ITagForm {
+    id?: string;
+    name: string;
+    slug: string;
 }

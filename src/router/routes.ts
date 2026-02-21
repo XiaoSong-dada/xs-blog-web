@@ -43,6 +43,11 @@ export const routes = [
                         path: 'friend-link',
                         component: () => import('@/views/admin/link/FriendLink.vue'),
                         name: 'AdminFriendLinkList',
+                    },
+                    {
+                        path: 'tag',
+                        component: () => import('@/views/admin/tag/index.vue'),
+                        name: 'AdminTagList',
                     }
                 ]
             },
