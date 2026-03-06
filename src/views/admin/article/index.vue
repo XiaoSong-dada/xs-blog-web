@@ -65,8 +65,53 @@
                 </a-button>
                 <a-button type="primary" :icon="h(VerticalAlignBottomOutlined)" @click="downMarkDown">导出</a-button>
                 <a-button type="primary" :icon="h(SendOutlined)" @click="batchPublish">批量发布</a-button>
+                <a-button type="primary" :icon="h(TagOutlined)" @click="openTagModal()">批量设置标签</a-button>
             </a-flex>
         </div>
+        <a-modal v-model:open="showTagModal" title="批量设置标签" okText="确认" cancelText="取消" @ok="onConfirmTagSetting" @cancel="closeTagModal" width="1000px">
+            <div class="tag-modal">
+                <div class="modal-toolbar">
+                    <a-flex :gap="8" align="center">
+                        <a-input v-model:value="modalSearchTitle" placeholder="文章标题" class="modal-input" />
+                        <a-button type="primary" :icon="h(SearchOutlined)" @click="onSearchModal">搜索</a-button>
+                        <a-button :icon="h(SyncOutlined)" @click="onResetModal">重置</a-button>
+                    </a-flex>
+                </div>
+
+                <div class="modal-content pt-16">
+                    <a-flex :gap="16">
+                        <div style="flex:1">
+                            <a-table
+                                :title="()=>'文章列表'"
+                                :columns="leftColumns"
+                                :data-source="leftData"
+                                :row-selection="leftRowSelection"
+                                :loading="leftLoading"
+                                row-key="id"
+                                :pagination="leftPagination"
+                                bordered
+                                :scroll="{ y: 400 }"
+                            >
+                            </a-table>
+                        </div>
+                        <div style="width:320px">
+                            <a-table
+                                :title="()=>'标签列表'"
+                                :columns="rightColumns"
+                                :data-source="rightData"
+                                :row-selection="rightRowSelection"
+                                :loading="rightLoading"
+                                row-key="id"
+                                :pagination="rightPagination"
+                                bordered
+                                :scroll="{ y: 400 }"
+                            >
+                            </a-table>
+                        </div>
+                    </a-flex>
+                </div>
+            </div>
+        </a-modal>
         <a-table :columns="columns" :data-source="data" :scroll="{ x: '100%', y: computTableHeight }" :loading="loading"
             :pagination="paginationComputed" :row-selection="rowSelection" row-key="slug">
             <template #bodyCell="{ column, record, index }">
@@ -110,13 +155,15 @@
                 提交文件
             </a-button>
         </a-modal>
+
+        
     </div>
 </template>
 
 <script setup lang="ts">
 import { Table, Button, Flex, Input, Popconfirm, message, type UploadFile, Modal, Upload, Select, Tag } from 'ant-design-vue';
-import { PlusOutlined } from '@ant-design/icons-vue';
-import { useArticleList } from '@/hook/article/useArticle'
+import { PlusOutlined, TagOutlined } from '@ant-design/icons-vue';
+import { useArticleList, useArticleBatchTagModals } from '@/hook/article/useArticle'
 import {
     EditOutlined,
     DeleteOutlined,
@@ -163,6 +210,28 @@ const openUpload = ref<boolean>(false);
 const filteredCount = ref<number>(0);
 const GROUP_COUNT = 10;
 const tagOptions = ref<{ label: string; value: string }[]>([]);
+
+const { 
+    showTagModal,
+    modalSearchTitle,
+    leftData,
+    rightData,
+    leftLoading,
+    rightLoading,
+    leftRowSelection,
+    rightRowSelection,
+    leftPagination,
+    rightPagination,
+    leftColumns,
+    rightColumns,
+    onConfirmTagSetting,
+    openTagModal,
+    closeTagModal,
+    onSearchModal,
+    onResetModal,
+} = useArticleBatchTagModals();
+
+
 
 const loadTagOptions = async () => {
     const res = await getTagList({ limit: 1000, offset: 0, name: '', slug: '' });

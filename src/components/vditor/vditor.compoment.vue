@@ -17,6 +17,7 @@
                     </a-input-group>
                 </div>
 
+                <slot name="toolbar"></slot>
 
                 <div class="toolbar-actions">
                     <a-tag v-if="lastSavedAt" color="blue">

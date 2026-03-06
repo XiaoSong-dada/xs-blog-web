@@ -58,7 +58,7 @@ export interface IItemCompoment {
 export interface CenterMenuItem {
     key: string;
     label: string;
-    icon?: 'user' | 'article' | 'link';
+    icon?: 'user' | 'article' | 'link' | 'tag';
     route: string
 }
 

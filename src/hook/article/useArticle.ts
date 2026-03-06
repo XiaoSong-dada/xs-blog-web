@@ -10,7 +10,7 @@ import type {
     ICommentThread,
 } from "@/types/main";
 import type { ArticlePayload } from '@/types/vditor';
-import { ref, h, type VNode ,computed} from "vue";
+import { ref, h, type VNode ,computed, reactive } from "vue";
 import {
     getList, getPublishList,
     getPublishDetailBySulg,
@@ -28,8 +28,10 @@ import {
     toggleLike as toggleLikeApi,
     toggleBookmark as toggleBookmarkApi,
 } from '@/api/article/article';
+import { getTagList } from '@/api/tag/tag';
 import { useBuildQueryParams } from '@/hook/useBuilding';
 import { message, Modal } from "ant-design-vue";
+import type { ColumnsType } from 'ant-design-vue/es/table';
 import { AuthService } from "@/service/auth.service";
 import { isNull } from "@/utils/verification";
 
@@ -64,7 +66,7 @@ const rowSelection = computed(() => ({
     selectedRows.value = rows
   },
 }))
-const columns = [
+const columns: ColumnsType<IArticle> = [
     {
         title: '序号',
         key: 'index',
@@ -92,11 +94,11 @@ const columns = [
     {
         title: '内容',
         key: 'content_md',
-        with: '150px',
+        width: '150px',
         dataIndex: 'content_md'
     },
     {
-        title: '浏览',
+        title: '浏览量',
         key: 'view_count',
         width: '150px',
         dataIndex: 'view_count'
@@ -124,7 +126,8 @@ const columns = [
     {
         title: '操作',
         key: 'action',
-        width: '200px'
+        width: '200px',
+        fixed: 'right'
     },
 ];
 
@@ -394,6 +397,199 @@ export const useAddView = () => {
             // 直接增加
             addView(id)
         }
+    }
+}
+
+// Modal state constants (declared outside hook as requested)
+const showTagModal = ref<boolean>(false);
+const showPublishModal = ref<boolean>(false);
+const showDeleteModal = ref<boolean>(false);
+
+const tagModalParams = ref<{ selectedTagIds: string[] }>({ selectedTagIds: [] });
+// 声明 RightColumn 与 LeftColumn 数组
+const leftColumns: ColumnsType<any> = [
+    {
+        title: '文章标题',
+        key: 'title',
+        dataIndex: 'title'
+    },
+    {
+        title: '文章标签',
+        key: 'tags',
+        dataIndex: 'tags'
+    },
+];
+
+const rightColumns: ColumnsType<any> = [
+    {
+        title: '名称',
+        key: 'name',
+        dataIndex: 'name'
+    },
+    {
+        title: '标记',
+        key: 'slug',
+        dataIndex: 'slug'
+    },
+];
+// Hook to expose modal visibilities and modal-related params
+export const useArticleBatchTagModals = () => {
+    // modal-local state useful for batch tag UI
+    const modalSearchTitle = ref<string>('');
+    const leftData = ref<any[]>([]);
+    const rightData = ref<any[]>([]);
+    const selectedLeftRowKeys = ref<(string | number)[]>([]);
+    const selectedRightRowKeys = ref<(string | number)[]>([]);
+    const leftLoading = ref(false);
+    const rightLoading = ref(false);
+
+    const fetchLeftList = async () => {
+        leftLoading.value = true;
+        try {
+            const query = buildQueryParams<IArticleQuery>({
+                title: modalSearchTitle.value.trim(),
+                slug: '',
+                content_md: '',
+                published_at: '',
+                tag_id: undefined,
+                offset: leftPagination.current,
+                limit: leftPagination.pageSize,
+            });
+            const res = await getList(query);
+            leftData.value = res.data ?? [];
+            leftPagination.total = res.total ?? leftData.value.length;
+        } finally {
+            leftLoading.value = false;
+        }
+    };
+
+    const fetchRightList = async () => {
+        rightLoading.value = true;
+        try {
+            const query = buildQueryParams({
+                name: '',
+                slug: '',
+                offset: rightPagination.current,
+                limit: rightPagination.pageSize,
+            });
+            const res = await getTagList(query);
+            rightData.value = res.data ?? [];
+            rightPagination.total = res.total ?? rightData.value.length;
+        } finally {
+            rightLoading.value = false;
+        }
+    };
+
+    const initModalData = async () => {
+        await Promise.all([fetchLeftList(), fetchRightList()]);
+    };
+
+    // modal basic actions
+    const openTagModal = async (tagIds: string[] = []) => {
+        tagModalParams.value.selectedTagIds = [...tagIds];
+        modalSearchTitle.value = '';
+        selectedLeftRowKeys.value = [];
+        selectedRightRowKeys.value = [];
+        leftPagination.current = 1;
+        rightPagination.current = 1;
+        showTagModal.value = true;
+        await initModalData();
+    }
+
+    const closeTagModal = () => {
+        showTagModal.value = false;
+    }
+
+    const openPublishModal = () => { showPublishModal.value = true };
+    const closePublishModal = () => { showPublishModal.value = false };
+
+    const openDeleteModal = () => { showDeleteModal.value = true };
+    const closeDeleteModal = () => { showDeleteModal.value = false };
+
+    const leftRowSelection = computed(() => ({
+        selectedRowKeys: selectedLeftRowKeys.value,
+        onChange: (keys: (string | number)[]) => { selectedLeftRowKeys.value = keys; }
+    }));
+
+    const rightRowSelection = computed(() => ({
+        selectedRowKeys: selectedRightRowKeys.value,
+        onChange: (keys: (string | number)[]) => { selectedRightRowKeys.value = keys; }
+    }));
+
+    const leftPagination = reactive({
+        current: 1,
+        pageSize: 10,
+        total: 0,
+        showSizeChanger: true,
+        onChange: async (page: number, pageSize?: number) => {
+            leftPagination.current = page;
+            leftPagination.pageSize = pageSize || leftPagination.pageSize;
+            await fetchLeftList();
+        }
+    });
+
+    const rightPagination = reactive({
+        current: 1,
+        pageSize: 10,
+        total: 0,
+        showSizeChanger: true,
+        onChange: async (page: number, pageSize?: number) => {
+            rightPagination.current = page;
+            rightPagination.pageSize = pageSize || rightPagination.pageSize;
+            await fetchRightList();
+        }
+    });
+
+    const onSearchModal = async () => {
+        leftPagination.current = 1;
+        await fetchLeftList();
+    };
+
+    const onResetModal = async () => {
+        modalSearchTitle.value = '';
+        leftPagination.current = 1;
+        await fetchLeftList();
+    };
+
+    const onConfirmTagSetting = () => {
+        // placeholder: close modal, real logic to be implemented elsewhere
+        closeTagModal();
+    }
+    
+
+
+    return {
+        // visibilities
+        showTagModal,
+        showPublishModal,
+        showDeleteModal,
+        // modal params
+        tagModalParams,
+        // modal-local state
+        modalSearchTitle,
+        leftData,
+        rightData,
+        leftLoading,
+        rightLoading,
+        selectedLeftRowKeys,
+        selectedRightRowKeys,
+        leftRowSelection,
+        rightRowSelection,
+        leftPagination,
+        rightPagination,
+        // columns
+        leftColumns,
+        rightColumns,
+        // actions
+        openTagModal,
+        closeTagModal,
+        openPublishModal,
+        closePublishModal,
+        openDeleteModal,
+        closeDeleteModal,
+        onConfirmTagSetting,
+        onSearchModal,
+        onResetModal,
     }
 }
 

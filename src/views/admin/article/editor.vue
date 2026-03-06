@@ -1,34 +1,13 @@
 <template>
     <div class="article-editor-page">
-        <div class="tag-toolbar">
-            <a-flex align="center" :gap="10">
-                <span>文章标签：</span>
-                <a-select
-                    v-model:value="selectedTagIds"
-                    mode="multiple"
-                    :options="tagOptions"
-                    placeholder="请选择标签"
-                    class="tag-select"
-                    :max-tag-count="4"
-                    :allow-clear="true"
-                />
-            </a-flex>
-        </div>
-
-        <vditor-compoment
-            :upload-url="upload.upload_url"
-            upload-type="image"
-            @save-draft="createArticle"
-            :mode="modle"
-            @edit-draft="editArticle"
-            @publish="publishArticle"
-            @is-dirty="(dirty) => isDirty = dirty"
-            :form="vditroFrom"
-            @go-back="goBackToAdmin"
-            :autosave="false"
-            :markdown="markdown"
-            :initial="initVditor"
-        />
+        <vditor-compoment :upload-url="upload.upload_url" upload-type="image" @save-draft="createArticle" :mode="modle"
+            @edit-draft="editArticle" @publish="publishArticle" @is-dirty="(dirty) => isDirty = dirty"
+            :form="vditroFrom" @go-back="goBackToAdmin" :autosave="false" :markdown="markdown" :initial="initVditor">
+            <template #toolbar>
+                <a-select v-model:value="selectedTagIds" mode="multiple" :options="tagOptions" placeholder="请选择标签"
+                    class="tag-select" :max-tag-count="2" :allow-clear="true" width="200px" />
+            </template>
+        </vditor-compoment>
     </div>
 </template>
 
@@ -51,10 +30,10 @@ const { articleDetail, getArticleDetail } = useArticleDetailById();
 const tagList = ref<ITag[]>([]);
 const tagOptions = ref<{ label: string; value: string }[]>([]);
 const initVditor = ref<Partial<ArticlePayload>>({
-        title: '',
-        slug: '',
-        content_md: ''
-    });
+    title: '',
+    slug: '',
+    content_md: ''
+});
 const markdown = ref<string>('');
 const vditroFrom = ref<IActicleFrom>({
     title: '',
@@ -94,8 +73,8 @@ watch(
     () => articleDetail.value,
     (article) => {
         console.log(article);
-        
-        initVditor.value.content_md  = article?.content_md ?? '';
+
+        initVditor.value.content_md = article?.content_md ?? '';
         initVditor.value.title = article?.title ?? '';
         initVditor.value.slug = article?.slug ?? '';
         article_id.value = article?.id ?? '';
