@@ -19,9 +19,8 @@ import router from '@/router/main';
 import type { IActicleFrom, ArticlePayload } from '@/types/vditor';
 import type { ITag } from '@/types/main';
 import { onMounted, reactive, ref, watch } from 'vue';
-import { Flex, Select } from 'ant-design-vue';
+import { Select } from 'ant-design-vue';
 
-const AFlex = Flex;
 const ASelect = Select;
 
 const { article_id, modle, isDirty, createArticle, editArticle, publishArticle, selectedTagIds, setTagIds } = useArticleEditor();

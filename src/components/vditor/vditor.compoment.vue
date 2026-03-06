@@ -74,12 +74,14 @@ import type { ChangeEvent } from "ant-design-vue/es/_util/EventInterface";
 import { RedoOutlined, ArrowLeftOutlined } from '@ant-design/icons-vue'
 import { AuthService } from "@/service/auth.service";
 import { config } from '@/config/local.env'
+import { useComputedUrl } from "@/hook/file/useFile";
 
 const AInput = Input;
 const ATag = Tag;
 const ATypographyText = TypographyText;
 const AButton = Button;
 const AInputGroup = InputGroup;
+const { computeImageUrl } = useComputedUrl();
 
 const props = withDefaults(defineProps<Props>(), {
     mode: "create",
@@ -323,11 +325,7 @@ function initVditor() {
                             const storedPath = response?.data?.stored_path;
                             if (response?.code === 200 && storedPath) {
                                 const originalName = response?.data?.original_name || "file";
-                                const staticBase = config.VITE_STATIC_URL
-                                const normalizedPath = storedPath.startsWith("/") ? storedPath.slice(1) : storedPath;
-                                const url = storedPath.startsWith("http")
-                                    ? storedPath
-                                    : `${staticBase.replace(/\/$/, "")}/${normalizedPath}`;
+                                const url = computeImageUrl(storedPath);
                                 return JSON.stringify({
                                     code: 0,
                                     msg: response?.message || "ok",
