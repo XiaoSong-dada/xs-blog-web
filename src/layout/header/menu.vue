@@ -1,7 +1,7 @@
 <template>
     <a-tabs class="top-menu" v-model:activeKey="activeKey" type="line" :tabBarGutter="20" @change="handleTabChange">
         <template #leftExtra>
-            <span class="top-menu-logo">小宋博客</span>
+            <h1 class="top-menu-logo">小宋小站</h1>
         </template>
         <a-tab-pane v-for="item in homeTopMenu" v-model:key="item.key" :tab="item.label" />
         <template #rightExtra>
@@ -133,6 +133,12 @@ watch(
         width: 500px;
         min-width: 200px;
         max-width: calc(100vw - 320px);
+    }
+
+    // 清除h1默认样式并保留所需外观
+    h1 {
+        font-size: 16px;
+        font-weight: normal;
     }
 
 }

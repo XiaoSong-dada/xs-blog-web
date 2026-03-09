@@ -5,5 +5,7 @@ export const config = {
     TIMEOUT: 20000,
     PROXY_NAME:'/api',
     VITE_STATIC_URL: import.meta.env.VITE_STATIC_URL ?? 'http://localhost:8000/static/',
-    VITE_VDITOR_CDN: import.meta.env.VITE_VDITOR_CDN ?? '/vditor'
+    VITE_VDITOR_CDN: import.meta.env.VITE_VDITOR_CDN ?? '/vditor',
+    VITE_SITE_ICP: import.meta.env.VITE_SITE_ICP ?? '',
+    VITE_SITE_ICP_LINK: import.meta.env.VITE_SITE_ICP_LINK ?? ''
 }

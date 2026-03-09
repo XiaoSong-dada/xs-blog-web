@@ -25,10 +25,13 @@ import {
     replyArticleComment,
     batchPublish as batch_publsih,
     deleteArticle as deleteArticleApi,
+    batchImportArticleTags,
+    updateArticleTags,
     toggleLike as toggleLikeApi,
     toggleBookmark as toggleBookmarkApi,
 } from '@/api/article/article';
 import { getTagList } from '@/api/tag/tag';
+import { useTagList } from '@/hook/tag/useTag';
 import { useBuildQueryParams } from '@/hook/useBuilding';
 import { message, Modal } from "ant-design-vue";
 import type { ColumnsType } from 'ant-design-vue/es/table';
@@ -126,7 +129,7 @@ const columns: ColumnsType<IArticle> = [
     {
         title: '操作',
         key: 'action',
-        width: '200px',
+        width: '310px',
         fixed: 'right'
     },
 ];
@@ -442,6 +445,7 @@ export const useArticleBatchTagModals = () => {
     const selectedRightRowKeys = ref<(string | number)[]>([]);
     const leftLoading = ref(false);
     const rightLoading = ref(false);
+    const confirmLoading = ref(false);
 
     const fetchLeftList = async () => {
         leftLoading.value = true;
@@ -551,9 +555,34 @@ export const useArticleBatchTagModals = () => {
         await fetchLeftList();
     };
 
-    const onConfirmTagSetting = () => {
-        // placeholder: close modal, real logic to be implemented elsewhere
-        closeTagModal();
+    const onConfirmTagSetting = async () => {
+        const articleIds = selectedLeftRowKeys.value.map((id) => String(id)).filter((id) => id.length > 0);
+        const tagIds = selectedRightRowKeys.value.map((id) => String(id)).filter((id) => id.length > 0);
+
+        if (articleIds.length === 0) {
+            return message.warn('请选择文章');
+        }
+        if (tagIds.length === 0) {
+            return message.warn('请选择标签');
+        }
+
+        confirmLoading.value = true;
+        try {
+            const res = await batchImportArticleTags(articleIds, tagIds);
+            if (res.code === 200) {
+                const inserted = res.data?.inserted ?? 0;
+                const skipped = res.data?.skipped ?? 0;
+                message.success(`批量设置成功，新增 ${inserted} 条，跳过 ${skipped} 条`);
+                closeTagModal();
+                return true;
+            }
+            message.warn(res.message);
+        } catch {
+            message.error('批量设置标签失败');
+        } finally {
+            confirmLoading.value = false;
+        }
+        return false;
     }
     
 
@@ -571,6 +600,7 @@ export const useArticleBatchTagModals = () => {
         rightData,
         leftLoading,
         rightLoading,
+        confirmLoading,
         selectedLeftRowKeys,
         selectedRightRowKeys,
         leftRowSelection,
@@ -875,3 +905,66 @@ export const useArticleComment = (article_id: string | (() => string)) => {
         loadMore,
     }
 }
+
+// Hook: 编辑单篇文章的标签（穿梭框）
+export const useEditorTag = () => {
+    const showEditor = ref<boolean>(false);
+    const loadingEditor = ref<boolean>(false);
+    const transferData = ref<{ key: string; title: string; description?: string }[]>([]);
+    const targetKeys = ref<string[]>([]); // 已选中的 tag id（显示在右侧）
+    const currentArticleId = ref<string>('');
+
+    const loadTags = async () => {
+        loadingEditor.value = true;
+        try {
+            const { data, fetchList } = useTagList();
+            // fetch full list (backend returns all even with pagination params)
+            await fetchList({ offset: 1, limit: 1000 });
+            const list = data.value ?? [];
+            transferData.value = list.map((t: any) => ({ key: t.id, title: t.name, description: t.slug }));
+        } finally {
+            loadingEditor.value = false;
+        }
+    };
+
+    const openEditor = async (articleId: string, currentTags: { id: string }[] = []) => {
+        currentArticleId.value = articleId;
+        targetKeys.value = currentTags.map((t) => t.id);
+        await loadTags();
+        showEditor.value = true;
+    };
+
+    const closeEditor = () => {
+        showEditor.value = false;
+        transferData.value = [];
+        targetKeys.value = [];
+        currentArticleId.value = '';
+    };
+
+    const confirmEditor = async () => {
+        if (!currentArticleId.value) return message.warn('文章id不存在');
+        try {
+            const res = await updateArticleTags(currentArticleId.value, targetKeys.value);
+            if (res.code === 200) {
+                message.success('标签更新成功');
+                closeEditor();
+                return true;
+            }
+            message.warn(res.message);
+        } catch (e) {
+            message.error('更新失败');
+        }
+        return false;
+    };
+
+    return {
+        showEditor,
+        loadingEditor,
+        transferData,
+        targetKeys,
+        currentArticleId,
+        openEditor,
+        closeEditor,
+        confirmEditor,
+    };
+};

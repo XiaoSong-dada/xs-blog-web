@@ -25,6 +25,14 @@ export interface IArticleBookmarkResult {
     bookmark_count: number;
 }
 
+export interface IArticleTagBatchImportResult {
+    inserted: number;
+    expected_pairs: number;
+    skipped: number;
+    valid_article_count: number;
+    valid_tag_count: number;
+}
+
 export const getList = async (params: IArticleQuery): Promise<ApiResponse<IArticle[]>> => {
     return requestHttp.get('/article', params)
 }
@@ -55,6 +63,20 @@ export const createArticle = async (article: IAritcleCreate): Promise<ApiRespons
 
 export const updateArticle = async (article: IAritcleUpdate): Promise<ApiReposeBase> => {
     return requestHttp.put(`/article`, article)
+}
+
+export const updateArticleTags = async (
+    article_id: string,
+    tag_ids: string[]
+): Promise<ApiReposeBase> => {
+    return requestHttp.put(`/article/tag/${article_id}`, { tag_ids })
+}
+
+export const batchImportArticleTags = async (
+    article_ids: string[],
+    tags: string[]
+): Promise<ApiResponse<IArticleTagBatchImportResult>> => {
+    return requestHttp.post('/article/tag-import/batch', { article_ids, tags })
 }
 
 export const publishArticle = async (article_id:string): Promise<ApiReposeBase> => {

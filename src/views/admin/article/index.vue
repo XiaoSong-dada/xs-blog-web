@@ -41,13 +41,8 @@
                             标签：
                         </text>
                         <div class="flex-center flex-column">
-                            <a-select
-                                class="toolbar-input"
-                                v-model:value="params.tag_id"
-                                :options="tagOptions"
-                                :allow-clear="true"
-                                placeholder="请选择标签"
-                            />
+                            <a-select class="toolbar-input" v-model:value="params.tag_id" :options="tagOptions"
+                                :allow-clear="true" placeholder="请选择标签" />
                         </div>
                     </a-flex>
                 </a-flex>
@@ -68,7 +63,8 @@
                 <a-button type="primary" :icon="h(TagOutlined)" @click="openTagModal()">批量设置标签</a-button>
             </a-flex>
         </div>
-        <a-modal v-model:open="showTagModal" title="批量设置标签" okText="确认" cancelText="取消" @ok="onConfirmTagSetting" @cancel="closeTagModal" width="1000px">
+        <a-modal v-model:open="showTagModal" title="批量设置标签" okText="确认" cancelText="取消" @ok="batchImportTag"
+            @cancel="closeTagModal" width="1000px">
             <div class="tag-modal">
                 <div class="modal-toolbar">
                     <a-flex :gap="8" align="center">
@@ -81,36 +77,36 @@
                 <div class="modal-content pt-16">
                     <a-flex :gap="16">
                         <div style="flex:1">
-                            <a-table
-                                :title="()=>'文章列表'"
-                                :columns="leftColumns"
-                                :data-source="leftData"
-                                :row-selection="leftRowSelection"
-                                :loading="leftLoading"
-                                row-key="id"
-                                :pagination="leftPagination"
-                                bordered
-                                :scroll="{ y: 400 }"
-                            >
+                            <a-table :title="() => '文章列表'" :columns="leftColumns" :data-source="leftData"
+                                :row-selection="leftRowSelection" :loading="leftLoading" row-key="id"
+                                :pagination="leftPagination" bordered :scroll="{ y: 400 }">
+                                <template #bodyCell="{ column, record, index }">
+                                    <template v-if="column.key === 'tags'">
+                                        <a-flex :gap="6" wrap="wrap">
+                                            <a-tag v-for="tag in (record.tags ?? [])" :key="tag.id" color="blue">
+                                                {{ tag.name }}
+                                            </a-tag>
+                                        </a-flex>
+                                    </template>
+
+                                </template>
+
                             </a-table>
                         </div>
                         <div style="width:320px">
-                            <a-table
-                                :title="()=>'标签列表'"
-                                :columns="rightColumns"
-                                :data-source="rightData"
-                                :row-selection="rightRowSelection"
-                                :loading="rightLoading"
-                                row-key="id"
-                                :pagination="rightPagination"
-                                bordered
-                                :scroll="{ y: 400 }"
-                            >
+                            <a-table :title="() => '标签列表'" :columns="rightColumns" :data-source="rightData"
+                                :row-selection="rightRowSelection" :loading="rightLoading" row-key="id"
+                                :pagination="rightPagination" bordered :scroll="{ y: 400 }">
                             </a-table>
                         </div>
                     </a-flex>
                 </div>
             </div>
+        </a-modal>
+        <a-modal class="flex-center tag-editor-modal " v-model:open="showEditor" title="编辑标签" okText="确认"
+            cancelText="取消" :confirm-loading="loadingEditor" @ok="onConfirmEditor" @cancel="closeEditor" width="600px">
+            <a-transfer :data-source="transferData" :target-keys="targetKeys" show-search :render="(item) => item.title"
+                @change="handleTransferChange" style="width:100%" :list-style="{ height: '400px', width: '100%' }" />
         </a-modal>
         <a-table :columns="columns" :data-source="data" :scroll="{ x: '100%', y: computTableHeight }" :loading="loading"
             :pagination="paginationComputed" :row-selection="rowSelection" row-key="slug">
@@ -133,6 +129,7 @@
                     {{ (column.key && record[column.key]) ? formatDate(record[column.key]) : '' }}
                 </template>
                 <template v-if="column.key === 'action'">
+                    <a-button type="link" :icon="h(TagOutlined)" @click="() => openTagEditor(record)">编辑标签</a-button>
                     <a-button type="link" :icon="h(EditOutlined)" @click="updateArticle(record.id)">修改</a-button>
                     <a-popconfirm :title="`是否确认删除文章${record.slug}`" ok-text="确认" cancel-text="取消"
                         @confirm="() => deleteArticle(record.id)">
@@ -141,8 +138,9 @@
                 </template>
             </template>
         </a-table>
-        <a-modal v-model:open="openUpload" title="上传文件" okText="确认" cancelText="取消" @ok="commitFile" @cancel="cancelImport"
-            :body-style="{ maxHeight: '400px', overflowY: 'auto', overflowX: 'hidden' }" centered>
+        <a-modal v-model:open="openUpload" title="上传文件" okText="确认" cancelText="取消" @ok="commitFile"
+            @cancel="cancelImport" :body-style="{ maxHeight: '400px', overflowY: 'auto', overflowX: 'hidden' }"
+            centered>
             <a-upload v-model:file-list="fileList" name="file" directory accept=".png,.jpg,.jpeg,.md"
                 :before-upload="beforeUpload">
                 <a-button>
@@ -156,14 +154,14 @@
             </a-button>
         </a-modal>
 
-        
+
     </div>
 </template>
 
 <script setup lang="ts">
-import { Table, Button, Flex, Input, Popconfirm, message, type UploadFile, Modal, Upload, Select, Tag } from 'ant-design-vue';
+import { Table, Button, Flex, Input, Popconfirm, message, type UploadFile, Modal, Upload, Select, Tag, Transfer } from 'ant-design-vue';
 import { PlusOutlined, TagOutlined } from '@ant-design/icons-vue';
-import { useArticleList, useArticleBatchTagModals } from '@/hook/article/useArticle'
+import { useArticleList, useArticleBatchTagModals, useEditorTag } from '@/hook/article/useArticle'
 import {
     EditOutlined,
     DeleteOutlined,
@@ -196,6 +194,7 @@ const AUpload = Upload;
 const AModal = Modal;
 const ASelect = Select;
 const ATag = Tag;
+const ATransfer = Transfer;
 
 const { columns, params, data, total, loading, fetchList, resetParams, rowSelection, batchPublish, selectedRows, deleteArticle } = useArticleList();
 const { common_dict } = useCommonDict();
@@ -211,7 +210,7 @@ const filteredCount = ref<number>(0);
 const GROUP_COUNT = 10;
 const tagOptions = ref<{ label: string; value: string }[]>([]);
 
-const { 
+const {
     showTagModal,
     modalSearchTitle,
     leftData,
@@ -230,6 +229,9 @@ const {
     onSearchModal,
     onResetModal,
 } = useArticleBatchTagModals();
+
+// editor tag hook (single article)
+const { showEditor, transferData, targetKeys, openEditor, closeEditor, confirmEditor, loadingEditor } = useEditorTag();
 
 
 
@@ -271,6 +273,24 @@ const paginationComputed = computed(() => ({
 
 const updateArticle = (article_id: string): void => {
     router.push(`./article/edit/${article_id}`)
+}
+
+const openTagEditor = async (record: any) => {
+    await openEditor(record.id, record.tags ?? []);
+}
+
+const onConfirmEditor = async () => {
+    const ok = await confirmEditor();
+    if (ok) await fetchList();
+}
+
+const handleTransferChange = (keys: string[]) => {
+    targetKeys.value = keys;
+}
+
+const batchImportTag = async () => {
+    const ok = await onConfirmTagSetting();
+    if (ok) await fetchList();
 }
 
 
@@ -411,7 +431,7 @@ const submitFile = async () => {
                     h('p', `未成功上传临时区文件:`),
                     ...error_array,
                 ]),
-                bodyStyle:{
+                bodyStyle: {
                     maxHeight: '400px',
                     overflowY: 'auto',
                     overflowX: 'hidden',
@@ -458,6 +478,11 @@ const computTableHeight = computed(() => tableHeight.value)
         &-input {
             width: 180px;
         }
+    }
+
+    .tag-editor-modal {
+        width: 600px;
+        height: 500px;
     }
 
 }
