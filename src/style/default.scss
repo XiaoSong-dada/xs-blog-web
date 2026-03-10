@@ -60,7 +60,7 @@ body,
 
 /* 可选：限制最大高度（按需添加此类 `overflow-scroll--max`），也可直接在组件中单独设置 max-height */
 .overflow-scroll--max {
-  max-height: calc(100vh - $header-h - 120px);
+  max-height: calc(100vh - $header-h - 50px);
 }
 
 /* Optional: WebKit scrollbar custom styles（若使用 scoped 可能需去掉 scoped 或使用深度选择器） */

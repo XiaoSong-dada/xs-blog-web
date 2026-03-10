@@ -107,7 +107,7 @@ watch(
     --toc-height: 400px;
 
     --sticky-top: calc(var(--header-h) + var(--page-padding));
-    --sticky-max-h: calc(100vh - 80px);
+    --sticky-max-h: calc(100vh - 120px);
 
     background-color: #F5F6F7;
     min-height: 100%;

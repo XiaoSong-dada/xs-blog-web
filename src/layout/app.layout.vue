@@ -5,6 +5,9 @@
       <router-view />
     </div>
     <footer v-if="siteIcp" class="site-footer">
+
+      <span>Copyright © {{ new Date().getFullYear() }} {{ config.VITE_SITE_NAME }}</span>
+      <span> | </span>
       <a
         v-if="siteIcpLink"
         :href="siteIcpLink"
@@ -14,6 +17,17 @@
         {{ siteIcp }}
       </a>
       <span v-else>{{ siteIcp }}</span>
+      <span> | </span>
+      <span>
+        <a
+          :href="config.VITE_GITHUB_REPO_URL"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+        <github-outlined />
+          {{ config.VITE_GITHUB_REPO }}
+        </a>
+      </span>
     </footer>
   </div>
 </template>
@@ -22,7 +36,8 @@
 import HeaderMenu from "@/layout/header/menu.vue";
 import { computed } from 'vue';
 import { useRoute } from "vue-router";
-import { config } from '@/config/env';
+import { config } from '@/config/local.env';
+import { GithubOutlined } from "@ant-design/icons-vue";
 
 
 const route = useRoute();

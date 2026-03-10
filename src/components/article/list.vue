@@ -4,9 +4,8 @@
             <header class="card__header">
                 <h3 class="card__title" @click="() => emit('clickTitle', article.slug)">{{ article.title }}</h3>
 
-                <div class="card__tags">
-                    <a-tag>学习</a-tag>
-                    <a-tag>工作</a-tag>
+                <div class="card__tags" v-if="article.tags && article.tags.length">
+                    <a-tag v-for="tag in article.tags" :key="tag.id">{{ tag.name }}</a-tag>
                 </div>
             </header>
 

@@ -208,6 +208,7 @@ export const useArticleList = (publish_flag: boolean = false) => {
             const query = { ...params.value, ...overrides }
             const bulid = buildQueryParams<IArticleQuery>(query)
             const res = publish_flag ? await getPublishList(bulid) : await getList(bulid)
+            
             const resTotal = (res as { total?: number }).total
             const normalized = normalizeArticleList(res.data, resTotal)
             data.value = normalized.list
