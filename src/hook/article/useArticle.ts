@@ -364,11 +364,15 @@ export const useArticleDetail = () => {
     const articleDetail = ref<IArticle | null>(null)
 
     const getArticleDetail = async (slug: string, publish_flag: boolean = false) => {
-        const detail = publish_flag ? await getPublishDetailBySulg(slug) : await getDetailBySulg(slug)
-        if (detail.code === 200 && detail.data) {
-            articleDetail.value = detail.data
+        try {
+            const detail = publish_flag ? await getPublishDetailBySulg(slug) : await getDetailBySulg(slug)
+            if (detail.code === 200 && detail.data) {
+                articleDetail.value = detail.data
+            }
+            else message.warn(`获取详细信息失败: ${detail.message}`);
+        } catch {
+            message.error('获取详细信息失败，请稍后重试')
         }
-        else message.warn(`获取详细信息失败: ${detail.message}`);
     }
 
     return {
@@ -798,6 +802,8 @@ export const useArticleComment = (article_id: string | (() => string)) => {
             console.log('res', res)
             if (append) commentThreads.value = [...commentThreads.value, ...list]
             else commentThreads.value = list
+        } catch {
+            message.error('获取评论失败，请稍后重试')
         } finally {
             loading.value = false
         }

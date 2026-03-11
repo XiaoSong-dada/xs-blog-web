@@ -111,14 +111,14 @@ export const getArticleComments = async (
     article_id: string,
     params: ICommentQuery
 ): Promise<ApiResponse<ICommentThread[]>> => {
-    return requestHttp.get(`/article/${article_id}/comments`, params)
+    return requestHttp.get(`/comment/${article_id}/comments`, params)
 }
 
 export const createArticleComment = async (
     article_id: string,
     payload: ICommentCreate
 ): Promise<ApiResponse<IComment>> => {
-    return requestHttp.post(`/article/${article_id}/comments`, payload)
+    return requestHttp.post(`/comment/${article_id}/comments`, payload)
 }
 
 export const replyArticleComment = async (
@@ -126,5 +126,5 @@ export const replyArticleComment = async (
     comment_id: string,
     payload: ICommentReplyCreate
 ): Promise<ApiResponse<IComment>> => {
-    return requestHttp.post(`/article/${article_id}/comments/${comment_id}/reply`, payload)
+    return requestHttp.post(`/comment/${article_id}/comments/${comment_id}/reply`, payload)
 }
