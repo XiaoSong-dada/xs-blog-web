@@ -72,7 +72,6 @@ const send = () =>{
         message.warn('请先输入邮箱')
         return
     }
-    console.log(user.value);
     
 
     if(_userInfo.value?.email === user.value.email) {

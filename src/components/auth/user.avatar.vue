@@ -17,29 +17,22 @@ import { useRouter } from 'vue-router';
 import { adminMenus,userMenus } from '@/constants/auth-menu';
 import userDropDown from './user.drop.down.vue';
 import { getUserInfo } from '@/api/user/user';
-import { config } from '@/config/local.env';
 import { Avatar } from 'ant-design-vue';
+import { useComputedUrl } from '@/hook/file/useFile';
 
 const AAvatar = Avatar;
 const userInfo = ref<IUserInfo>()
 const avatarUrl = ref<string>(defaultAvatar)
 const router = useRouter()
-
-const resolveAvatarUrl = (path?: string | null) => {
-    if (!path) return defaultAvatar
-    if (path.startsWith('http')) return path
-    const normalizedPath = path.startsWith('/') ? path.slice(1) : path
-    return `${config.VITE_STATIC_URL.replace(/\/$/, '')}/${normalizedPath}`
-}
+const { computeImageUrl } = useComputedUrl();
 
 const fetchAvatar = async () => {
     const res = await getUserInfo()
     const candidate = res.data
-    avatarUrl.value = resolveAvatarUrl(candidate?.avatar_url)
+    avatarUrl.value = computeImageUrl(candidate?.avatar_url)
 }
 
 onMounted(async () => {
-    console.log(AuthService.getUserInfo());
     const user = AuthService.getUserInfo();
     if (user) {
         userInfo.value = user;

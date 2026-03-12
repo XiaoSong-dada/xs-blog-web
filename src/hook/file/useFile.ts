@@ -11,6 +11,12 @@ export const useComputedUrl = () => {
    * @param url 原始图片地址
    */
   const computeImageUrl = (url?: string | null) => {
+    
+    // 查看url是否为static开头如果是static开头就只需要拼接VITE_BACKEND_BASE_URL和url即可
+    if (url && url.trim().startsWith(config.VITE_BACKEND_STATIC || "static")) {
+      const baseUrl = config.VITE_BACKEND_BASE_URL || "";
+      return `${baseUrl}/${url.trim()}`;
+    }
     return resolveStaticAssetUrl(url, config.VITE_STATIC_URL || "");
   };
 

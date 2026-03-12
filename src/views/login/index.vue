@@ -59,10 +59,8 @@ const formState: UnwrapRef<FormState> = reactive({
     password: '',
 });
 const handleFinish: FormProps['onFinish'] = values => {
-    console.log(values, formState);
 };
 const handleFinishFailed: FormProps['onFinishFailed'] = errors => {
-    console.log(errors);
 };
 
 const handleLogin = async () => {

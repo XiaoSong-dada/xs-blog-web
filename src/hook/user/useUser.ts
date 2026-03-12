@@ -41,14 +41,12 @@ export const useUserList = () => {
         loading.value = true
         try {
             const query = { ...params.value, ...overrides }
-            console.log(query);
 
             const res = await getList(buildQueryParams(query))
             const resTotal = (res as { total?: number }).total
             const normalized = normalizeUserList(res.data, resTotal)
             data.value = normalized.list
             total.value = normalized.total
-            console.log(res);
 
         } finally {
             loading.value = false

@@ -341,7 +341,7 @@ const submitFile = async () => {
         }
     });
     if (map_error.length > 0) message.warn(map_error.join('\n'));
-    console.log(img_map);
+    
 
     // 二维数组 分组
     const group_array: Array<IUploadGroup> = []
@@ -384,8 +384,7 @@ const submitFile = async () => {
 
             group.file_array.push(file);
             group.has_img = true;
-            path.forEach(url => {
-                console.log(url);
+                path.forEach(url => {
                 for (const img of img_map.keys()) {
                     if (img.indexOf(url) >= 0) group.file_array.push(img_map.get(img) as UploadFile);
                 }

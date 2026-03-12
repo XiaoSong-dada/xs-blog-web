@@ -144,7 +144,6 @@ class RequestHttp {
             } catch (error) {
                 lastError = error;
                 if (attempt < retries) {
-                    console.log(`重试第 ${attempt} 次...`);
                 }
             }
         }

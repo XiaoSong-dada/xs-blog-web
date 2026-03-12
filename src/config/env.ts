@@ -10,5 +10,7 @@ export const config = {
     VITE_SITE_ICP_LINK: import.meta.env.VITE_SITE_ICP_LINK ?? '',
     VITE_SITE_NAME: import.meta.env.VITE_SITE_NAME ?? 'My Blog',
     VITE_GITHUB_REPO: import.meta.env.VITE_GITHUB_REPO ?? '小宋哒哒',
-    VITE_GITHUB_REPO_URL: import.meta.env.VITE_GITHUB_REPO_URL ?? '#'
+    VITE_GITHUB_REPO_URL: import.meta.env.VITE_GITHUB_REPO_URL ?? '#',
+    VITE_BACKEND_BASE_URL: import.meta.env.VITE_BACKEND_BASE_URL ?? '',
+    VITE_BACKEND_STATIC: import.meta.env.VITE_BACKEND_STATIC ?? 'static',
 }

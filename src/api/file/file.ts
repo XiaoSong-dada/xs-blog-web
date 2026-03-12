@@ -16,7 +16,7 @@ export const createSession = async (): Promise<ApiResponse<IUplaodSession>> => {
 
 
 export const uploadSession = async (session_id: string, group: IUploadGroup): Promise<ApiResponse<IUploadResult>> => {
-    console.log('this is file ', group);
+    
 
     const formData = new FormData()
 

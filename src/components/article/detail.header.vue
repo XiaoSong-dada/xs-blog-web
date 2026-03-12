@@ -22,7 +22,6 @@ onMounted(async () => {
         detailData.value = props.data;
         // 格式化数据
         detailData.value.created_at = formatDate(detailData.value?.created_at)
-        console.log('do this ');
 
     }
 

@@ -800,7 +800,7 @@ export const useArticleComment = (article_id: string | (() => string)) => {
             const list = res.data ?? []
             total.value = res.total ?? 0
 
-            console.log('res', res)
+            
             if (append) commentThreads.value = [...commentThreads.value, ...list]
             else commentThreads.value = list
         } catch {

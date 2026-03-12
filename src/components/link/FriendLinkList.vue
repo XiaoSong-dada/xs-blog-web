@@ -62,11 +62,15 @@ const props = withDefaults(defineProps<{
   color: inherit;
 }
 
+.friend-list :deep(.ant-list-item:last-child) {
+  border-bottom: 1px solid rgba(0,0,0,0.06)
+}
+
 .link-card {
   padding: 12px;
   background: var(--bg-color, #fff);
-  border-bottom: 1px solid rgba(0,0,0,0.06);
 }
+
 
 .link-title {
   font-weight: 600;

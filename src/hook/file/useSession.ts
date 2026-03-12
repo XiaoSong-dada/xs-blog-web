@@ -87,7 +87,6 @@ export const useSession = () => {
             pool.run(async () => {
                 try {
                     const res: ApiResponse<IUploadResult> = await upload(id, group)
-                    console.log('这是上传结果: ', res);
 
                     // 你根据后端返回结构适配一下：
                     // 如果 upload 接口返回 { code, data: { uploaded:[], errors:[] } }

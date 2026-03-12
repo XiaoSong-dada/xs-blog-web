@@ -71,8 +71,7 @@ onMounted(() => {
 watch(
     () => articleDetail.value,
     (article) => {
-        console.log(article);
-
+        
         initVditor.value.content_md = article?.content_md ?? '';
         initVditor.value.title = article?.title ?? '';
         initVditor.value.slug = article?.slug ?? '';

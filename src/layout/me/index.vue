@@ -27,7 +27,6 @@ const title = ref<string>('');
 
 
 const selected = (item: any) => {
-  console.log('selected', item)
   meMenu.forEach(menu => {
     if (menu.key === item.key) {
       router.push(`/me/${menu.route}`)
