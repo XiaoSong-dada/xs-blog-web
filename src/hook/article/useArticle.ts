@@ -366,6 +366,7 @@ export const useArticleDetail = () => {
     const getArticleDetail = async (slug: string, publish_flag: boolean = false) => {
         try {
             const detail = publish_flag ? await getPublishDetailBySulg(slug) : await getDetailBySulg(slug)
+            
             if (detail.code === 200 && detail.data) {
                 articleDetail.value = detail.data
             }

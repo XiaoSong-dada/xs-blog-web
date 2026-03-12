@@ -8,13 +8,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount, watch } from "vue";
-import { config } from '@/config/local.env';
+import { ref, onBeforeUnmount, watch } from "vue";
+import { config } from "@/config/local.env";
+import { useComputedUrl } from "@/hook/file/useFile";
 import Vditor from "vditor";
 import "vditor/dist/index.css";
-interface HTMLDivElement extends HTMLElement {
-  align: string
-}
+
 const props = defineProps<{
   markdown: string,
 }>()
@@ -25,6 +24,7 @@ const emit = defineEmits<{
 const elRef = ref<HTMLDivElement | null>(null)
 const previewVisible = ref(false)
 const previewSrc = ref("")
+const { computeImageUrl } = useComputedUrl()
 
 let clickHandler: ((e: Event) => void) | null = null
 let keyHandler: ((e: KeyboardEvent) => void) | null = null
@@ -39,12 +39,10 @@ async function render(md: string) {
       toc:true
     }
   })
+  normalizePreviewImageUrls()
   emit("rendered", elRef.value)
   bindImageClick()
 }
-
-onMounted(() => {
-})
 
 onBeforeUnmount(() => {
   if (elRef.value && clickHandler) {
@@ -79,6 +77,19 @@ function bindImageClick() {
     }
     window.addEventListener("keydown", keyHandler)
   }
+}
+
+function normalizePreviewImageUrls() {
+  if (!elRef.value) return
+
+  const images = elRef.value.querySelectorAll("img")
+  images.forEach((img) => {
+    const rawSrc = img.getAttribute("src")
+    const normalizedSrc = computeImageUrl(rawSrc)
+    if (normalizedSrc) {
+      img.setAttribute("src", normalizedSrc)
+    }
+  })
 }
 
 function closePreview() {
