@@ -80,7 +80,7 @@
                             <a-table :title="() => '文章列表'" :columns="leftColumns" :data-source="leftData"
                                 :row-selection="leftRowSelection" :loading="leftLoading" row-key="id"
                                 :pagination="leftPagination" bordered :scroll="{ y: 400 }">
-                                <template #bodyCell="{ column, record, index }">
+                                <template #bodyCell="{ column, record }">
                                     <template v-if="column.key === 'tags'">
                                         <a-flex :gap="6" wrap="wrap">
                                             <a-tag v-for="tag in (record.tags ?? [])" :key="tag.id" color="blue">
