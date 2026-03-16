@@ -11,12 +11,24 @@ export const useComputedUrl = () => {
    * @param url 原始图片地址
    */
   const computeImageUrl = (url?: string | null) => {
-    
-    // 查看url是否为static开头如果是static开头就只需要拼接VITE_BACKEND_BASE_URL和url即可
-    if (url && url.trim().startsWith(config.VITE_BACKEND_STATIC || "static")) {
-      const baseUrl = config.VITE_BACKEND_BASE_URL || "";
-      return `${baseUrl}/${url.trim()}`;
+      // 查看url是否以静态前缀开头（支持有/或无/的情况），若是则拼接后端地址
+    if (url) {
+      const trimmed = url.trim();
+      const rawPrefix = (config.VITE_BACKEND_STATIC || "static").toString().trim();
+      const prefix = rawPrefix.replace(/^\/+/, "");
+      const normalizedUrl = trimmed.replace(/^\/+/, "");
+
+      const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const re = new RegExp(`^/?${escapeRegExp(prefix)}(?:/|$)`);
+      if (prefix && re.test(trimmed)) {
+        const baseUrl = (config.VITE_BACKEND_BASE_URL || "").toString().replace(/\/+$/, "");
+        console.log(baseUrl);
+        console.log(`${baseUrl}/${normalizedUrl} ` + ` /${normalizedUrl}`);
+        
+        return baseUrl ? `${baseUrl}/${normalizedUrl}` : `/${normalizedUrl}`;
+      }
     }
+
     return resolveStaticAssetUrl(url, config.VITE_STATIC_URL || "");
   };
 

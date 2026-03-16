@@ -27,8 +27,23 @@ export function resolveStaticAssetUrl(url?: string | null, staticBase: string = 
     return rawUrl
   }
 
-  const normalizedBase = staticBase.replace(/\/+$/, "")
+  const normalizedBase = staticBase.replace(/\/+$"/, "")
   const normalizedPath = rawUrl.startsWith("/") ? rawUrl : `/${rawUrl}`
 
-  return normalizedBase ? `${normalizedBase}${normalizedPath}` : normalizedPath
+  if (!normalizedBase) {
+    return normalizedPath
+  }
+
+  // 如果 base 的最后一段和 path 的开头重复（如 base = '.../static' 且 path = '/static/xxx'），
+  // 则去掉 path 中重复的前缀，避免拼成 '.../static/static/xxx'
+  const baseLast = normalizedBase.split("/").pop()
+  if (baseLast) {
+    const esc = baseLast.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+    const dupRe = new RegExp(`^/${esc}(?:/|$)`)
+    if (dupRe.test(normalizedPath)) {
+      return `${normalizedBase}${normalizedPath.replace(new RegExp(`^/${esc}`), "")}`
+    }
+  }
+
+  return `${normalizedBase}${normalizedPath}`
 }
