@@ -14,3 +14,5 @@ export const config = {
     VITE_BACKEND_BASE_URL: import.meta.env.VITE_BACKEND_BASE_URL ?? '',
     VITE_BACKEND_STATIC: import.meta.env.VITE_BACKEND_STATIC ?? 'static',
 }
+
+export default config

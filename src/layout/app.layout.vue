@@ -36,7 +36,7 @@
 import HeaderMenu from "@/layout/header/menu.vue";
 import { computed } from 'vue';
 import { useRoute } from "vue-router";
-import { config } from '@/config/local.env';
+import { config } from '@/config/config';
 import { GithubOutlined } from "@ant-design/icons-vue";
 
 

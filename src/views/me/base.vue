@@ -41,7 +41,7 @@ import { Form, Input, Button, Image, Upload, type UploadFile, message } from 'an
 import { UploadOutlined } from '@ant-design/icons-vue';
 import { useUser } from '@/hook/user/useUser';
 import { useUplaodImgFile } from '@/hook/file/useUpload';
-import { config } from '@/config/local.env';
+import { config } from '@/config/config';
 import { useSendEmail } from '@/hook/email/useEmail';
 const AForm = Form;
 const AFormItem = Form.Item;
