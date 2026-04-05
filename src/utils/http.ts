@@ -30,7 +30,7 @@ const RequestEnums = {
 } as const;
 
 const config = {
-    baseURL: local_config.PROXY_NAME,
+    baseURL: local_config.VITE_BACKEND_API_URL,
     timeout: local_config.TIMEOUT,
     withCredentials: true
 };
