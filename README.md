@@ -50,7 +50,8 @@ src/
 项目开发时主要依赖 Vite 环境变量。可以在项目根目录创建 `.env.development` 文件，例如：
 
 ```env
-VITE_BACKEND_API_URL=http://localhost:8000
+VITE_API_REQUEST_MODE=direct
+VITE_BACKEND_API_URL=http://localhost:8000/api
 VITE_STATIC_URL=http://localhost:8000/static/
 VITE_VDITOR_CDN=/vditor
 VITE_SITE_NAME=小宋博客
@@ -64,7 +65,8 @@ VITE_BACKEND_STATIC=static
 
 说明：
 
-- `VITE_BACKEND_API_URL` 用于 Vite 开发服务器代理，当前项目会将前端请求的 `/api` 转发到该地址。
+- `VITE_API_REQUEST_MODE` 控制接口请求模式，`direct` 表示前端直接请求后端，`proxy` 表示前端统一请求同源 `/api`。
+- `VITE_BACKEND_API_URL` 在 `direct` 模式下表示后端接口基地址，建议包含 `/api` 前缀，例如 `http://localhost:8000/api`。
 - `VITE_STATIC_URL` 用于拼接后端静态资源访问地址，例如头像、文章图片等。
 - `VITE_VDITOR_CDN` 默认使用项目中的 `public/vditor` 目录，也可以替换成外部静态资源地址。
 
@@ -87,7 +89,7 @@ pnpm dev
 - 前端：http://localhost:5173
 - 后端接口：http://localhost:8000
 
-开发模式下，前端通过 Vite 代理访问后端接口，因此需要确保后端服务已先启动。
+默认开发模式使用前端直连后端接口，因此需要确保后端服务已先启动并允许 `http://localhost:5173` 跨域访问。
 
 ### 打包构建
 
@@ -114,9 +116,17 @@ pnpm preview
 
 ## 开发联调说明
 
-- 前端接口前缀统一走 `/api`。
-- Vite 代理会将 `/api` 前缀转发到 `VITE_BACKEND_API_URL`，并在转发时去掉 `/api` 前缀。
+- 开发环境默认使用 `direct` 模式，axios 会直接请求 `VITE_BACKEND_API_URL`。
+- 生产环境默认使用 `proxy` 模式，前端统一请求同源 `/api`，再由 1Panel 的 Nginx 反向代理到后端服务。
+- 如果开发阶段仍需走 Vite 代理，可将 `VITE_API_REQUEST_MODE=proxy`，并将 `VITE_BACKEND_API_URL` 配成真实后端地址（包含 `/api` 前缀）。
 - 后端默认静态资源目录为 `/static`，前端展示图片、头像、附件时需要确保后端文件服务可访问。
+
+## 生产部署建议
+
+- 推荐由 1Panel 的 Nginx 统一处理 HTTPS、`/`、`/api/` 和 `/static/` 的反向代理。
+- 当前项目中的容器内 Nginx 只负责分发前端静态文件，不再代理接口请求。
+- 如果你需要生产环境直连后端，也可以在构建时设置 `VITE_API_REQUEST_MODE=direct`，并将 `VITE_BACKEND_API_URL` 配置为完整的 HTTPS 接口地址，例如 `https://api.example.com/api`。
+- 生产环境直连后端时，需要同步将前端域名加入后端 `ALLOWED_ORIGINS`，否则浏览器会因跨域策略拒绝接口请求。
 
 ## 推荐开发流程
 

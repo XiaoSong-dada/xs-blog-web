@@ -28,5 +28,6 @@ dist-ssr
 .env
 .env.*
 !.env.example
+.pnpm-store
 
 *.zip
