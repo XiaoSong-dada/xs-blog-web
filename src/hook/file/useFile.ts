@@ -1,4 +1,4 @@
-import { config } from "@/config/local.env";
+import { config } from "@/config/config";
 import { resolveStaticAssetUrl } from "@/utils/url";
 
 /**

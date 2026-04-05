@@ -9,7 +9,7 @@
 
 <script setup lang="ts">
 import { ref, onBeforeUnmount, watch } from "vue";
-import { config } from "@/config/local.env";
+import { config } from "@/config/config";
 import { useComputedUrl } from "@/hook/file/useFile";
 import Vditor from "vditor";
 import "vditor/dist/index.css";

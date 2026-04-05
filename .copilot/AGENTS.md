@@ -20,7 +20,7 @@ src/
   api/          # 按资源分组的 API 调用函数（如 api/tag/tag.ts）
   assets/       # 静态资源（图标等）
   components/   # 可复用组件，按功能分组
-  config/       # 本地环境配置（local.env.ts）
+  config/       # 本地环境配置（config.ts）
   constants/    # 常量定义（菜单项等）
   hook/         # 组合式函数（useXxx），按功能分组
   layout/       # 页面布局组件
@@ -109,7 +109,7 @@ export const addTag = async (params: ITagForm): Promise<ApiReposeBase> => {
 
 ## 环境配置
 
-- 运行时环境变量通过 `src/config/local.env.ts` 中的 `config` 对象统一访问，不要在组件中直接使用 `import.meta.env`。
+- 运行时环境变量通过 `src/config/.env.ts` 中的 `config` 对象统一访问，不要在组件中直接使用 `import.meta.env`。
 - Vite Dev Server 将 `/api/*` 代理到 `VITE_BACKEND_API_URL`，前端 API 调用统一走 `/api` 前缀。
 
 ---

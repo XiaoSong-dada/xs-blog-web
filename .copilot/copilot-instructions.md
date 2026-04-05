@@ -92,6 +92,12 @@ HTTP 客户端：Axios
 
 - 目标：现代浏览器（Chrome、Firefox、Safari、Edge 最新版）
 
+## 业务快速定位文档
+
+- 在开始任何前端任务前，先查看 `xs-blog-base/doc/web/frontend-dependency-map.md`。
+- 先根据其中的“业务快速定位”与“总体链路”找到对应的 `routes -> layout -> views -> hook -> api` 业务链条，再决定深入哪些文件。
+- 该文档只用于结构定位与依赖导航，不替代具体实现阅读。
+
 ## 数据库表结构提示规则
 
 - 当用户询问“列出库表结构”时，应首先在项目的 `db/` 目录下查找 `*.sql` 文件获取定义，然后再查看后端模型或其他来源。

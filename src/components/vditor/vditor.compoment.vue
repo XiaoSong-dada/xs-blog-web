@@ -73,7 +73,7 @@ import { convertToPinyin } from "@/utils/pinyin";
 import type { ChangeEvent } from "ant-design-vue/es/_util/EventInterface";
 import { RedoOutlined, ArrowLeftOutlined } from '@ant-design/icons-vue'
 import { AuthService } from "@/service/auth.service";
-import { config } from '@/config/local.env'
+import { config } from '@/config/config';
 import { useComputedUrl } from "@/hook/file/useFile";
 
 const AInput = Input;

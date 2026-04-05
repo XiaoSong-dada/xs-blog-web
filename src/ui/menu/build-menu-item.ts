@@ -12,14 +12,10 @@ const iconMap = {
 
 export const buildMenuItem = (
   item: CenterMenuItem,
-  children?: ItemType[],
-  type?: 'group',
 ): ItemType => {
   return {
     key: item.key,
     icon: item.icon ? iconMap[item.icon] : undefined,
-    children,
     label: item.label,
-    type,
   }
 }
