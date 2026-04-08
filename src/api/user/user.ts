@@ -1,8 +1,22 @@
 import { requestHttp } from '@/utils/http';
-import type { UserLoginData, IUserSearch, IUserListResponse, IRegister, IUserCell, IUserUpdate, IUserPassword } from '@/types/main';
+import type {
+    UserLoginData,
+    UserCaptchaTokenData,
+    IUserSearch,
+    IUserListResponse,
+    IRegister,
+    IUserCell,
+    IUserUpdate,
+    IUserPassword,
+} from '@/types/main';
 import type { ApiReposeBase, ApiResponse, ApiResponseDetail } from '@/types/http'
+
 export const login = async (data: UserLoginData): Promise<ApiResponse<{ token: string }>> => {
     return requestHttp.post<{ token: string }>('/auth/login', data);
+}
+
+export const issueCaptchaToken = async (username: string): Promise<ApiResponse<UserCaptchaTokenData>> => {
+    return requestHttp.post<UserCaptchaTokenData>('/auth/captcha/token', { username });
 }
 
 export const getList = async (params: IUserSearch): Promise<ApiResponse<IUserListResponse | IUserListResponse['list']>> => {

@@ -4,7 +4,7 @@
             <template #title>
                 <div class="card-title">登录</div>
             </template>
-            <a-form :model="formState" @finish="handleFinish" @finishFailed="handleFinishFailed">
+            <a-form :model="formState" @finish="handleLogin" @finishFailed="handleFinishFailed">
                 <a-form-item>
                     <a-input v-model:value="formState.user" placeholder="用户名">
                         <template #prefix>
@@ -20,12 +20,17 @@
                     </a-input>
                 </a-form-item>
                 <a-form-item>
-                    <a-button type="primary" html-type="submit" class="login-button" @click="handleLogin">
+                    <a-button type="primary" html-type="submit" class="login-button" :loading="loginLoading">
                         登录
                     </a-button>
                     <p>还没有账号？点击<a @click="handleRegister">注册</a>一个账号</p>
                 </a-form-item>
             </a-form>
+            <Vcode
+                :show="captchaVisible"
+                @success="handleCaptchaSuccess"
+                @close="handleCaptchaClose"
+            />
         </a-card>
     </div>
 
@@ -33,16 +38,18 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive } from 'vue';
+import { reactive, ref } from 'vue';
 import { Form, Input, Button, Card, message } from 'ant-design-vue';
 import { UserOutlined, LockOutlined } from '@ant-design/icons-vue';
 import type { UnwrapRef } from 'vue';
 import type { FormProps } from 'ant-design-vue';
 import type { UserLoginData } from '@/types/main';
-import { login as loginApi } from '@/api/user/user';
+import { issueCaptchaToken, login as loginApi } from '@/api/user/user';
 import { useRouter } from 'vue-router';
 import { AuthService } from '@/service/auth.service';
 import { isNull } from '@/utils/verification';
+import Vcode from 'vue3-puzzle-vcode';
+
 const router = useRouter();
 const AForm = Form;
 const AFormItem = Form.Item;
@@ -58,42 +65,83 @@ const formState: UnwrapRef<FormState> = reactive({
     user: '',
     password: '',
 });
-const handleFinish: FormProps['onFinish'] = (_values) => {
-};
 const handleFinishFailed: FormProps['onFinishFailed'] = (_errors) => {
 };
 
-const handleLogin = async () => {
-    const data: UserLoginData = {
+const captchaVisible = ref(false);
+const loginLoading = ref(false);
+const pendingLoginData = ref<UserLoginData | null>(null);
+
+const validateBeforeCaptcha = (): boolean => {
+    const data = {
         username: formState.user,
         password: formState.password,
     };
-
-    let checked = true;
-    const require_array: { key: keyof UserLoginData, message: string }[] = [
+    const requireArray: { key: keyof typeof data; message: string }[] = [
         {
             key: 'username',
-            message: '用户名不能为空'
+            message: '用户名不能为空',
         },
         {
-            key: 'password'
-            , message: '密码不能为空'
+            key: 'password',
+            message: '密码不能为空',
+        },
+    ];
+
+    for (const item of requireArray) {
+        if (isNull(data[item.key])) {
+            message.warn(item.message);
+            return false;
         }
-    ]
-    require_array.forEach(item => {
-        data[item.key as keyof UserLoginData]
-        if (isNull(item)) return message.warn(item.message)
-    })
+    }
+    return true;
+};
 
-    if (!checked) return;
+const handleLogin: FormProps['onFinish'] = async () => {
+    if (!validateBeforeCaptcha()) {
+        return;
+    }
 
-    loginApi(data).then(res => {
+    pendingLoginData.value = {
+        username: formState.user,
+        password: formState.password,
+        captcha_token: '',
+    };
+    captchaVisible.value = true;
+};
+
+const handleCaptchaSuccess = async () => {
+    if (!pendingLoginData.value || loginLoading.value) {
+        return;
+    }
+
+    captchaVisible.value = false;
+    loginLoading.value = true;
+    try {
+        const captchaRes = await issueCaptchaToken(pendingLoginData.value.username);
+        const captchaToken = captchaRes.data?.captcha_token || '';
+        if (isNull(captchaToken)) {
+            message.error('验证码凭证获取失败，请重试');
+            return;
+        }
+
+        const res = await loginApi({
+            ...pendingLoginData.value,
+            captcha_token: captchaToken,
+        });
         if (res.code === 200) {
-            AuthService.setToken(res.data?.token || '')
-            router.push({ path: '/' })
+            AuthService.setToken(res.data?.token || '');
+            router.push({ path: '/' });
         }
-    });
+    } finally {
+        loginLoading.value = false;
+        pendingLoginData.value = null;
+    }
+};
 
+const handleCaptchaClose = () => {
+    captchaVisible.value = false;
+    pendingLoginData.value = null;
 };
 
 const handleRegister = () => {

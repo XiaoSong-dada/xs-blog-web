@@ -6,6 +6,12 @@ import type { IPages } from "./http";
 export interface UserLoginData {
     username: string;
     password: string;
+    captcha_token: string;
+}
+
+export interface UserCaptchaTokenData {
+    captcha_token: string;
+    expires_in: number;
 }
 
 // 用户注册数据模型
