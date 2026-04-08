@@ -1,4 +1,4 @@
-import type { ApiResponse, ApiReposeBase } from "@/types/http"
+import type { ApiResponse } from "@/types/http"
 import type { ICommitResult, IDownloadResult, IUplaodFile, IUplaodSession, IUploadGroup, IUploadResult } from "@/types/main"
 import { requestHttp } from "@/utils/http"
 
