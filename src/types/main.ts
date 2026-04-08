@@ -225,6 +225,16 @@ export interface UploadTaskOk {
     errors?: string[]
 } 
 
+export interface IUploadError {
+    file_name: string;
+    error: string;
+}
+
+export interface ICommitResult {
+    success: string[];
+    errors: IUploadError[];
+}
+
 // 下载文件返回类型
 export interface IDownloadResult {
     download_url: string;
