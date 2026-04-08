@@ -103,6 +103,7 @@ export interface IResetPassword {
 export interface IArticle {
     id: string;
     author_id: string;
+    author?: string | null;
     title: string;
     slug: string;
     content_md: string | null;
@@ -168,6 +169,8 @@ export interface ICommentThread {
 // 文章接口
 export interface IArticleSearchList {
     id: string;
+    author_id?: string | null;
+    author?: string | null;
     slug: string;
     title: string;
     snippet: string;
@@ -178,6 +181,7 @@ export interface IArticleSearchList {
     bookmarked?: boolean;
     comment_count?: number;
     published_at: string | null;
+    tags?: ITag[];
     rank: number;
     hit_title: boolean;
     hit_content: boolean;
@@ -205,6 +209,7 @@ export interface IArticleDetailPropos {
 
 // 文章卡片用户介绍行
 export interface IArticleMeta {
+    author?: string | null;
     published_at?: string;
 }
 

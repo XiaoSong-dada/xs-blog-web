@@ -33,6 +33,7 @@ watch(
         if (!val) return;
         detailData.value = val;
         detailData.value.created_at = formatDate(detailData.value.created_at);
+        metaData.value.author = detailData.value.author ?? null;
         metaData.value.published_at = formatDate(detailData.value.published_at as string);
     },
     { immediate: true }

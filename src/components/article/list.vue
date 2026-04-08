@@ -16,7 +16,7 @@
             <p class="meta">
                 <span class="meta__item">
                     <span class="meta__label">作者</span>
-                    <span class="meta__value">小宋</span>
+                    <span class="meta__value">{{ article.author ?? "未知" }}</span>
                 </span>
 
                 <span class="meta__divider">·</span>

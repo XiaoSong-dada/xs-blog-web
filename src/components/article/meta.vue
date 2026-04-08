@@ -2,14 +2,14 @@
     <p class="meta">
         <span class="meta__item">
             <span class="meta__label">作者</span>
-            <span class="meta__value">小宋</span>
+            <span class="meta__value">{{ props.data.author ?? "未知" }}</span>
         </span>
 
         <span class="meta__divider">·</span>
 
         <span class="meta__item">
             <span class="meta__label">发布</span>
-            <time class="meta__value" :datetime="data.published_at ?? ''">
+            <time class="meta__value" :datetime="props.data.published_at ?? ''">
                 {{ props.data.published_at ? formatDate(props.data.published_at, "yyyy/MM/dd") : "未发布" }}
             </time>
         </span>
@@ -17,12 +17,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
 import type { IArticleMeta } from '@/types/main'
 import { formatDate } from '@/utils/date'
 
 const props = defineProps<{ data: IArticleMeta }>()
-const data = ref<IArticleMeta>({})
 
 </script>
 
