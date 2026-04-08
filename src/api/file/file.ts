@@ -1,5 +1,5 @@
 import type { ApiResponse, ApiReposeBase } from "@/types/http"
-import type { IDownloadResult, IUplaodFile, IUplaodSession, IUploadGroup, IUploadResult } from "@/types/main"
+import type { ICommitResult, IDownloadResult, IUplaodFile, IUplaodSession, IUploadGroup, IUploadResult } from "@/types/main"
 import { requestHttp } from "@/utils/http"
 
 export const uploadFile = async (file:File , bucket:string ): Promise<ApiResponse<IUplaodFile>> => {
@@ -28,7 +28,7 @@ export const uploadSession = async (session_id: string, group: IUploadGroup): Pr
     return requestHttp.post(`/file/${session_id}/upload`, formData);
 }
 
-export const commitSession = async (session_id: string): Promise<ApiReposeBase> => {
+export const commitSession = async (session_id: string): Promise<ApiResponse<ICommitResult>> => {
     return requestHttp.post(`/file/${session_id}/commit`)
 }
 

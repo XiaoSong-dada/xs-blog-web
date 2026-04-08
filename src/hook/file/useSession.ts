@@ -72,7 +72,11 @@ export const useSession = () => {
         const concurrency = Math.max(1, opts?.concurrency ?? 3)
         const pool = new ConcurrencyPool(concurrency)
 
-        const total = groups.length
+        const validGroups = groups.filter(
+            (group): group is IUploadGroup => !!group && Array.isArray(group.file_array) && group.file_array.length > 0
+        )
+
+        const total = validGroups.length
         let done = 0
         // 添加进度条：使用数字 percent，避免传 ref 对象导致 [object Object]%
         let percent = 0
@@ -83,7 +87,14 @@ export const useSession = () => {
         })
 
 
-        const tasks = groups.map((group, index) =>
+        if (total === 0) {
+            modalRef.destroy()
+            const emptyResult: IUploadResult = { uploaded: [], errors: ['没有可上传的文件分组'] }
+            upload_result.value = emptyResult
+            return emptyResult
+        }
+
+        const tasks = validGroups.map((group, index) =>
             pool.run(async () => {
                 try {
                     const res: ApiResponse<IUploadResult> = await upload(id, group)
@@ -116,6 +127,10 @@ export const useSession = () => {
         // 汇总
         const result: IUploadResult = { uploaded: [], errors: [] }
         for (const item of settled) {
+            if (!item) {
+                result.errors.push('存在无效上传任务，已跳过')
+                continue
+            }
             if (item.ok) {
                 result.uploaded.push(...(item.data?.uploaded ?? []))
                 if (item.data?.errors?.length) result.errors.push(...item.data.errors)

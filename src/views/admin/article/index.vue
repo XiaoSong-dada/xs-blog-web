@@ -409,8 +409,8 @@ const submitFile = async () => {
     }
     // 测试一下
     if (session.value?.session_id) {
-
-        uploadSession(session.value?.session_id, group_array).then(res => {
+        try {
+            const res = await uploadSession(session.value?.session_id, group_array)
             // 
             const success_array: VNode[] = [];
             res.uploaded?.forEach(item => {
@@ -436,7 +436,9 @@ const submitFile = async () => {
                     overflowX: 'hidden',
                 }
             })
-        })
+        } catch (error: any) {
+            message.error(error?.message ?? '文件上传失败，请稍后重试')
+        }
     }
     else message.warn('未获取session')
 }
@@ -451,14 +453,27 @@ const commitFile = async () => {
         return message.warn('未找到对话')
     }
 
-    const res = await commitSession(sessionId)
-    if (res.code === 200) {
-        message.success('提交成功');
-        fetchList();
-        cancelImport();
-    }
-    else {
-        message.error(`提交失败:${res.message}`)
+    try {
+        const res = await commitSession(sessionId)
+        const successCount = res.data?.success?.length ?? 0
+        const errorCount = res.data?.errors?.length ?? 0
+
+        if (successCount > 0 && errorCount === 0) {
+            message.success(`提交成功，共导入 ${successCount} 篇文章`)
+            fetchList()
+            cancelImport()
+            return
+        }
+
+        if (successCount > 0 && errorCount > 0) {
+            message.warning(`部分成功：导入 ${successCount} 篇，失败 ${errorCount} 篇`)
+            fetchList()
+            return
+        }
+
+        message.error(res.message || '提交失败：未导入任何文章')
+    } catch (error: any) {
+        message.error(error?.response?.data?.message ?? error?.message ?? '提交失败，请稍后重试')
     }
 }
 
