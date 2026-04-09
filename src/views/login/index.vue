@@ -2,7 +2,10 @@
     <div class="login">
         <a-card class="login-container">
             <template #title>
-                <div class="card-title">登录</div>
+                <div class="card-title flex-between">
+                    <span>登录</span>
+                    <a-button @click="handleBack">←返回站点</a-button>
+                </div>
             </template>
             <a-form :model="formState" @finish="handleLogin" @finishFailed="handleFinishFailed">
                 <a-form-item>
@@ -110,6 +113,10 @@ const handleLogin: FormProps['onFinish'] = async () => {
     captchaVisible.value = true;
 };
 
+const handleBack = () => {
+    router.push({ path: '/' });
+};
+
 const handleCaptchaSuccess = async () => {
     if (!pendingLoginData.value || loginLoading.value) {
         return;
@@ -162,7 +169,6 @@ const handleRegister = () => {
 
     .login-container {
         width: 350px;
-        margin-right: 100px;
 
         .card-title {
             width: 100%;
