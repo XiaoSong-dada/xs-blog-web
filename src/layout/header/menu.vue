@@ -35,12 +35,24 @@
             <UserAvatar v-if="isLogin" />
             <LoginButton v-else />
         </div>
+        <a-button
+            v-if="shouldShowFloatingMenuTrigger"
+            class="mobile-layout-menu-trigger"
+            shape="circle"
+            @click="toggleMobileLayoutMenu"
+            aria-label="侧栏菜单"
+        >
+            <template #icon>
+                <MenuFoldOutlined v-if="isMobileLayoutMenuOpen" />
+                <MenuUnfoldOutlined v-else />
+            </template>
+        </a-button>
     </div>
 </template>
 
 <script setup lang="ts">
 import { homeTopMenu } from '@/constants/home.top.menu';
-import { ref, reactive, onMounted, onBeforeUnmount, computed, watch, nextTick } from 'vue';
+import { ref, reactive, onMounted, onBeforeUnmount, computed, watch, nextTick, inject } from 'vue';
 import { Button, InputSearch } from 'ant-design-vue';
 import type { HomeTopMenuItem } from '@/types/main';
 import { useRouter, useRoute } from 'vue-router';
@@ -49,9 +61,10 @@ import LoginButton from '@/components/auth/login.button.vue';
 import UserAvatar from '@/components/auth/user.avatar.vue';
 import useAuthStore from '@/stores/auth';
 import { storeToRefs } from 'pinia';
-import { SearchOutlined } from '@ant-design/icons-vue';
+import { SearchOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons-vue';
 import HeaderSearch from '@/components/header/search.vue'
 import TopTag from '@/components/header/top.tag.vue';
+import { mobileLayoutMenuKey } from '@/layout/common/mobile.layout.menu';
 
 // import userDropDown from '@/components/auth/user.drop.down.vue';
 const authStore = useAuthStore();
@@ -68,6 +81,7 @@ const isMobile = ref(false);
 const isMobileSearchExpanded = ref(false);
 const mobileSearchWrapRef = ref<HTMLElement | null>(null);
 const mobileSearchInputRef = ref<{ focus?: () => void } | null>(null);
+const mobileLayoutMenu = inject(mobileLayoutMenuKey, null);
 
 const MOBILE_BREAKPOINT = 992;
 
@@ -105,11 +119,24 @@ const handleTabChange = (key: string) => {
 }
 
 const openMobileSearch = () => {
+    mobileLayoutMenu?.closeMenu();
     isMobileSearchExpanded.value = true;
     mobileSearchKeyword.value = headerSearch.value;
     nextTick(() => {
         mobileSearchInputRef.value?.focus?.();
     });
+};
+
+const isMobileLayoutMenuOpen = computed(() => {
+    return mobileLayoutMenu?.isMobileMenuOpen.value ?? false;
+});
+
+const shouldShowFloatingMenuTrigger = computed(() => {
+    return isMobile.value && !isMobileSearchExpanded.value && Boolean(mobileLayoutMenu?.isMobileMenuRoute.value);
+});
+
+const toggleMobileLayoutMenu = () => {
+    mobileLayoutMenu?.toggleMenu();
 };
 
 const collapseMobileSearch = () => {
@@ -250,6 +277,15 @@ watch(
         display: none;
     }
 
+    .mobile-layout-menu-trigger {
+        display: none;
+        position: absolute;
+        top: 100%;
+        right: 12px;
+        margin-top: 8px;
+        z-index: 1101;
+    }
+
     // 清除h1默认样式并保留所需外观
     h1 {
         font-size: 16px;
@@ -294,6 +330,12 @@ watch(
             width: 100%;
         }
 
+        .mobile-layout-menu-trigger {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
         :deep(.login-button) {
             width: auto;
             gap: 8px;
@@ -307,6 +349,8 @@ watch(
             width: 40px;
             gap: 0;
         }
+
+
     }
 
 
