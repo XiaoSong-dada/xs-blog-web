@@ -117,9 +117,9 @@ watch(
         display: flex;
         align-items: flex-start;
 
-        width: min(1240px, 100%);
+        width: min(1234px, 100%);
         margin: 0 auto;
-        padding: var($page-padding);
+        padding: var(--page-padding);
         min-height: 100%;
         box-sizing: border-box;
         gap: var(--gap);
@@ -191,6 +191,43 @@ watch(
         .detail-aside--toc {
             left: 10px;
             width: calc(var(--toc-w) - 20px);
+        }
+        .detail-main {
+            margin-left: calc(var(--toc-w) + var(--gap));
+        }
+    }
+
+    @media (max-width: 1024px) {
+        .detail-layout {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .sticky-aside {
+            position: static;
+            top: auto;
+            width: 100%;
+            max-height: none;
+            overflow: visible;
+        }
+
+        .detail-aside,
+        .detail-aside--toc,
+        .detail-main {
+            width: 100%;
+            min-width: 0;
+            flex-basis: auto;
+            margin-left: 0;
+            left: auto;
+        }
+
+        .detail-aside--toc {
+            min-height: auto;
+        }
+
+        .detail-main {
+            min-height: auto;
+            margin-top: 0;
         }
     }
 
