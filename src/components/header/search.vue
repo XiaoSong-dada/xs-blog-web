@@ -16,13 +16,13 @@ import { InputSearch } from 'ant-design-vue';
 const AInputSearch = InputSearch;
 const searchValue = ref<string>('');
 const emit = defineEmits<{
-    (e:"SearchArticle", kw: string): void;
-    (e:"ClearArticle"):void;
+    (e: 'search-article', kw: string): void;
+    (e: 'clear-article'): void;
 }>()
 
 const search = (val: string) => {
     if(val){
-        emit('SearchArticle', val);
+        emit('search-article', val);
     }
 }
 
@@ -30,7 +30,7 @@ watch(
  searchValue,
  (val) => {
     if(!val){
-        emit('ClearArticle')
+        emit('clear-article')
     }
 }
 )

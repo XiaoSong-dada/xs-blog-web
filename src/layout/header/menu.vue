@@ -1,28 +1,47 @@
 <template>
-    <a-tabs class="top-menu" v-model:activeKey="activeKey" type="line" :tabBarGutter="20" @change="handleTabChange">
-        <template #leftExtra>
-            <h1 class="top-menu-logo">小宋小站</h1>
-        </template>
-        <a-tab-pane v-for="item in homeTopMenu" v-model:key="item.key" :tab="item.label" />
-        <template #rightExtra>
-            <header-search @search-article="search" @clear-article="clear"/>
-            <div class="top-right flex-start align-center">
-                <div>
-                </div>
-                <div class="login-status align-center flex-end">
-                    <UserAvatar v-if="isLogin" />
-                    <LoginButton v-else />
-                </div>
-            </div>
+    <div class="header flex-item-center">
+        <div class="header-left" :class="{ 'is-hidden': isMobile && isMobileSearchExpanded }">
+            <h1 class="header-logo">小宋小站</h1>
+            <top-tag class="top-menu" :items="homeTopMenu" :active-key="activeKey" @change="handleTabChange" />
+        </div>
 
-        </template>
-    </a-tabs>
+        <div class="header-center" :class="{ 'is-expanded': isMobile && isMobileSearchExpanded }">
+            <header-search v-if="!isMobile" @search-article="search" @clear-article="clear" />
+
+            <a-button v-else-if="!isMobileSearchExpanded" class="mobile-search-trigger" shape="circle" @click="openMobileSearch" aria-label="搜索">
+                <template #icon>
+                    <SearchOutlined />
+                </template>
+            </a-button>
+
+            <div
+                v-else
+                ref="mobileSearchWrapRef"
+                class="mobile-search-input inline-block"
+                @focusout="handleMobileSearchFocusOut"
+            >
+                <a-input-search
+                    ref="mobileSearchInputRef"
+                    v-model:value="mobileSearchKeyword"
+                    enter-button
+                    allowClear
+                    placeholder="搜索文章内容"
+                    @search="handleMobileSearch"
+                />
+            </div>
+        </div>
+
+        <div class="header-right">
+            <UserAvatar v-if="isLogin" />
+            <LoginButton v-else />
+        </div>
+    </div>
 </template>
 
 <script setup lang="ts">
 import { homeTopMenu } from '@/constants/home.top.menu';
-import { ref, reactive, onMounted, computed, watch } from 'vue';
-import { Tabs, TabPane } from 'ant-design-vue';
+import { ref, reactive, onMounted, onBeforeUnmount, computed, watch, nextTick } from 'vue';
+import { Button, InputSearch } from 'ant-design-vue';
 import type { HomeTopMenuItem } from '@/types/main';
 import { useRouter, useRoute } from 'vue-router';
 import { AuthService } from '@/service/auth.service';
@@ -30,28 +49,53 @@ import LoginButton from '@/components/auth/login.button.vue';
 import UserAvatar from '@/components/auth/user.avatar.vue';
 import useAuthStore from '@/stores/auth';
 import { storeToRefs } from 'pinia';
+import { SearchOutlined } from '@ant-design/icons-vue';
 import HeaderSearch from '@/components/header/search.vue'
+import TopTag from '@/components/header/top.tag.vue';
 
 // import userDropDown from '@/components/auth/user.drop.down.vue';
 const authStore = useAuthStore();
 const { token } = storeToRefs(authStore);
-const ATabs = Tabs;
-const ATabPane = TabPane;
+const AButton = Button;
+const AInputSearch = InputSearch;
 const homeTopMenuMap = reactive(new Map<string, HomeTopMenuItem>());
 const router = useRouter();
 const route = useRoute()
 const activeKey = ref('home');
 const headerSearch = ref<string>('');
+const mobileSearchKeyword = ref('');
+const isMobile = ref(false);
+const isMobileSearchExpanded = ref(false);
+const mobileSearchWrapRef = ref<HTMLElement | null>(null);
+const mobileSearchInputRef = ref<{ focus?: () => void } | null>(null);
+
+const MOBILE_BREAKPOINT = 992;
+
+const updateViewportState = () => {
+    const isCurrentMobile = window.innerWidth < MOBILE_BREAKPOINT;
+    isMobile.value = isCurrentMobile;
+
+    if (!isCurrentMobile) {
+        isMobileSearchExpanded.value = false;
+        mobileSearchKeyword.value = '';
+    }
+};
 
 onMounted(() => {
     homeTopMenu.forEach(item => {
         homeTopMenuMap.set(item.key, item);
     });
     authStore.loadToken();
+    updateViewportState();
+    window.addEventListener('resize', updateViewportState);
 });
 
-const handleTabChange = (key: string | number) => {
-    const item = homeTopMenuMap.get(key as string);
+onBeforeUnmount(() => {
+    window.removeEventListener('resize', updateViewportState);
+});
+
+const handleTabChange = (key: string) => {
+    const item = homeTopMenuMap.get(key);
     if (item){
         if(item.route === '/article' && headerSearch.value){
             return router.push(`/article?kw=${headerSearch.value}&offset=${0}&limit=${10}`)
@@ -59,6 +103,38 @@ const handleTabChange = (key: string | number) => {
         return router.push(item.route);
     }
 }
+
+const openMobileSearch = () => {
+    isMobileSearchExpanded.value = true;
+    mobileSearchKeyword.value = headerSearch.value;
+    nextTick(() => {
+        mobileSearchInputRef.value?.focus?.();
+    });
+};
+
+const collapseMobileSearch = () => {
+    isMobileSearchExpanded.value = false;
+};
+
+const handleMobileSearch = (val: string) => {
+    if (!val) {
+        clear();
+    } else {
+        search(val);
+    }
+    collapseMobileSearch();
+};
+
+const handleMobileSearchFocusOut = (event: FocusEvent) => {
+    if (!isMobile.value || !isMobileSearchExpanded.value) return;
+
+    const nextFocusTarget = event.relatedTarget as Node | null;
+    if (nextFocusTarget && mobileSearchWrapRef.value?.contains(nextFocusTarget)) {
+        return;
+    }
+
+    collapseMobileSearch();
+};
 
 const isLogin = computed(() => {
     if (!token.value) return false;
@@ -68,6 +144,7 @@ const isLogin = computed(() => {
 // 解决菜单项聚焦问题
 const routeToKey = (path: string) => {
     if (path.startsWith('/admin')) return 'admin'
+    if (path.startsWith('/friend-link')) return 'friend-link'
     if (path.startsWith('/article/')) return 'article-detail'
     if (path.startsWith('/article')) return 'article'
     if (path.startsWith('/about')) return 'about'
@@ -83,6 +160,7 @@ const search = (val:string) =>{
 
 const clear = ()=>{
     headerSearch.value = '';
+    mobileSearchKeyword.value = '';
     router.push(`/article`)
 }
 
@@ -93,14 +171,32 @@ watch(
     },
     { immediate: true }
 )
+
+watch(
+    mobileSearchKeyword,
+    (val, oldVal) => {
+        if (isMobile.value && isMobileSearchExpanded.value && oldVal && !val) {
+            clear();
+        }
+    }
+)
 </script>
 
 <style scoped lang="scss">
-.top-menu {
+.header {
+    box-sizing: border-box;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(320px, 520px) auto;
+    align-items: center;
+    column-gap: 16px;
+    border-bottom: 1px solid #f0f0f0;
     &-logo {
-        padding-left: 20px;
+        margin: 0;
         margin-right: 20px;
+        white-space: nowrap;
     }
+
+    padding: 0 10px;
 
     height: $header-h;
     position: sticky;
@@ -108,31 +204,50 @@ watch(
     z-index: 1000;
     background: #fff;
 
-    .top-right {
-        gap: 30px;
-
-        .login-status {
-            height: 40px;
-            padding-right: 20px;
-        }
-
-    }
-
-    :deep(.ant-tabs-nav) {
-        background-color: #fff;
-        margin-bottom: 0;
+    .header-left {
+        min-width: 0;
+        display: flex;
+        align-items: center;
+        overflow: hidden;
         height: $header-h;
-        position: relative;
+
+        &.is-hidden {
+            width: 0;
+            opacity: 0;
+            margin: 0;
+            pointer-events: none;
+            display: none;
+        }
     }
 
-    :deep(.top-menu-search) {
-        position: absolute;
-        left: clamp(500px, 50%, 50%);
-        top: 50%;
-        transform: translate(-50%, -50%);
-        width: 500px;
-        min-width: 200px;
-        max-width: calc(100vw - 320px);
+    .top-menu {
+        min-width: 0;
+        flex: 1;
+        height: 100%;
+        display: flex;
+        width: 150px;
+        align-items: stretch;
+    }
+
+    .header-center {
+        min-width: 0;
+        width: 100%;
+    }
+
+    .header-right {
+        justify-self: end;
+        display: flex;
+        align-items: center;
+        min-width: max-content;
+        flex-shrink: 0;
+    }
+
+    .mobile-search-trigger {
+        display: none;
+    }
+
+    .mobile-search-input {
+        display: none;
     }
 
     // 清除h1默认样式并保留所需外观
@@ -140,6 +255,60 @@ watch(
         font-size: 16px;
         font-weight: normal;
     }
+
+    @media (max-width: 992px) {
+        grid-template-columns: minmax(0, 1fr) auto auto;
+        column-gap: 8px;
+        padding-bottom: 0;
+        .header-center {
+            width: auto;
+            justify-self: end;
+            grid-column: 2;
+
+            &.is-expanded {
+                width: 100%;
+                grid-column: 1 / 3;
+            }
+        }
+
+        .header-right {
+            grid-column: 3;
+        }
+
+        .header-left {
+            transition: width 0.25s ease, opacity 0.25s ease;
+        }
+
+        .top-menu {
+            overflow: hidden;
+        }
+
+        .mobile-search-trigger {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .mobile-search-input {
+            display: block;
+            width: 100%;
+        }
+
+        :deep(.login-button) {
+            width: auto;
+            gap: 8px;
+        }
+
+        :deep(.login-button .ant-btn) {
+            padding-inline: 10px;
+        }
+
+        :deep(.user-avatar) {
+            width: 40px;
+            gap: 0;
+        }
+    }
+
 
 }
 </style>

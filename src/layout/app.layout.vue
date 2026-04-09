@@ -58,12 +58,13 @@ const isNeedPadding = computed(() => {
 
 <style scoped lang="scss">
 .app-layout {
-  min-height: 100%;
   display: flex;
   flex-direction: column;
+  min-height: 100vh;
 
   .main-content {
     flex: 1;
+    overflow: auto;
 
     &.admin-layout {
       padding-top: 0;

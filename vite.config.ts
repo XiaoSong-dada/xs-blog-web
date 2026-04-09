@@ -42,6 +42,7 @@ export default defineConfig(({ mode }) => {
         @use "@/style/flex.scss" as *;
         @use "@/style/layout.scss" as *;
         @use "@/style/variable.scss" as *;
+        @use "@/style/display.scss" as *;
         `
       }
     }
