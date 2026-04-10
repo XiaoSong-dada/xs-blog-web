@@ -37,4 +37,8 @@ watch(
 
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.top-menu-search {
+    width: 512px;
+}
+</style>

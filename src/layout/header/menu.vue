@@ -5,8 +5,8 @@
             <top-tag class="top-menu" :items="homeTopMenu" :active-key="activeKey" @change="handleTabChange" />
         </div>
 
-        <div class="header-center" :class="{ 'is-expanded': isMobile && isMobileSearchExpanded }">
-            <header-search v-if="!isMobile" @search-article="search" @clear-article="clear" />
+        <div class="header-center flex-center" :class="{ 'is-expanded': isMobile && isMobileSearchExpanded }">
+            <header-search class="header-search" v-if="!isMobile" @search-article="search" @clear-article="clear" />
 
             <a-button v-else-if="!isMobileSearchExpanded" class="mobile-search-trigger" shape="circle" @click="openMobileSearch" aria-label="搜索">
                 <template #icon>
@@ -213,7 +213,7 @@ watch(
 .header {
     box-sizing: border-box;
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(320px, 520px) auto;
+    grid-template-columns: auto 1fr auto;
     align-items: center;
     column-gap: 16px;
     border-bottom: 1px solid #f0f0f0;
@@ -249,7 +249,7 @@ watch(
 
     .top-menu {
         min-width: 0;
-        flex: 1;
+        flex: 0 0 150px;
         height: 100%;
         display: flex;
         width: 150px;
@@ -258,7 +258,26 @@ watch(
 
     .header-center {
         min-width: 0;
+        width: auto;
+        display: flex;
+        justify-content: center;
+        justify-self: center;
+    }
+
+    .header-center :deep(.ant-input-search) {
         width: 100%;
+        max-width: 100%;
+    }
+
+    .header-search {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 512px;
+        max-width: 512px;
+        z-index: 1200;
+        pointer-events: auto;
     }
 
     .header-right {
@@ -297,6 +316,8 @@ watch(
         column-gap: 8px;
         padding-bottom: 0;
         .header-center {
+            position: static;
+            min-width: 0;
             width: auto;
             justify-self: end;
             grid-column: 2;
@@ -305,6 +326,13 @@ watch(
                 width: 100%;
                 grid-column: 1 / 3;
             }
+        }
+
+        .header-search {
+            position: static;
+            transform: none;
+            width: 100%;
+            max-width: none;
         }
 
         .header-right {
