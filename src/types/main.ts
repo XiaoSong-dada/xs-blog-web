@@ -331,3 +331,24 @@ export interface ITagForm {
     name: string;
     slug: string;
 }
+
+// AI 聊天相关类型
+export interface ChatMessage {
+    role: 'user' | 'assistant';
+    content: string;
+}
+
+export interface DeepSeekConfig {
+    api_key: string;
+    base_url: string;
+    model: string;
+}
+
+export interface AIChatRequest {
+    messages: ChatMessage[];
+    config: DeepSeekConfig;
+}
+
+export interface AIChatResponse {
+    reply: string;
+}

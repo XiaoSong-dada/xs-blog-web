@@ -7,7 +7,9 @@
         <p class="me-layout-title">
             {{title}}
         </p>
-      <router-view />
+      <div class="me-content-body">
+        <router-view />
+      </div>
     </a-layout-content>
   </a-layout>
 </template>
@@ -50,6 +52,9 @@ const selected = (item: any) => {
   &-content {
     padding: 0 40px;
     background: #fff;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 
     &--full {
       width: 100%;
@@ -62,6 +67,13 @@ const selected = (item: any) => {
     margin-bottom: 20px;
     font-size:20px;
     font-weight: 500;
+    flex-shrink: 0;
+  }
+
+  &-body {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
   }
 
   @media (max-width: 992px) {
