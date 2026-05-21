@@ -3,4 +3,5 @@ export const meMenu: CenterMenuItem[] = [
   { key: 'bookmark', label: '我的收藏' , route: 'bookmark' },
   { key: 'base', label: '基础设置', route: 'base' },
   { key: 'security', label: '安全设置' , route: 'security' },
+  { key: 'ai-test', label: 'AI 测试', route: 'ai-test' },
 ]

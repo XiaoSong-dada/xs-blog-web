@@ -59,6 +59,7 @@ export const routes = [
                     { path: "base", name: "MeBase", component: () => import("@/views/me/base.vue") },
                     { path: "security", name: "MeSecurity", component: () => import("@/views/me/security.vue"), },
                     { path: "bookmark", name: "MeBookmark", component: () => import("@/views/me/bookmark.vue") },
+                    { path: "ai-test", name: "MeAITest", component: () => import("@/views/me/ai-test.vue") },
                 ]
             },
             {
